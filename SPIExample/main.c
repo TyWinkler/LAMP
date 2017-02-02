@@ -156,7 +156,7 @@ void main(){
     LPD8806Init();
 
     setPixel(0,colorHex(0xFF0000));
-    setPixel(1,color(255,255,255));
+    setPixel(1,color(255,0,255));
     setPixel(2,red);
     setPixel(3,blue);
     display();
