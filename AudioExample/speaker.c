@@ -64,6 +64,7 @@ extern tUDPSocket g_UdpSock;
 int g_iReceiveCount =0;
 int g_iRetVal =0;
 int iCount =0;
+unsigned char *p;
 
 #define USERFILE        "trance.wav"
 unsigned char pBuffer[100];
@@ -123,6 +124,8 @@ void readFile(){
         f_read(&fp,pBuffer,100,&Size);
         Report("Read : %d Bytes\n\n\r",Size);
         Report("%s",pBuffer);
+        p = pBuffer;
+        p += 62;
     }
     else
     {
@@ -166,7 +169,7 @@ void Speaker( void *pvParameters )
 
         if( Size > 0)
         {
-          iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
+          iRetVal = FillBuffer(pRxBuffer,(unsigned char*)p, Size);
           if(iRetVal < 0)
           {
             UART_PRINT("Unable to fill buffer");

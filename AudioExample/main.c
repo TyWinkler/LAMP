@@ -314,33 +314,33 @@ int main()
         LOOP_FOREVER();
     }
 
-    RecordPlay = I2S_MODE_RX_TX;
-    g_loopback = 1;
+    RecordPlay = I2S_MODE_RX;
+    //g_loopback = 1;
 
 
     //
     // Create RX and TX Buffer
     //
-    if(RecordPlay == I2S_MODE_RX_TX)
-    {
-        pRecordBuffer = CreateCircularBuffer(RECORD_BUFFER_SIZE);
-        if(pRecordBuffer == NULL)
-        {
-            UART_PRINT("Unable to Allocate Memory for Tx Buffer\n\r");
-            LOOP_FOREVER();
-        }
-    }
+    //if(RecordPlay == I2S_MODE_RX_TX)
+    //{
+    //    pRecordBuffer = CreateCircularBuffer(RECORD_BUFFER_SIZE);
+    //    if(pRecordBuffer == NULL)
+    //    {
+    //        UART_PRINT("Unable to Allocate Memory for Tx Buffer\n\r");
+    //        LOOP_FOREVER();
+    //    }
+    //}
 
     /* Play */
-    if(RecordPlay & I2S_MODE_TX)
-    {
+    //if(RecordPlay & I2S_MODE_TX)
+    //{
         pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
         if(pRxBuffer == NULL)
         {
             UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
             LOOP_FOREVER();
         }
-    }
+    //}
 
 
     //
@@ -349,7 +349,7 @@ int main()
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, 16000,
                       AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL,
-                      AUDIO_CODEC_MIC_ALL);
+                      AUDIO_CODEC_MIC_NONE);
 
     AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
     AudioCodecMicVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
@@ -387,11 +387,11 @@ int main()
     // Initialize the DMA Module
     //    
     UDMAInit();
-    if(RecordPlay & I2S_MODE_TX)
-    {
+    //if(RecordPlay & I2S_MODE_TX)
+    //{
        UDMAChannelSelect(UDMA_CH5_I2S_TX, NULL);
         SetupPingPongDMATransferRx(pRxBuffer);
-    }
+    //}
     //if(RecordPlay == I2S_MODE_RX_TX)
     //{
     //    UDMAChannelSelect(UDMA_CH4_I2S_RX, NULL);
@@ -418,23 +418,23 @@ int main()
     //
     // Start the simplelink thread
     //
-    lRetVal = VStartSimpleLinkSpawnTask(9);  
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+    //lRetVal = VStartSimpleLinkSpawnTask(9);
+    //if(lRetVal < 0)
+    //{
+    //    ERR_PRINT(lRetVal);
+    //    LOOP_FOREVER();
+    //}
 
 
     //
     // Start the Network Task
     //
-    lRetVal = osi_TaskCreate( Network, (signed char*)"NetworkTask",\OSI_STACK_SIZE, NULL, 1, &g_NetworkTask );
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+    //lRetVal = osi_TaskCreate( Network, (signed char*)"NetworkTask",\OSI_STACK_SIZE, NULL, 1, &g_NetworkTask );
+    //if(lRetVal < 0)
+    //{
+    //    ERR_PRINT(lRetVal);
+    //    LOOP_FOREVER();
+    //}
 
     //
     // Start the Control Task
