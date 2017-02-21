@@ -64,10 +64,11 @@ extern tUDPSocket g_UdpSock;
 int g_iReceiveCount =0;
 int g_iRetVal =0;
 int iCount =0;
-unsigned char *p;
+//unsigned char *p;
 
 #define USERFILE        "trance.wav"
-unsigned char pBuffer[100];
+#define BUFFSIZE 1024
+unsigned char pBuffer[BUFFSIZE];
 
 FIL fp;
 FATFS fs;
@@ -79,7 +80,7 @@ extern unsigned long  g_ulStatus;
 extern unsigned char g_ucSpkrStartFlag;
 extern unsigned char g_uiPlayWaterMark;
 extern unsigned char g_loopback;
-unsigned char speaker_data[16*1024];
+//unsigned char speaker_data[16*1024];
 extern tCircularBuffer *pRxBuffer;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -116,16 +117,15 @@ ListDirectory()
 void openFile(){
     Message("\n\rReading user file...\n\r");
     res = f_open(&fp,USERFILE,FA_READ);
+    f_lseek(&fp,44);
 }
 
 void readFile(){
     if(res == FR_OK)
     {
-        f_read(&fp,pBuffer,100,&Size);
+        f_read(&fp,pBuffer,BUFFSIZE,&Size);
         Report("Read : %d Bytes\n\n\r",Size);
         Report("%s",pBuffer);
-        p = pBuffer;
-        p += 62;
     }
     else
     {
@@ -169,7 +169,7 @@ void Speaker( void *pvParameters )
 
         if( Size > 0)
         {
-          iRetVal = FillBuffer(pRxBuffer,(unsigned char*)p, Size);
+          iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
           if(iRetVal < 0)
           {
             UART_PRINT("Unable to fill buffer");

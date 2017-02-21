@@ -100,6 +100,7 @@
 
 #define APPLICATION_VERSION     "1.1.1"
 #define OSI_STACK_SIZE          1024
+#define SAMPLERATE              16000
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -314,7 +315,7 @@ int main()
         LOOP_FOREVER();
     }
 
-    RecordPlay = I2S_MODE_RX;
+    RecordPlay = I2S_MODE_TX;
     //g_loopback = 1;
 
 
@@ -332,50 +333,26 @@ int main()
     //}
 
     /* Play */
-    //if(RecordPlay & I2S_MODE_TX)
-    //{
+    if(RecordPlay & I2S_MODE_TX)
+    {
         pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
         if(pRxBuffer == NULL)
         {
             UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
             LOOP_FOREVER();
         }
-    //}
+    }
 
 
     //
     // Configure Audio Codec
     //     
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
-    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, 16000,
+    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE,
                       AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL,
                       AUDIO_CODEC_MIC_NONE);
 
     AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
-    AudioCodecMicVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
-
-
-    GPIO_IF_LedConfigure(LED2|LED3);
-
-    GPIO_IF_LedOff(MCU_RED_LED_GPIO);
-    GPIO_IF_LedOff(MCU_GREEN_LED_GPIO);    
-
-    //
-    // Configure PIN_01 for GPIOOutput
-    //
-    //MAP_PinTypeGPIO(PIN_01, PIN_MODE_0, false);
-    // MAP_GPIODirModeSet(GPIOA1_BASE, 0x4, GPIO_DIR_MODE_OUT);
-
-    //
-    // Configure PIN_02 for GPIOOutput
-    //
-    //MAP_PinTypeGPIO(PIN_02, PIN_MODE_0, false);
-    // MAP_GPIODirModeSet(GPIOA1_BASE, 0x8, GPIO_DIR_MODE_OUT);
-
-
-    //Turning off Green,Orange LED after i2c writes completed - First Time
-    GPIO_IF_LedOff(MCU_GREEN_LED_GPIO);
-    GPIO_IF_LedOff(MCU_ORANGE_LED_GPIO);
 
     //
     // Initialize the Audio(I2S) Module
@@ -387,11 +364,11 @@ int main()
     // Initialize the DMA Module
     //    
     UDMAInit();
-    //if(RecordPlay & I2S_MODE_TX)
-    //{
+    if(RecordPlay & I2S_MODE_TX)
+    {
        UDMAChannelSelect(UDMA_CH5_I2S_TX, NULL);
         SetupPingPongDMATransferRx(pRxBuffer);
-    //}
+    }
     //if(RecordPlay == I2S_MODE_RX_TX)
     //{
     //    UDMAChannelSelect(UDMA_CH4_I2S_RX, NULL);
@@ -408,7 +385,7 @@ int main()
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }    
-    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, 16000, AUDIO_CODEC_STEREO, RecordPlay, 1);
+    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, RecordPlay, 1);
 
     //
     // Start Audio Tx/Rx
