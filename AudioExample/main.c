@@ -101,6 +101,7 @@
 #define APPLICATION_VERSION     "1.1.1"
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              16000
+#define CHANNELS                AUDIO_CODEC_STEREO
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -349,7 +350,7 @@ int main()
     //     
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE,
-                      AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL,
+                     CHANNELS, AUDIO_CODEC_SPEAKER_ALL,
                       AUDIO_CODEC_MIC_NONE);
 
     AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
@@ -385,7 +386,7 @@ int main()
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }    
-    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, RecordPlay, 1);
+    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, CHANNELS, RecordPlay, 1);
 
     //
     // Start Audio Tx/Rx

@@ -133,23 +133,33 @@ int AudioCodecConfig(unsigned char codecId, unsigned char bitsPerSample, unsigne
         }
 
         bitClk = bitsPerSample * bitRate * noOfChannels;
-        if(bitClk == 512000)
+        if(bitClk == bitsPerSample * noOfChannels * bitRate)
         {
             AudioCodecPageSelect(TI3254_PAGE_0);
 
             AudioCodecRegWrite(TI3254_CLK_MUX_REG, 0x03);		// PLL Clock is CODEC_CLKIN
             AudioCodecRegWrite(TI3254_CLK_PLL_P_R_REG, 0x94);	// PLL is powered up, P=1, R=4
-            AudioCodecRegWrite(TI3254_CLK_PLL_J_REG, 0x2A);		// J=42
-            AudioCodecRegWrite(TI3254_CLK_PLL_D_MSB_REG, 0x00);	// D = 0
-
-            AudioCodecRegWrite(TI3254_CLK_NDAC_REG, 0x8E);		// NDAC divider powered up, NDAC = 14
-            AudioCodecRegWrite(TI3254_CLK_MDAC_REG, 0x81);		// MDAC divider powered up, MDAC = 1
-            AudioCodecRegWrite(TI3254_DAC_OSR_MSB_REG, 0x01);	// DOSR = 0x0180 = 384
-            AudioCodecRegWrite(TI3254_DAC_OSR_LSB_REG, 0x80);	// DOSR = 0x0180 = 384
-
-            AudioCodecRegWrite(TI3254_CLK_NADC_REG, 0x95);    	// NADC divider powered up, NADC = 21
+            AudioCodecRegWrite(TI3254_CLK_PLL_J_REG, 0x2A);     // J=42
+            AudioCodecRegWrite(TI3254_CLK_PLL_D_MSB_REG, 0x00); // D = 0
+            AudioCodecRegWrite(TI3254_CLK_NDAC_REG, 0x8E);      // NDAC divider powered up, NDAC = 14
+            AudioCodecRegWrite(TI3254_CLK_MDAC_REG, 0x81);      // MDAC divider powered up, MDAC = 1
+            AudioCodecRegWrite(TI3254_DAC_OSR_MSB_REG, 0x01);   // DOSR = 0x0180 = 384
+            AudioCodecRegWrite(TI3254_DAC_OSR_LSB_REG, 0x80);   // DOSR = 0x0180 = 384
+            AudioCodecRegWrite(TI3254_CLK_NADC_REG, 0x95);      // NADC divider powered up, NADC = 21
             AudioCodecRegWrite(TI3254_CLK_MADC_REG, 0x82);      // MADC divider powered up, MADC = 2
-            AudioCodecRegWrite(TI3254_ADC_OSR_REG, 0x80);    	// AOSR = 128 ((Use with PRB_R1 to PRB_R6, ADC Filter Type A)
+            AudioCodecRegWrite(TI3254_ADC_OSR_REG, 0x80);     // AOSR = 128 ((Use with PRB_R1 to PRB_R6, ADC Filter Type A)
+
+//            AudioCodecRegWrite(TI3254_CLK_MUX_REG, 0x04);     // PLL Clock
+//            AudioCodecRegWrite(TI3254_CLK_PLL_P_R_REG, 0x05);   // P, R
+//            AudioCodecRegWrite(TI3254_CLK_PLL_J_REG, 0x06);		// J
+//            AudioCodecRegWrite(TI3254_CLK_PLL_D_MSB_REG, 0x07);	// D
+//            AudioCodecRegWrite(TI3254_CLK_NDAC_REG, 0x0B);		// NDAC
+//            AudioCodecRegWrite(TI3254_CLK_MDAC_REG, 0x0C);		// MDAC
+//            AudioCodecRegWrite(TI3254_DAC_OSR_MSB_REG, 0x0D);	// DOSR
+//            AudioCodecRegWrite(TI3254_DAC_OSR_LSB_REG, 0x0E);	// DOSR
+//            AudioCodecRegWrite(TI3254_CLK_NADC_REG, 0x12);    	// NADC
+//            AudioCodecRegWrite(TI3254_CLK_MADC_REG, 0x13);      // MADC
+//            AudioCodecRegWrite(TI3254_ADC_OSR_REG, 0x14);    	// AOSR
         }
         else
         {
