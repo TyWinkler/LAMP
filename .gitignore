@@ -33,3 +33,5 @@
 
 # Misc Files
 *.d
+AudioExample/UniCast/makefile
+*.mk
