@@ -35,3 +35,11 @@
 *.d
 AudioExample/UniCast/makefile
 *.mk
+*.d
+*.obj
+AudioExample/UniCast/makefile
+*.mk
+*.bin
+*.map
+*.out
+*.xml
