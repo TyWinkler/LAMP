@@ -43,3 +43,6 @@ AudioExample/UniCast/makefile
 *.map
 *.out
 *.xml
+*.prefs
+*.bin
+*.opt
