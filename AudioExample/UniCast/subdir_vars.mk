@@ -10,29 +10,31 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../audiocodec.c \
+../blah.c \
 ../circ_buff.c \
 ../control.c \
 ../diskio.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/gpio_if.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2c_if.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2s_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/gpio_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2c_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2s_if.c \
 ../main.c \
 ../microphone.c \
 ../network.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/network_common.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/network_common.c \
 ../pcm_handler.c \
 ../pinmux.c \
 ../sFileRW.c \
 ../smartconfig.c \
 ../speaker.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/startup_ccs.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/timer_if.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/uart_if.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/udma_if.c \
-C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/wdt_if.c 
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/startup_ccs.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/timer_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/uart_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/udma_if.c \
+C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/wdt_if.c 
 
 C_DEPS += \
 ./audiocodec.d \
+./blah.d \
 ./circ_buff.d \
 ./control.d \
 ./diskio.d \
@@ -56,6 +58,7 @@ C_DEPS += \
 
 OBJS += \
 ./audiocodec.obj \
+./blah.obj \
 ./circ_buff.obj \
 ./control.obj \
 ./diskio.obj \
@@ -79,6 +82,7 @@ OBJS += \
 
 OBJS__QUOTED += \
 "audiocodec.obj" \
+"blah.obj" \
 "circ_buff.obj" \
 "control.obj" \
 "diskio.obj" \
@@ -102,6 +106,7 @@ OBJS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "audiocodec.d" \
+"blah.d" \
 "circ_buff.d" \
 "control.d" \
 "diskio.d" \
@@ -125,25 +130,26 @@ C_DEPS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../audiocodec.c" \
+"../blah.c" \
 "../circ_buff.c" \
 "../control.c" \
 "../diskio.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/gpio_if.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2c_if.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2s_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/gpio_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2c_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/i2s_if.c" \
 "../main.c" \
 "../microphone.c" \
 "../network.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/network_common.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/network_common.c" \
 "../pcm_handler.c" \
 "../pinmux.c" \
 "../sFileRW.c" \
 "../smartconfig.c" \
 "../speaker.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/startup_ccs.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/timer_if.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/uart_if.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/udma_if.c" \
-"C:/ti/CC3200SDK_1.2.0/cc3200-sdk/example/common/wdt_if.c" 
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/startup_ccs.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/timer_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/uart_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/udma_if.c" \
+"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/example/common/wdt_if.c" 
 
 

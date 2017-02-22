@@ -100,7 +100,7 @@
 
 #define APPLICATION_VERSION     "1.1.1"
 #define OSI_STACK_SIZE          1024
-#define SAMPLERATE              16000
+#define SAMPLERATE              44100
 #define CHANNELS                AUDIO_CODEC_STEREO
 
 //*****************************************************************************
@@ -349,11 +349,11 @@ int main()
     // Configure Audio Codec
     //     
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
-    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE,
+    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, 0,
                      CHANNELS, AUDIO_CODEC_SPEAKER_ALL,
                       AUDIO_CODEC_MIC_NONE);
 
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 70);
 
     //
     // Initialize the Audio(I2S) Module
