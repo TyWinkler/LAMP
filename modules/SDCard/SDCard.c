@@ -21,11 +21,21 @@
 //
 //*****************************************************************************
 
+// Hardware & driverlib library includes
 #include <string.h>
+#include "rom.h"
+#include "rom_map.h"
+#include "utils.h"
+#include "hw_ints.h"
+#include "common.h"
+#include "uart_if.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 #include "hw_common_reg.h"
 #include "ff.h"
+#include "sdhost.h"
+#include "pin.h"
+#include "prcm.h"
 
 // Global Variables
 FIL fp;
@@ -35,6 +45,7 @@ DIR dir;
 UINT Size;
 
 #define BUFFSIZE 100
+char pBuffer[BUFFSIZE];
 char File[];
 char Directory[] = "/";
 
@@ -48,7 +59,7 @@ char Directory[] = "/";
 //! \return None.
 //
 //*****************************************************************************
-static void sdCardInit(){
+void sdCardInit(){
     MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);                 // Set the SD card clock as output pin
     MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
     MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
@@ -58,15 +69,15 @@ static void sdCardInit(){
     MAP_SDHostSetExpClk(SDHOST_BASE,MAP_PRCMPeripheralClockGet(PRCM_SDHOST),15000000); // Configure card clock
 }
 
-static void setFile(char file[]){
-    File = file;
+void setFile(char file[]){
+    strcpy(File, file);
 }
 
-static void setDirectoryPath(char directoryPath[]){
-    Directory = directoryPath;
+void setDirectoryPath(char directoryPath[]){
+    strcpy(Directory, directoryPath);
 }
 
-static void openDirectory(){
+void openDirectory(){
     res = f_opendir(&dir,Directory);
     if( res == FR_OK){
         Message("Opening root directory.................... [ok]\n\n\r");
@@ -77,7 +88,7 @@ static void openDirectory(){
     }
 }
 
-static void ListDirectory(){
+void ListDirectory(){
     FILINFO fno;
     FRESULT res;
     unsigned long ulSize;
@@ -93,24 +104,24 @@ static void ListDirectory(){
             ulSize = ulSize/1024;
             bIsInKB = true;
         }
-        Report("->%-15s%5d %-2s    %-5s\n\r",fno.fname,ulSize,\(bIsInKB == true)?"KB":"B",(fno.fattrib&AM_DIR)?"Dir":"File");
+        Report("->%-15s%5d %-2s    %-5s\n\r",fno.fname,ulSize, (bIsInKB == true)?"KB":"B",(fno.fattrib&AM_DIR)?"Dir":"File");
     }
 }
 
-static void mountFile(){
+void mountFile(){
     f_mount(&fs,"0",1);
 }
 
-static void openFile(){
+void openFile(){
     Message("\n\rOpening user file...\n\r");
     res = f_open(&fp,File,FA_READ);
 }
 
-static void removeWavHeader(){
+void removeWavHeader(){
     f_lseek(&fp,44);
 }
 
-static unsigned char readFile(){
+char* readFile(){
     if(res == FR_OK){
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
         Report("Read : %d Bytes\n\n\r",Size);
@@ -121,11 +132,11 @@ static unsigned char readFile(){
     return pBuffer;
 }
 
-static void closeFile(){
+void closeFile(){
     f_close(&fp);
 }
 
-static void createFile(char fileName[], char fileText){
+void createFile(char fileName[], char *fileText){
     res = f_open(&fp,fileName,FA_CREATE_ALWAYS|FA_WRITE);
     if(res == FR_OK){
         f_write(&fp,fileText,sizeof(fileText),&Size);
@@ -136,7 +147,7 @@ static void createFile(char fileName[], char fileText){
     }
 }
 
-static UINT getSize(){
+UINT getSize(){
     return Size;
 }
 
