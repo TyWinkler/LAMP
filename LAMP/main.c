@@ -1,59 +1,27 @@
 //*****************************************************************************
 //
-// Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
-// 
-// 
-//  Redistribution and use in source and binary forms, with or without 
-//  modification, are permitted provided that the following conditions 
-//  are met:
+// Application Name     -   LAMP
+// Application Overview -   This is the Light and Music Project by group 15 of
+//                          the University of Texas Senior Design. LAMP is a
+//                          alarm clock like device that utilize both LEDs and
+//                          speakers to simulate a rising sun. The application
+//                          is paired with an android or iphone app that will
+//                          allow users to configure their LAMP as they see fit.
+//                          in addition to the alarm functionality the device
+//                          will function as a general atmosphere device by
+//                          changing the devices light patterns and music.
 //
-//    Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer.
+// Application Details  -   https://github.com/TyWinkler/LAMP/tree/master/LAMP
+// Devices Used         -   MCU:            CC3200
+//                      -   LED Strip:      LPD8806
+//                      -   SDCard Reader:  SparkFun SD/MMC Card Breakout
+//                      -   LCD Screen:     Ili9341
+//                      -   Audio:          TI SimpleLink Wi-Fi CC3200 Audio BoosterPack
 //
-//    Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the 
-//    documentation and/or other materials provided with the   
-//    distribution.
-//
-//    Neither the name of Texas Instruments Incorporated nor the names of
-//    its contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-//  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-//  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-//  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-//  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Application Version  -   0.0.1
 //
 //*****************************************************************************
 
-
-//*****************************************************************************
-//
-// Application Name     -   Wifi Audio Application
-// Application Overview -   This is a sample application demonstrating 
-//                          Bi-directional audio transfer.Audio is streamed
-//                          from one LP and rendered on another LP over wifi. 
-//
-// Application Details  -
-// http://processors.wiki.ti.com/index.php/CC32xx_Wifi_Audio_Application
-// or
-// doc\examples\CC32xx Wifi Audio Application.pdf
-//
-//*****************************************************************************
-
-//****************************************************************************
-//
-//! \addtogroup wifi_audio_app
-//! @{
-//
-//****************************************************************************
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,8 +53,6 @@
 #include "uart_if.h"
 #include "i2c_if.h"
 
-
-
 //App include
 #include "pinmux.h"
 #include "network.h"
@@ -96,23 +62,21 @@
 #include "i2s_if.h"
 #include "pcm_handler.h"
 
+//SDCard reader
 #include "sdhost.h"
-
-#define APPLICATION_VERSION     "1.1.1"
-#define OSI_STACK_SIZE          1024
-#define SAMPLERATE              16000
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
-tCircularBuffer *pRecordBuffer;
 tCircularBuffer *pRxBuffer;
 tUDPSocket g_UdpSock;
 OsiTaskHandle g_SpeakerTask = NULL ;
-OsiTaskHandle g_MicTask = NULL ;
 OsiTaskHandle g_NetworkTask = NULL ;
 
-unsigned char g_loopback=1;
+#define OSI_STACK_SIZE          1024
+#define SAMPLERATE              44100
+
+unsigned char g_loopback = 1;
 
 #if defined(ccs)
 extern void (* const g_pfnVectors[])(void);
@@ -129,8 +93,7 @@ extern uVectorEntry __vector_table;
 //                    FUNCTION DECLARATIONS
 //******************************************************************************
 extern void Speaker( void *pvParameters );
-extern void Microphone( void *pvParameters );
-extern void Network( void *pvParameters );
+//extern void Network( void *pvParameters );
 
 //*****************************************************************************
 //
@@ -142,10 +105,7 @@ extern void Network( void *pvParameters );
 //! \return none
 //!
 //*****************************************************************************
-void
-vApplicationTickHook( void )
-{
-}
+void vApplicationTickHook( void ){}
 
 //*****************************************************************************
 //
@@ -156,13 +116,8 @@ vApplicationTickHook( void )
 //! \return none
 //!
 //*****************************************************************************
-void
-vAssertCalled( const char *pcFile, unsigned long ulLine )
-{
-    while(1)
-    {
-
-    }
+void vAssertCalled( const char *pcFile, unsigned long ulLine ){
+    while(1){}
 }
 
 //*****************************************************************************
@@ -174,11 +129,7 @@ vAssertCalled( const char *pcFile, unsigned long ulLine )
 //! \return none
 //!
 //*****************************************************************************
-void
-vApplicationIdleHook( void )
-{
-
-}
+void vApplicationIdleHook( void ){}
 
 //*****************************************************************************
 //
@@ -190,21 +141,14 @@ vApplicationIdleHook( void )
 //! \return none
 //!
 //*****************************************************************************
-void
-vApplicationStackOverflowHook( OsiTaskHandle *pxTask, signed char *pcTaskName)
-{
+void vApplicationStackOverflowHook( OsiTaskHandle *pxTask, signed char *pcTaskName){
     ( void ) pxTask;
     ( void ) pcTaskName;
-
     for( ;; );
 }
 
-void vApplicationMallocFailedHook()
-{
-    while(1)
-    {
-        // Infinite loop;
-    }
+void vApplicationMallocFailedHook(){
+    while(1){}
 }
 
 //*****************************************************************************
@@ -216,14 +160,10 @@ void vApplicationMallocFailedHook()
 //! \return None
 //
 //*****************************************************************************
-void
-BoardInit(void)
-{
+void BoardInit(void){
     /* In case of TI-RTOS vector table is initialize by OS itself */
 #ifndef USE_TIRTOS
-    //
     // Set vector table base
-    //
 #if defined(ccs)
     MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
 #endif
@@ -231,108 +171,48 @@ BoardInit(void)
     MAP_IntVTableBaseSet((unsigned long)&__vector_table);
 #endif
 #endif
-    //
     // Enable Processor
-    //
     MAP_IntMasterEnable();
     MAP_IntEnable(FAULT_SYSTICK);
-
     PRCMCC3200MCUInit();
 }
+
 //******************************************************************************
 //                            MAIN FUNCTION
 //******************************************************************************
-int main()
-{   
+int main(){
     long lRetVal = -1;
     unsigned char	RecordPlay;
 
     BoardInit();
 
-    //
-    // Pinmux Configuration
-    //
-    PinMuxConfig();
+    PinMuxConfig(); // Pinmux Configuration
 
     //SDCARD
-    //
-    // Set the SD card clock as output pin
-    //
-    MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
+    MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
+    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
+    MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
 
-    //
-    // Enable Pull up on data
-    //
-    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-
-    //
-    // Enable Pull up on CMD
-    //
-    MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-    //SDCARD
-
-    //
-    // Initialising the UART terminal
-    //
-    InitTerm();
-
-    //
-    // Clearing the Terminal.
-    //
-    ClearTerm();
+    InitTerm(); // Initialising the UART terminal
+    ClearTerm(); // Clearing the Terminal.
 
     //SDCARD
-    //
-    // Enable MMCHS
-    //
-    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK); // Enable MMCHS
+    MAP_PRCMPeripheralReset(PRCM_SDHOST); // Reset MMCHS
+    MAP_SDHostInit(SDHOST_BASE); // Configure MMCHS
+    MAP_SDHostSetExpClk(SDHOST_BASE, MAP_PRCMPeripheralClockGet(PRCM_SDHOST), 15000000); // Configure card clock
 
-    //
-    // Reset MMCHS
-    //
-    MAP_PRCMPeripheralReset(PRCM_SDHOST);
-
-    //
-    // Configure MMCHS
-    //
-    MAP_SDHostInit(SDHOST_BASE);
-
-    //
-    // Configure card clock
-    //
-    MAP_SDHostSetExpClk(SDHOST_BASE,
-                            MAP_PRCMPeripheralClockGet(PRCM_SDHOST),15000000);
-    //SDCARD
-
-
-    //
     // Initialising the I2C Interface
-    //    
     lRetVal = I2C_IF_Open(1);
     if(lRetVal < 0)
     {
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
-
     RecordPlay = I2S_MODE_TX;
-    //g_loopback = 1;
+    g_loopback = 1;
 
-
-    //
-    // Create RX and TX Buffer
-    //
-    //if(RecordPlay == I2S_MODE_RX_TX)
-    //{
-    //    pRecordBuffer = CreateCircularBuffer(RECORD_BUFFER_SIZE);
-    //    if(pRecordBuffer == NULL)
-    //    {
-    //        UART_PRINT("Unable to Allocate Memory for Tx Buffer\n\r");
-    //        LOOP_FOREVER();
-    //    }
-    //}
-
-    /* Play */
+    // Create RX Buffer
     if(RecordPlay & I2S_MODE_TX)
     {
         pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
@@ -343,43 +223,24 @@ int main()
         }
     }
 
-
-    //
     // Configure Audio Codec
-    //     
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
-    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE,
-                      AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL,
-                      AUDIO_CODEC_MIC_NONE);
-
+    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
     AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
 
-    //
     // Initialize the Audio(I2S) Module
-    //    
-
     AudioInit();
 
-    //
     // Initialize the DMA Module
-    //    
     UDMAInit();
     if(RecordPlay & I2S_MODE_TX)
     {
        UDMAChannelSelect(UDMA_CH5_I2S_TX, NULL);
         SetupPingPongDMATransferRx(pRxBuffer);
     }
-    //if(RecordPlay == I2S_MODE_RX_TX)
-    //{
-    //    UDMAChannelSelect(UDMA_CH4_I2S_RX, NULL);
-    //    SetupPingPongDMATransferTx(pRecordBuffer);
-    //}
 
-    //
     // Setup the Audio In/Out
-    //     
-    lRetVal = AudioSetupDMAMode(DMAPingPongCompleteAppCB_opt, \
-                                 CB_EVENT_CONFIG_SZ, RecordPlay);
+    lRetVal = AudioSetupDMAMode(DMAPingPongCompleteAppCB_opt, CB_EVENT_CONFIG_SZ, RecordPlay);
     if(lRetVal < 0)
     {
         ERR_PRINT(lRetVal);
@@ -387,14 +248,10 @@ int main()
     }    
     AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, RecordPlay, 1);
 
-    //
     // Start Audio Tx/Rx
-    //     
     Audio_Start(RecordPlay);
 
-    //
     // Start the simplelink thread
-    //
     //lRetVal = VStartSimpleLinkSpawnTask(9);
     //if(lRetVal < 0)
     //{
@@ -402,10 +259,7 @@ int main()
     //    LOOP_FOREVER();
     //}
 
-
-    //
     // Start the Network Task
-    //
     //lRetVal = osi_TaskCreate( Network, (signed char*)"NetworkTask",\OSI_STACK_SIZE, NULL, 1, &g_NetworkTask );
     //if(lRetVal < 0)
     //{
@@ -413,9 +267,7 @@ int main()
     //    LOOP_FOREVER();
     //}
 
-    //
     // Start the Control Task
-    //     
     lRetVal = ControlTaskCreate();
     if(lRetVal < 0)
     {
@@ -423,36 +275,13 @@ int main()
         LOOP_FOREVER();
     }    
 
-    //
-    // Start the Microphone Task
-    //       
-    //lRetVal = osi_TaskCreate( Microphone,(signed char*)"MicroPhone", \OSI_STACK_SIZE, NULL, 1, &g_MicTask );
-    //if(lRetVal < 0)
-    //{
-    //    ERR_PRINT(lRetVal);
-    //    LOOP_FOREVER();
-    //}
-
-    //
     // Start the Speaker Task
-    //
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, \
-                               NULL, 1, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
     if(lRetVal < 0)
     {
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
-    //
-    // Start the task scheduler
-    //
-    osi_start();      
+    osi_start(); // Start the task scheduler
 }
-
-//*****************************************************************************
-//
-// Close the Doxygen group.
-//! @}
-//
-//*****************************************************************************
