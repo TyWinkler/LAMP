@@ -66,7 +66,7 @@ int g_iRetVal =0;
 int iCount =0;
 //unsigned char *p;
 
-#define USERFILE        "trance.wav"
+#define USERFILE        "elecfeel.wav"
 #define BUFFSIZE 1024
 unsigned char pBuffer[BUFFSIZE];
 
