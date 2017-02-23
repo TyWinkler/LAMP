@@ -39,10 +39,8 @@ AudioExample/UniCast/makefile
 *.obj
 AudioExample/UniCast/makefile
 *.mk
-*.bin
 *.map
 *.out
 *.xml
 *.prefs
-*.bin
 *.opt
