@@ -44,3 +44,6 @@ AudioExample/UniCast/makefile
 *.xml
 *.prefs
 *.opt
+CC3200-ili9341-LCD-display-master/Release/makefile
+LAMP/UniCast/makefile
+*.bin
