@@ -95,10 +95,10 @@
 */
 
 // Color definitions
-#define	ILI9340_BLACK   0x0000
-#define	ILI9340_BLUE    0x001F
-#define	ILI9340_RED     0xF800
-#define	ILI9340_GREEN   0x07E0
+#define ILI9340_BLACK   0x0000
+#define ILI9340_BLUE    0x001F
+#define ILI9340_RED     0xF800
+#define ILI9340_GREEN   0x07E0
 #define ILI9340_CYAN    0x07FF
 #define ILI9340_MAGENTA 0xF81F
 #define ILI9340_YELLOW  0xFFE0
@@ -193,7 +193,7 @@
 //*****************************************************************************
 #if ! defined(PORTRAIT) && ! defined(PORTRAIT_FLIP) && \
     ! defined(LANDSCAPE) && ! defined(LANDSCAPE_FLIP)
-#define LANDSCAPE_FLIP
+#define PORTRAIT
 #endif
 
 //*****************************************************************************
@@ -238,24 +238,26 @@ pfnWriteCommand WriteCommand = WriteCommandGPIO;
 
 void CommandEnable()
 {
-   GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,0);  // pin 62 GPIO_PIN_7
+   //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,0);  // pin 62 GPIO_PIN_7
+   GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,0);  // pin 61 GPIO_PIN_7
 }
 
 void CommandDisable()
 {
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,GPIO_PIN_7);
+    //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,GPIO_PIN_7);
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,GPIO_PIN_6);
 }
 
 void ChipSelectEnable()
 {
-	GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,0);  // pin3
-
+    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,0);  // pin3
+    GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);  // pin 63
 }
 
 void ChipSelectDisable()
 {
-	GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,GPIO_PIN_4);
-
+    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,GPIO_PIN_4);
+    GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
 }
 void
 WriteDataGPIO16(unsigned short usData)
@@ -350,13 +352,13 @@ ReadData(void)
 {
     unsigned long usData;
 
-	ChipSelectEnable();
+    ChipSelectEnable();
 
     //
     // Return the data that was read.
     //
     SPIDataGet (GSPI_BASE, &usData);
-	ChipSelectDisable();
+    ChipSelectDisable();
 
     return((unsigned short)usData);
 }
@@ -399,140 +401,140 @@ ReadRegister(unsigned char ucIndex)
 void
 salowCC3200_ili9341InitScreen(void)
 {
-	unsigned long temp;
-	temp = 80000000 / (3 * 1000);	//	temp=1 ms
+    unsigned long temp;
+    temp = 80000000 / (3 * 1000);   //  temp=1 ms
 
-	CommandDisable();
-	ChipSelectDisable();
+    CommandDisable();
+    ChipSelectDisable();
 
-	WriteCommand(0x01);  //software reset
+    WriteCommand(0x01);  //software reset
 
-	//	Wait until the data has been transmitted
-	//while(SSIBusy(SSI0_BASE))
-	//{
-	//}
+    //  Wait until the data has been transmitted
+    //while(SSIBusy(SSI0_BASE))
+    //{
+    //}
 
     //SysCtlDelay(5 * temp);
-	UtilsDelay(5*temp);
-	 //WriteCommand(0x28);   // display off
+    UtilsDelay(5*temp);
+     //WriteCommand(0x28);   // display off
 
-	 WriteCommand(0xEF);
-	  WriteData(0x03);
-	  WriteData(0x80);
-	  WriteData(0x02);
+     WriteCommand(0xEF);
+      WriteData(0x03);
+      WriteData(0x80);
+      WriteData(0x02);
 
-	  WriteCommand(0xCF);
-	  WriteData(0x00);
-	  WriteData(0XC1);
-	  WriteData(0X30);
+      WriteCommand(0xCF);
+      WriteData(0x00);
+      WriteData(0XC1);
+      WriteData(0X30);
 
-	  WriteCommand(0xED);
-	  WriteData(0x64);
-	  WriteData(0x03);
-	  WriteData(0X12);
-	  WriteData(0X81);
+      WriteCommand(0xED);
+      WriteData(0x64);
+      WriteData(0x03);
+      WriteData(0X12);
+      WriteData(0X81);
 
-	  WriteCommand(0xE8);
-	  WriteData(0x85);
-	  WriteData(0x00);
-	  WriteData(0x78);
+      WriteCommand(0xE8);
+      WriteData(0x85);
+      WriteData(0x00);
+      WriteData(0x78);
 
-	  WriteCommand(0xCB);
-	  WriteData(0x39);
-	  WriteData(0x2C);
-	  WriteData(0x00);
-	  WriteData(0x34);
-	  WriteData(0x02);
+      WriteCommand(0xCB);
+      WriteData(0x39);
+      WriteData(0x2C);
+      WriteData(0x00);
+      WriteData(0x34);
+      WriteData(0x02);
 
-	  WriteCommand(0xF7);
-	  WriteData(0x20);
+      WriteCommand(0xF7);
+      WriteData(0x20);
 
-	  WriteCommand(0xEA);
-	  WriteData(0x00);
-	  WriteData(0x00);
+      WriteCommand(0xEA);
+      WriteData(0x00);
+      WriteData(0x00);
 
-	  WriteCommand(ILI9341_PWCTR1);    //Power control
-	  WriteData(0x23);   //VRH[5:0]
+      WriteCommand(ILI9341_PWCTR1);    //Power control
+      WriteData(0x23);   //VRH[5:0]
 
-	  WriteCommand(ILI9341_PWCTR2);    //Power control
-	  WriteData(0x10);   //SAP[2:0];BT[3:0]
+      WriteCommand(ILI9341_PWCTR2);    //Power control
+      WriteData(0x10);   //SAP[2:0];BT[3:0]
 
-	  WriteCommand(ILI9341_VMCTR1);    //VCM control
-	  WriteData(0x3e); //对比度调节
-	  WriteData(0x28);
+      WriteCommand(ILI9341_VMCTR1);    //VCM control
+      WriteData(0x3e); //锟皆比度碉拷锟斤拷
+      WriteData(0x28);
 
-	  WriteCommand(ILI9341_VMCTR2);    //VCM control2
-	  WriteData(0x86);  //--
+      WriteCommand(ILI9341_VMCTR2);    //VCM control2
+      WriteData(0x86);  //--
 
-	  WriteCommand(ILI9341_MADCTL);    // Memory Access Control
-	  WriteData(0x48);
+      WriteCommand(ILI9341_MADCTL);    // Memory Access Control
+      WriteData(0x48);
 
-	  WriteCommand(ILI9341_PIXFMT);
-	  WriteData(0x55);
+      WriteCommand(ILI9341_PIXFMT);
+      WriteData(0x55);
 
-	  WriteCommand(ILI9341_FRMCTR1);
-	  WriteData(0x00);
-	  WriteData(0x18);
+      WriteCommand(ILI9341_FRMCTR1);
+      WriteData(0x00);
+      WriteData(0x18);
 
-	  WriteCommand(ILI9341_DFUNCTR);    // Display Function Control
-	  WriteData(0x08);
-	  WriteData(0x82);
-	  WriteData(0x27);
+      WriteCommand(ILI9341_DFUNCTR);    // Display Function Control
+      WriteData(0x08);
+      WriteData(0x82);
+      WriteData(0x27);
 
-	  WriteCommand(0xF2);    // 3Gamma Function Disable
-	  WriteData(0x00);
+      WriteCommand(0xF2);    // 3Gamma Function Disable
+      WriteData(0x00);
 
-	  WriteCommand(ILI9341_GAMMASET);    //Gamma curve selected
-	  WriteData(0x01);
+      WriteCommand(ILI9341_GAMMASET);    //Gamma curve selected
+      WriteData(0x01);
 
-	  WriteCommand(ILI9341_GMCTRP1);    //Set Gamma
-	  WriteData(0x0F);
-	  WriteData(0x31);
-	  WriteData(0x2B);
-	  WriteData(0x0C);
-	  WriteData(0x0E);
-	  WriteData(0x08);
-	  WriteData(0x4E);
-	  WriteData(0xF1);
-	  WriteData(0x37);
-	  WriteData(0x07);
-	  WriteData(0x10);
-	  WriteData(0x03);
-	  WriteData(0x0E);
-	  WriteData(0x09);
-	  WriteData(0x00);
+      WriteCommand(ILI9341_GMCTRP1);    //Set Gamma
+      WriteData(0x0F);
+      WriteData(0x31);
+      WriteData(0x2B);
+      WriteData(0x0C);
+      WriteData(0x0E);
+      WriteData(0x08);
+      WriteData(0x4E);
+      WriteData(0xF1);
+      WriteData(0x37);
+      WriteData(0x07);
+      WriteData(0x10);
+      WriteData(0x03);
+      WriteData(0x0E);
+      WriteData(0x09);
+      WriteData(0x00);
 
-	  WriteCommand(ILI9341_GMCTRN1);    //Set Gamma
-	  WriteData(0x00);
-	  WriteData(0x0E);
-	  WriteData(0x14);
-	  WriteData(0x03);
-	  WriteData(0x11);
-	  WriteData(0x07);
-	  WriteData(0x31);
-	  WriteData(0xC1);
-	  WriteData(0x48);
-	  WriteData(0x08);
-	  WriteData(0x0F);
-	  WriteData(0x0C);
-	  WriteData(0x31);
-	  WriteData(0x36);
-	  WriteData(0x0F);
-	  WriteCommand(ILI9340_SLPOUT);
-	  UtilsDelay(120 * temp);
-	  WriteCommand(ILI9340_DISPON);
-	//UtilsDelay(100 * temp);
+      WriteCommand(ILI9341_GMCTRN1);    //Set Gamma
+      WriteData(0x00);
+      WriteData(0x0E);
+      WriteData(0x14);
+      WriteData(0x03);
+      WriteData(0x11);
+      WriteData(0x07);
+      WriteData(0x31);
+      WriteData(0xC1);
+      WriteData(0x48);
+      WriteData(0x08);
+      WriteData(0x0F);
+      WriteData(0x0C);
+      WriteData(0x31);
+      WriteData(0x36);
+      WriteData(0x0F);
+      WriteCommand(ILI9340_SLPOUT);
+      UtilsDelay(120 * temp);
+      WriteCommand(ILI9340_DISPON);
+    //UtilsDelay(100 * temp);
 
 
 
-	UtilsDelay(100 * temp);
+    UtilsDelay(100 * temp);
 
-	WriteCommand(0x2c);   	//	Memory Write
-	//	This command is used to transfer data from MCU to frame memory. This command makes no change to the other driver
-	//	status. When this command is accepted, the column register and the page register are reset to the Start Column/Start
-	//	Page positions. The Start Column/Start Page positions are different in accordance with MADCTL setting.) Then D [17:0] is
-	//	stored in frame memory and the column register and the page register incremented. Sending any other command can stop
-	//	frame Write. X = Don抰 care.
+    WriteCommand(0x2c);     //  Memory Write
+    //  This command is used to transfer data from MCU to frame memory. This command makes no change to the other driver
+    //  status. When this command is accepted, the column register and the page register are reset to the Start Column/Start
+    //  Page positions. The Start Column/Start Page positions are different in accordance with MADCTL setting.) Then D [17:0] is
+    //  stored in frame memory and the column register and the page register incremented. Sending any other command can stop
+    //  frame Write. X = Don锟絫 care.
 
 
 }
@@ -617,7 +619,7 @@ salowCC3200_ili9341BacklightOn(void)
     // Assert the signal that turns on the backlight.
     //
     //HWREG(LCD_BL_BASE + GPIO_O_DATA + (LCD_BL_PIN << 2)) = LCD_BL_PIN;
-    WriteCommand(0x53);		//	Write CTRL Display (53h)
+    WriteCommand(0x53);     //  Write CTRL Display (53h)
     WriteData(0x24);
 }
 
@@ -637,7 +639,7 @@ salowCC3200_ili9341BacklightOff(void)
     // Deassert the signal that turns on the backlight.
     //
     //HWREG(LCD_BL_BASE + GPIO_O_DATA + (LCD_BL_PIN << 2)) = 0;
-    WriteCommand(0x53);		//	Write CTRL Display (53h)
+    WriteCommand(0x53);     //  Write CTRL Display (53h)
     WriteData(0x00);
 }
 
@@ -1335,13 +1337,13 @@ const tDisplay g_ssalowCC3200_ili9341 =
     320,
     240,
 #endif
-	salowCC3200_ili9341PixelDraw,
-	salowCC3200_ili9341PixelDrawMultiple,
-	salowCC3200_ili9341LineDrawH,
-	salowCC3200_ili9341LineDrawV,
-	salowCC3200_ili9341RectFill,
-	salowCC3200_ili9341ColorTranslate,
-	salowCC3200_ili9341Flush
+    salowCC3200_ili9341PixelDraw,
+    salowCC3200_ili9341PixelDrawMultiple,
+    salowCC3200_ili9341LineDrawH,
+    salowCC3200_ili9341LineDrawV,
+    salowCC3200_ili9341RectFill,
+    salowCC3200_ili9341ColorTranslate,
+    salowCC3200_ili9341Flush
 };
 
 //*****************************************************************************
@@ -1350,10 +1352,3 @@ const tDisplay g_ssalowCC3200_ili9341 =
 //! @}
 //
 //*****************************************************************************
-
-
-
-
-
-
-

@@ -62,9 +62,6 @@ void PinMuxConfig(void)
     MAP_PinModeSet(PIN_18, PIN_MODE_0);
     MAP_PinModeSet(PIN_21, PIN_MODE_0);
     MAP_PinModeSet(PIN_52, PIN_MODE_0);
-    MAP_PinModeSet(PIN_59, PIN_MODE_0);
-    MAP_PinModeSet(PIN_61, PIN_MODE_0);
-    MAP_PinModeSet(PIN_63, PIN_MODE_0);
     
     //
     // Enable Peripheral Clocks 
@@ -96,6 +93,21 @@ void PinMuxConfig(void)
     MAP_PinTypeGPIO(PIN_58, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x8, GPIO_DIR_MODE_IN);
     //
+    // Configure PIN_59 for GPIO Output
+    //
+    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
+    //
+    // Configure PIN_61 for GPIO Output
+    //
+    MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
+    //
+    // Configure PIN_63 for GPIO Output
+    //
+    MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
+	//
     // Configure PIN_64 for SDHost0 SDCARD_DATA
     //
     MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);

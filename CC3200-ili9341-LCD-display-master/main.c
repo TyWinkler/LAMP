@@ -193,10 +193,11 @@ void ConfigLcdScreen()
 void LCDReset(){
 	unsigned long temp;
 		temp = 80000000 / (3 * 1000);
-	GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);
+	//GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);
+	GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,0); //Pin 59
 	UtilsDelay(10*temp);
-	GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
-
+	//GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
+	GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,GPIO_PIN_4);
 }
 void displaymytextnext(){
 
@@ -243,7 +244,7 @@ void displaymytext(void){
 		//
 		// Put the CC3200 Banner on screen.
 		//
-		GrContextFontSet(&sContext, &g_sFontCmss28b);
+		GrContextFontSet(&sContext, &g_sFontCmss28);
 		//GrStringDrawCentered(&sContext, "Salow", -1,
 		//					GrContextDpyWidthGet(&sContext) / 2, 20, 0);
 

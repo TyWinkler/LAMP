@@ -102,7 +102,7 @@ PinMuxConfig(void)
        //PinTypeGPIO(PIN_02, PIN_MODE_0, false);
        //GPIODirModeSet(GPIOA1_BASE, 0x8, GPIO_DIR_MODE_OUT);
 
-
+/*
          // Configure PIN_63 for GPIO Output reset
          //
          PinTypeGPIO(PIN_63, PIN_MODE_0, false);
@@ -118,5 +118,20 @@ PinMuxConfig(void)
        //
        PinTypeGPIO(PIN_03, PIN_MODE_0, false);
        GPIODirModeSet(GPIOA1_BASE, 0x10, GPIO_DIR_MODE_OUT);
-
+*/
+      //
+      // Configure PIN_59 for GPIO Output - Reset
+      //
+      MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false);
+      MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
+      //
+      // Configure PIN_61 for GPIO Output - D/C
+      //
+      MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false);
+      MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
+      //
+      // Configure PIN_63 for GPIO Output - Chip Select
+      //
+      MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false);
+      MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
 }
