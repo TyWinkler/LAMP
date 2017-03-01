@@ -36,11 +36,6 @@
 			<locationURI>CC3200_SDK_ROOT/example/common/i2c_if.c</locationURI>
 		</link>
 		<link>
-			<name>i2s_if.c</name>
-			<type>1</type>
-			<locationURI>CC3200_SDK_ROOT/example/common/i2s_if.c</locationURI>
-		</link>
-		<link>
 			<name>network_common.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-ORIGINAL_PROJECT_ROOT/common/network_common.c</locationURI>
