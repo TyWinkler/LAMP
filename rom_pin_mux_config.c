@@ -73,7 +73,7 @@ void PinMuxConfig(void)
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_I2S, PRCM_RUN_MODE_CLK);
     //
-    // Configure PIN_50 for GPIO Output - LED Chip Select
+    // Configure PIN_50 for GPIO Output - LED Chip Select // Remember to power the IC
     //
     MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
@@ -93,21 +93,21 @@ void PinMuxConfig(void)
     MAP_PinTypeGPIO(PIN_58, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x8, GPIO_DIR_MODE_IN);
     //
-    // Configure PIN_59 for GPIO Output
+    // Configure PIN_59 for GPIO Output - LCD Reset
     //
     MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
     //
-    // Configure PIN_61 for GPIO Output
+    // Configure PIN_61 for GPIO Output - D/C
     //
     MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
     //
-    // Configure PIN_63 for GPIO Output
+    // Configure PIN_63 for GPIO Output - Chip Select
     //
     MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
-	//
+	  //
     // Configure PIN_64 for SDHost0 SDCARD_DATA
     //
     MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
@@ -119,11 +119,13 @@ void PinMuxConfig(void)
     // Configure PIN_02 for SDHost0 SDCARD_CMD
     //
     MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
+    
+		//
+    // Configure PIN_08 for SPI0 GSPI_CS - Nothing we have uses the built in CS
     //
-    // Configure PIN_08 for SPI0 GSPI_CS
-    //
-    MAP_PinTypeSPI(PIN_08, PIN_MODE_7);
-    //
+    //MAP_PinTypeSPI(PIN_08, PIN_MODE_7);
+    
+		//
     // Configure PIN_05 for SPI0 GSPI_CLK
     //
     MAP_PinTypeSPI(PIN_05, PIN_MODE_7);
