@@ -73,10 +73,10 @@ void PinMuxConfig(void)
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_I2S, PRCM_RUN_MODE_CLK);
     //
-    // Configure PIN_50 for GPIO Input
+    // Configure PIN_50 for GPIO Output - LED Chip Select
     //
     MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false);
-    MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_IN);
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
     //
     // Configure PIN_55 for GPIO Input
     //
