@@ -1,7 +1,7 @@
 //*****************************************************************************
-// pinmux.c
+// pinmux.h
 //
-// configure the device pins for different peripheral signals
+// function prototype for pinmuxconfig
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
 // 
@@ -41,67 +41,10 @@
 //
 //*****************************************************************************
 
-#include "pinmux.h"
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "hw_gpio.h"
-#include "pin.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "gpio.h"
-#include "prcm.h"
 
-//*****************************************************************************
-void
-PinMuxConfig(void)
-{
-    //
-    // Enable Peripheral Clocks 
-    //
-    MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
-    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
+#ifndef __PINMUX_H__
+#define __PINMUX_H__
 
-    //
-    // Configure PIN_55 for UART0 UART0_TX
-    //
-    MAP_PinTypeUART(PIN_55, PIN_MODE_3);
+extern void PinMuxConfig(void);
 
-    //
-    // Configure PIN_57 for UART0 UART0_RX
-    //
-    MAP_PinTypeUART(PIN_57, PIN_MODE_3);
-
-
-    //
-    // Configure PIN_06 for SDHOST0 SDHost_D0
-    //
-    MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
-
-    //
-    // Configure PIN_07 for SDHOST0 SDHost_CLK
-    //
-    MAP_PinTypeSDHost(PIN_07, PIN_MODE_8);
-
-    //
-    // Configure PIN_08 for SDHOST0 SDHost_CMD
-    //
-    MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
-
-
-    /*
-    //
-    // Configure PIN_64 for SDHost0 SDCARD_DATA
-    //
-    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
-
-    //
-    // Configure PIN_01 for SDHost0 SDCARD_CLK
-    //
-    MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
-
-    //
-    // Configure PIN_02 for SDHost0 SDCARD_CMD
-    //
-    MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
-    */
-}
+#endif //  __PINMUX_H__

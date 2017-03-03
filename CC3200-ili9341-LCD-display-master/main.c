@@ -201,64 +201,61 @@ void LCDReset(){
 }
 void displaymytextnext(){
 
-	g_lLcdCursorY = 30;
+    g_lLcdCursorY = 30;
 
-	salowCC3200_ili9341Init();
+    salowCC3200_ili9341Init();
 
-		//
-		// Initialize the graphics context.
-		//
-		//GrContextInit(&sContext, &g_sKentec320x240x16_SSD2119);
+    //
+    // Initialize the graphics context.
+    //
+    //GrContextInit(&sContext, &g_sKentec320x240x16_SSD2119);
 
 
-		 GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
+    GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
 
-		 GrContextForegroundSet(&sContext, ClrBlack);
+    GrContextForegroundSet(&sContext, ClrBlack);
 
-		 		//
-		 		// Put the CC3200 Banner on screen.
-		 		//
-		 		GrContextFontSet(&sContext, &g_sFontCmss34i);
-		 		GrStringDrawCentered(&sContext, "Salow", -1,
-		 									GrContextDpyWidthGet(&sContext) / 2, 20, 0);
+    //
+    // Put the CC3200 Banner on screen.
+    //
+    GrContextFontSet(&sContext, &g_sFontCmss34i);
+    GrStringDrawCentered(&sContext, "Salow", -1, GrContextDpyWidthGet(&sContext) / 2, 20, 0);
 
-		 		LcdPrintf(" ");
-			LcdPrintf("next text");
-			LcdPrintf(" ");
-			LcdPrintf("THank GOD");
+    LcdPrintf(" ");
+    LcdPrintf("next text");
+    LcdPrintf(" ");
+    LcdPrintf("THank GOD");
 }
 
 void displaymytext(void){
-	salowCC3200_ili9341Init();
+    salowCC3200_ili9341Init();
 
-		//
-		// Initialize the graphics context.
-		//
-		//GrContextInit(&sContext, &g_sKentec320x240x16_SSD2119);
-
-
-		 GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
-
-	GrContextForegroundSet(&sContext, ClrBlack);
-
-		//
-		// Put the CC3200 Banner on screen.
-		//
-		GrContextFontSet(&sContext, &g_sFontCmss28);
-		//GrStringDrawCentered(&sContext, "Salow", -1,
-		//					GrContextDpyWidthGet(&sContext) / 2, 20, 0);
+    //
+    // Initialize the graphics context.
+    //
+    //GrContextInit(&sContext, &g_sKentec320x240x16_SSD2119);
 
 
-		//LcdPrintf(" the value is %d",aa);
-		LcdPrintf(" ");
-		//GrContextForegroundSet(&sContext, ClrMaroon);
-		//GrContextFontSet(&sContext, &g_sFontCmsc28);
-		LcdPrintf("Our LCD is Working");
-		LcdPrintf(" ");
-		LcdPrintf("Ty Winkler");
+    GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
+    GrContextBackgroundSet(&sContext, ClrBlack);
+    GrContextForegroundSet(&sContext, ClrWhite);
 
-		//GrContextForegroundSet(&sContext,ClrMintCream);
-		//LcdPrintf("www.salow.co");
+    //
+    // Put the CC3200 Banner on screen.
+    //
+    GrContextFontSet(&sContext, &g_sFontCmss28);
+    //GrStringDrawCentered(&sContext, "Salow", -1, GrContextDpyWidthGet(&sContext) / 2, 20, 0);
+
+    //LcdPrintf(" the value is %d",aa);
+    LcdPrintf(" ");
+    //GrContextForegroundSet(&sContext, ClrMaroon);
+    //GrContextFontSet(&sContext, &g_sFontCmsc28);
+    LcdPrintf("Our LCD is Working");
+    LcdPrintf(" ");
+    LcdPrintf("Ty Winkler");
+
+    //GrContextForegroundSet(&sContext,ClrMintCream);
+    //LcdPrintf("www.salow.co");
 }
 
 
@@ -324,25 +321,5 @@ int main()
     //
     PinMuxConfig();
     ConfigLcdScreen();
-
-    //
-    // Configuring UART
-    //
-    InitTerm();
-
-    //
-    // Display Application Banner
-    //
-    DisplayBanner(APP_NAME);
-
-    //
-    // Enable pull down
-    //
-
-    //LcdPrintf("Connected to AP SALOW");
-
-
-
-
 
 }

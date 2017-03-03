@@ -1,7 +1,7 @@
 //*****************************************************************************
 // pinmux.c
 //
-// configure the device pins for different peripheral signals
+// configure the device pins for different signals
 //
 // Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
 // 
@@ -41,6 +41,7 @@
 //
 //*****************************************************************************
 
+
 #include "pinmux.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
@@ -53,55 +54,28 @@
 
 //*****************************************************************************
 void
-PinMuxConfig(void)
-{
-    //
+PinMuxConfig(void){
+
     // Enable Peripheral Clocks 
-    //
     MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
-    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_GSPI, PRCM_RUN_MODE_CLK);
 
-    //
-    // Configure PIN_55 for UART0 UART0_TX
-    //
-    MAP_PinTypeUART(PIN_55, PIN_MODE_3);
+    // UART
+    MAP_PinTypeUART(PIN_55, PIN_MODE_3); // Configure PIN_55 for UART0 UART0_TX
+    MAP_PinTypeUART(PIN_57, PIN_MODE_3); // Configure PIN_57 for UART0 UART0_RX
 
-    //
-    // Configure PIN_57 for UART0 UART0_RX
-    //
-    MAP_PinTypeUART(PIN_57, PIN_MODE_3);
+    // SPI
+    MAP_PinTypeSPI(PIN_05, PIN_MODE_7); // Configure PIN_05 for SPI0 GSPI_CLK
+    MAP_PinTypeSPI(PIN_06, PIN_MODE_7); // Configure PIN_06 for SPI0 GSPI_MISO
+    MAP_PinTypeSPI(PIN_07, PIN_MODE_7); // Configure PIN_07 for SPI0 GSPI_MOSI
 
-
-    //
-    // Configure PIN_06 for SDHOST0 SDHost_D0
-    //
-    MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
-
-    //
-    // Configure PIN_07 for SDHOST0 SDHost_CLK
-    //
-    MAP_PinTypeSDHost(PIN_07, PIN_MODE_8);
-
-    //
-    // Configure PIN_08 for SDHOST0 SDHost_CMD
-    //
-    MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
-
-
-    /*
-    //
-    // Configure PIN_64 for SDHost0 SDCARD_DATA
-    //
-    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
-
-    //
-    // Configure PIN_01 for SDHost0 SDCARD_CLK
-    //
-    MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
-
-    //
-    // Configure PIN_02 for SDHost0 SDCARD_CMD
-    //
-    MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
-    */
+    // LCD
+    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false); // Configure PIN_59 for GPIO Output - Reset
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
+    MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false); // Configure PIN_61 for GPIO Output - D/C
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
+    MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false); // Configure PIN_63 for GPIO Output - Chip Select
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
 }

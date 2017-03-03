@@ -187,22 +187,25 @@ void main()
     //
     // Set the SD card clock as output pin
     //
-    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
+    //MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
+    MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
 
     //
     // Enable Pull up on data
     //
-    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on CMD
     //
-    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on clk
     //
-    MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Initialising the Terminal.
@@ -244,8 +247,11 @@ void main()
     MAP_SDHostSetExpClk(SDHOST_BASE,
                             MAP_PRCMPeripheralClockGet(PRCM_SDHOST),15000000);
 
-    f_mount(&fs,"0",1);
-    res = f_opendir(&dir,"/");
+    res = f_mount(&fs,"0",1);
+    while(res != FR_OK){
+        res = f_mount(&fs,"0",1);
+        res = f_opendir(&dir,"/");
+    }
     if( res == FR_OK)
     {
         Message("Opening root directory.................... [ok]\n\n\r");
