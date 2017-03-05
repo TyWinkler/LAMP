@@ -71,7 +71,7 @@ PinMuxConfig(void)
     //
     MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
-
+    /*
     //
     // Configure PIN_06 for SDHOST0 SDHost_D0
     //
@@ -86,9 +86,9 @@ PinMuxConfig(void)
     // Configure PIN_08 for SDHOST0 SDHost_CMD
     //
     MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
+    */
 
 
-    /*
     //
     // Configure PIN_64 for SDHost0 SDCARD_DATA
     //
@@ -103,5 +103,5 @@ PinMuxConfig(void)
     // Configure PIN_02 for SDHost0 SDCARD_CMD
     //
     MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
-    */
+
 }

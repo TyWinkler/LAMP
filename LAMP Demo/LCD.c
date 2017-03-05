@@ -63,7 +63,7 @@ void displaymytext(void){
     LcdPrintf(" ");
     LcdPrintf("The color is");
     LcdPrintf(" ");
-    LcdPrintf("0xFFFF00");
+    LcdPrintf("0xFF0000");
 }
 
 int LcdPrintf(char *pcFormat, ...){

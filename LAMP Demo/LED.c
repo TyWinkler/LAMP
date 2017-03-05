@@ -62,7 +62,8 @@
 //
 //*****************************************************************************
 void LED( void *pvParameters ){
-    allColor(color(255,255,0));
+    reset();
+    allColor(color(255,0,0));
 
     while(1){
 
