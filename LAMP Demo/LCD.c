@@ -19,6 +19,8 @@
 //*****************************************************************************
 
 static tContext sContext;
+extern const tDisplay g_ssalowCC3200_ili9341;
+
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
 #define LCD_Y_SHIFT        20
@@ -59,9 +61,9 @@ void displaymytext(void){
     GrContextFontSet(&sContext, &g_sFontCmss28);
 
     LcdPrintf(" ");
-    LcdPrintf("Our LCD is Working");
+    LcdPrintf("The color is");
     LcdPrintf(" ");
-    LcdPrintf("Ty Winkler");
+    LcdPrintf("0xFFFF00");
 }
 
 int LcdPrintf(char *pcFormat, ...){

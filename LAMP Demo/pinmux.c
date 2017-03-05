@@ -78,4 +78,8 @@ PinMuxConfig(void){
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
     MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false); // Configure PIN_63 for GPIO Output - Chip Select
     MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
+
+    // LED
+    MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false); // Configure PIN_50 for GPIO Output - LED Chip Select
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
 }

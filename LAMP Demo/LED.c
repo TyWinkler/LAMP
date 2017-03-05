@@ -40,6 +40,7 @@
 #include "rom_map.h"
 #include "utils.h"
 #include "hw_ints.h"
+#include "LPD8806.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -61,6 +62,8 @@
 //
 //*****************************************************************************
 void LED( void *pvParameters ){
+    allColor(color(255,255,0));
+
     while(1){
 
     }

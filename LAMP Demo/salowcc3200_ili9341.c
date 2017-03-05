@@ -4,7 +4,7 @@
  *  Created on: Apr 10, 2016
  *      Author: salow
  */
-
+#include "grlib.h"
 
 #include "hw_gpio.h"
 #include "hw_ints.h"
@@ -15,7 +15,7 @@
 #include "interrupt.h"
 #include "timer.h"
 #include "rom.h"
-#include "grlib.h"
+
 #include "salowcc3200_ili9341.h"
 
 #include "utils.h"

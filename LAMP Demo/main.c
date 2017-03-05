@@ -46,7 +46,6 @@
 #include "rom_map.h"
 #include "pin.h"
 #include "utils.h"
-#include "grlib.h"
 
 //Common interface includes
 #include "udma_if.h"
