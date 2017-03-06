@@ -188,19 +188,19 @@ void main()
     // Set the SD card clock as output pin
     //
     MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
-    //MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
+                //MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
 
     //
     // Enable Pull up on data
     //
-    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-    //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_6MA, PIN_TYPE_STD_PU);
+                //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on CMD
     //
     MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-    //MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+                //MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on clk
@@ -229,7 +229,7 @@ void main()
     //
     // Enable MMCHS
     //
-    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK);
+    //MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK);
 
     //
     // Reset MMCHS
