@@ -43,9 +43,10 @@
 
 // Global Variables
 #define SPI_IF_BIT_RATE  5000
-#define NUMLEDS 4
+#define NUMLEDS 6
 
 unsigned long pixels[NUMLEDS];
+unsigned long myColor = 0xE05900;
 
 //*****************************************************************************
 //

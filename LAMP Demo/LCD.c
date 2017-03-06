@@ -13,6 +13,7 @@
 #include "hw_ints.h"
 #include "grlib.h"
 #include "gpio.h"
+#include "LPD8806.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -54,16 +55,12 @@ void displaymytext(void){
     salowCC3200_ili9341Init();
 
     GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
-    GrContextBackgroundSet(&sContext, ClrBlack);
-    GrContextForegroundSet(&sContext, ClrWhite);
+    GrContextBackgroundSet(&sContext, ClrWhite);
+    GrContextForegroundSet(&sContext, ClrBlack);
 
     // Put the CC3200 Banner on screen.
     GrContextFontSet(&sContext, &g_sFontCmss28);
 
-    LcdPrintf(" ");
-    LcdPrintf("The color is");
-    LcdPrintf(" ");
-    LcdPrintf("0xFF0000");
 }
 
 int LcdPrintf(char *pcFormat, ...){
@@ -108,6 +105,13 @@ int LcdPrintf(char *pcFormat, ...){
 void LCD( void *pvParameters ){
     LCDReset();
     displaymytext();
-    while(1){ }
+
+    while(1){
+        g_lLcdCursorY = 30;
+        LcdPrintf(" ");
+        LcdPrintf("The color is");
+        LcdPrintf(" ");
+        LcdPrintf("%02x", myColor);
+    }
 }
 

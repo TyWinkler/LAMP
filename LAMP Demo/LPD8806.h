@@ -14,5 +14,6 @@ extern unsigned long color(unsigned char r, unsigned char g, unsigned char b);
 extern unsigned long colorHex(unsigned long hex);
 extern void setPixel(unsigned int p, unsigned long color);
 extern void clearStrip(void);
+extern unsigned long myColor;
 
 #endif /* LPD8806_H_ */
