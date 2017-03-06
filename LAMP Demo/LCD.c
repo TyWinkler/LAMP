@@ -22,6 +22,7 @@
 static tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
 
+
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
 #define LCD_Y_SHIFT        20
@@ -55,8 +56,13 @@ void displaymytext(void){
     salowCC3200_ili9341Init();
 
     GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
-    GrContextBackgroundSet(&sContext, ClrWhite);
+    GrContextBackgroundSet(&sContext, ClrBlack);
     GrContextForegroundSet(&sContext, ClrBlack);
+    const int width = GrContextDpyWidthGet(&sContext);
+    const int height = GrContextDpyHeightGet(&sContext);
+    tRectangle screen = {0,0,width,height};
+    DpyRectFill(&g_ssalowCC3200_ili9341, &screen, ClrBlack);
+    GrContextForegroundSet(&sContext, ClrWhite);
 
     // Put the CC3200 Banner on screen.
     GrContextFontSet(&sContext, &g_sFontCmss28);
@@ -106,15 +112,24 @@ void LCD( void *pvParameters ){
     LCDReset();
     displaymytext();
     unsigned long critical;
+    unsigned long prevColor = myColor;
     while(1){
         critical = osi_EnterCritical();
-        LCDReset();
-        displaymytext();
+        GrContextForegroundSet(&sContext, ClrBlack);
         g_lLcdCursorY = 30;
         LcdPrintf(" ");
         LcdPrintf("The color is");
         LcdPrintf(" ");
-        LcdPrintf("%#08x", myColor);
+        long dispColor = prevColor & 0x00FFFFFF;
+        LcdPrintf("%#08x", dispColor);
+        GrContextForegroundSet(&sContext, ClrWhite);
+        g_lLcdCursorY = 30;
+        LcdPrintf(" ");
+        LcdPrintf("The color is");
+        LcdPrintf(" ");
+        dispColor = myColor & 0x00FFFFFF;
+        LcdPrintf("%#08x", dispColor);
+        prevColor = myColor;
         osi_ExitCritical(critical);
         osi_Sleep(500);
     }

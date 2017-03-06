@@ -67,7 +67,7 @@ OsiTaskHandle g_LCDTask = NULL;
 
 #define OSI_STACK_SIZE          1024
 #define TIMER_FREQ              80000000
-#define SPI_IF_BIT_RATE         100000
+#define SPI_IF_BIT_RATE         2500000
 
 #if defined(ccs)
 extern void (* const g_pfnVectors[])(void);
