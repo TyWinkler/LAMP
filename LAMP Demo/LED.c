@@ -63,9 +63,17 @@
 //*****************************************************************************
 void LED( void *pvParameters ){
     reset();
-    allColor(colorHex(myColor));
+    unsigned long critical;
     while(1){
-
+        critical = osi_EnterCritical();
+        allColor(colorHex(myColor));
+        if(myColor & 0x80000){
+            myColor++;
+        }
+        myColor = myColor << 1;
+        myColor = myColor & 0x00FFFFFF;
+        osi_ExitCritical(critical);
+        osi_Sleep(500);
     }
 }
 

@@ -46,7 +46,7 @@
 #define NUMLEDS 6
 
 unsigned long pixels[NUMLEDS];
-unsigned long myColor = 0xE05900;
+unsigned long myColor = 0xFF0000;
 
 //*****************************************************************************
 //

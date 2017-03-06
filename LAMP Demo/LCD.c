@@ -105,13 +105,18 @@ int LcdPrintf(char *pcFormat, ...){
 void LCD( void *pvParameters ){
     LCDReset();
     displaymytext();
-
+    unsigned long critical;
     while(1){
+        critical = osi_EnterCritical();
+        LCDReset();
+        displaymytext();
         g_lLcdCursorY = 30;
         LcdPrintf(" ");
         LcdPrintf("The color is");
         LcdPrintf(" ");
-        LcdPrintf("%02x", myColor);
+        LcdPrintf("%#08x", myColor);
+        osi_ExitCritical(critical);
+        osi_Sleep(500);
     }
 }
 
