@@ -66,12 +66,23 @@ void LED( void *pvParameters ){
     unsigned long critical;
     while(1){
         critical = osi_EnterCritical();
-        allColor(colorHex(myColor));
-        if(myColor & 0x80000){
-            myColor++;
+        unsigned long rgbColor[3] = {255,0,0};
+        int decColor, incColor, i;
+        for(decColor = 0; decColor < 3; decColor++){
+            incColor = decColor == 2 ? 0 : decColor + 1;
+            for(i = 0; i <255; i++){
+                rgbColor[decColor]--;
+                rgbColor[incColor]++;
+                myColor = rgbColor[0]<<16 + rgbColor[1]<<8 + rgbColor[2];
+                allColor(colorHex(myColor));
+            }
         }
-        myColor = myColor << 1;
-        myColor = myColor & 0x00FFFFFF;
+//        allColor(colorHex(myColor));
+//        if(myColor & 0x80000){
+//            myColor++;
+//        }
+//        myColor = myColor << 1;
+//        myColor = myColor & 0x00FFFFFF;
         osi_ExitCritical(critical);
         osi_Sleep(500);
     }
