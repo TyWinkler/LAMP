@@ -47,3 +47,5 @@ AudioExample/UniCast/makefile
 CC3200-ili9341-LCD-display-master/Release/makefile
 LAMP/UniCast/makefile
 *.bin
+CC3200-ili9341-LCD-display-master/Release/timer_cc
+LAMP/.launches/LAMP.launch
