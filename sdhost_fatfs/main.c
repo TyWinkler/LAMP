@@ -235,15 +235,15 @@ void main()
     int j;
     int k;
     int l;
-    for (k = 0; k < 4; k++){
+    for (i = 0; i < 4; i++){
         for (j = 0; j < 4; j++){
-            for (i = 0; i < 4; i++){
+            for (k = 0; k < 4; k++){
                 if(k != 0 && i != 0 && j != 0){
-                    MAP_PinConfigSet(pins[i],strength[j], type[k]);
+                    MAP_PinConfigSet(pins[i], strength[j], type[k]);
                 }
                 for (l = 0; l < 4; l++){
                     if(l != 0 && i != 0){
-                        MAP_PinDirModeSet(pins[i],direc[l]);
+                        MAP_PinDirModeSet(pins[i], direc[l]);
                     }
                     res = f_mount(&fs,"0",1);
                     res = f_opendir(&dir,"/");
