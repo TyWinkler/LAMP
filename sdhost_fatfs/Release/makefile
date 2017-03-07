@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS
+CG_TOOL_ROOT := C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -145,14 +145,14 @@ all: sdhost_fatfs.out
 sdhost_fatfs.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=vfplib --abi=eabi -me -g --define=ccs --define=cc3200 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"sdhost_fatfs.map" --heap_size=0x800 --stack_size=0x1000 -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/include" --reread_libs --display_error_number --diag_wrap=off --warn_sections --xml_link_info="sdhost_fatfs_linkInfo.xml" --rom_model -o "sdhost_fatfs.out" $(ORDERED_OBJS)
+	"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=vfplib --abi=eabi -me -g --define=ccs --define=cc3200 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"sdhost_fatfs.map" --heap_size=0x800 --stack_size=0x1000 -i"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/lib" -i"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/include" --reread_libs --display_error_number --diag_wrap=off --warn_sections --xml_link_info="sdhost_fatfs_linkInfo.xml" --rom_model -o "sdhost_fatfs.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
 
 sdhost_fatfs.bin: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armhex"  -o "sdhost_fatfs.bin" $(EXE_OUTPUTS__QUOTED)
+	"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armhex"  -o "sdhost_fatfs.bin" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -166,7 +166,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-"C:/ti/ccsv7/utils/tiobj2bin/tiobj2bin" "sdhost_fatfs.out" "sdhost_fatfs.bin" "C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armofd" "C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armhex" "C:/ti/ccsv7/utils/tiobj2bin/mkhex4bin"
+	-"C:/TI/ccsv7/utils/tiobj2bin/tiobj2bin" "sdhost_fatfs.out" "sdhost_fatfs.bin" "C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armofd" "C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/bin/armhex" "C:/TI/ccsv7/utils/tiobj2bin/mkhex4bin"
 	-@echo ' '
 
 .PHONY: all clean dependents

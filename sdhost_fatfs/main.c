@@ -193,19 +193,19 @@ void main()
     //
     // Enable Pull up on data
     //
-    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_6MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PD);
                 //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on CMD
     //
-    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PD);
                 //MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Enable Pull up on clk
     //
-    MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PD);
 
     //
     // Initialising the Terminal.
@@ -245,7 +245,7 @@ void main()
     // Configure card clock
     //
     MAP_SDHostSetExpClk(SDHOST_BASE,
-                            MAP_PRCMPeripheralClockGet(PRCM_SDHOST),15000000);
+                            MAP_PRCMPeripheralClockGet(PRCM_SDHOST),1500);
 
     res = f_mount(&fs,"0",1);
     while(res != FR_OK){
