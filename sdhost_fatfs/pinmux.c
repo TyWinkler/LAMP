@@ -50,6 +50,7 @@
 #include "rom_map.h"
 #include "gpio.h"
 #include "prcm.h"
+#include <sdhost.h>
 
 //*****************************************************************************
 void
@@ -103,5 +104,26 @@ PinMuxConfig(void)
     // Configure PIN_02 for SDHost0 SDCARD_CMD
     //
     MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
+
+
+    //
+    // Enable MMCHS
+    //
+    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK);
+
+    //
+    // Reset MMCHS
+    //
+    MAP_PRCMPeripheralReset(PRCM_SDHOST);
+
+    //
+    // Configure MMCHS
+    //
+    MAP_SDHostInit(SDHOST_BASE);
+
+    //
+    // Configure card clock
+    //
+    MAP_SDHostSetExpClk(SDHOST_BASE, MAP_PRCMPeripheralClockGet(PRCM_SDHOST),1500000);
 
 }
