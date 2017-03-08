@@ -93,8 +93,10 @@ PinMuxConfig(void)
     //
     // Configure PIN_06 for SDHost0 SDCARD_DATA
     //
-    MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
-    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
+    //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Configure PIN_01 for SDHost0 SDCARD_CLK

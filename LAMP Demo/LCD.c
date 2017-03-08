@@ -46,12 +46,10 @@ void LCDReset(){
     unsigned long temp;
         temp = 80000000 / (3 * 1000);
     //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);
-    //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,0); //Pin 59
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_1,0); //Pin 55
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,0); //Pin 59
     UtilsDelay(10*temp);
     //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
-    //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,GPIO_PIN_4);
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_1,GPIO_PIN_1);
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,GPIO_PIN_4);
 }
 
 void displaymytext(void){

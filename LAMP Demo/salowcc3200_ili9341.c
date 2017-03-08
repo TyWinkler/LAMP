@@ -239,29 +239,25 @@ pfnWriteCommand WriteCommand = WriteCommandGPIO;
 void CommandEnable()
 {
    //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,0);  // pin 62 GPIO_PIN_7
-   //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,0);  // pin 61 GPIO_PIN_6
-   GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_2,0);  // pin 57 GPIO_PIN_2
+   GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,0);  // pin 61 GPIO_PIN_7
 }
 
 void CommandDisable()
 {
     //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_7,GPIO_PIN_7);
-    //GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,GPIO_PIN_6);
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_2,GPIO_PIN_2);
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_6,GPIO_PIN_6);
 }
 
 void ChipSelectEnable()
 {
     //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,0);  // pin3
-    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);  // pin 63
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_3,0);  // pin 58
+    GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);  // pin 63
 }
 
 void ChipSelectDisable()
 {
     //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_4,GPIO_PIN_4);
-    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_3,GPIO_PIN_3);  // pin 58
+    GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
 }
 void
 WriteDataGPIO16(unsigned short usData)
