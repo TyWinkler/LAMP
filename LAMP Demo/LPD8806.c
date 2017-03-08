@@ -121,7 +121,7 @@ void display(){
     unsigned int i;
     unsigned long ulDummy;
 
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_0,1);  // pin 50 GPIO_PIN_0
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,1);  // pin 59 GPIO_PIN_0
 
     // Enable SPI Transfer
     MAP_SPICSEnable(GSPI_BASE);
@@ -141,7 +141,7 @@ void display(){
     // Prepare for a new transfer
     reset();
 
-    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_0,0);
+    GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,0);
 }
 
 //*****************************************************************************

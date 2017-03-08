@@ -185,29 +185,6 @@ void main()
     PinMuxConfig();
 
     //
-    // Set the SD card clock as output pin
-    //
-    //MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
-                //MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
-
-    //
-    // Enable Pull up on data
-    //
-    //MAP_PinConfigSet(PIN_64,PIN_STRENGTH_6MA, PIN_TYPE_STD_PU);
-                //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-
-    //
-    // Enable Pull up on CMD
-    //
-    //MAP_PinConfigSet(PIN_02,PIN_STRENGTH_6MA, PIN_TYPE_STD_PU);
-                //MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-
-    //
-    // Enable Pull up on clk
-    //
-    //MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-
-    //
     // Initialising the Terminal.
     //
     InitTerm();
@@ -225,35 +202,6 @@ void main()
     Message("\t\t        CC3200 SDHost Fatfs Demo Application  \n\r");
     Message("\t\t   ********************************************\n\r");
     Message("\n\n\n\r");
-
-    unsigned long pins[4] = {0,PIN_01,PIN_02,PIN_64};
-    unsigned long strength[4] = {0, PIN_STRENGTH_2MA, PIN_STRENGTH_4MA, PIN_STRENGTH_6MA};
-    unsigned long type[4] = {0, PIN_TYPE_STD_PU, PIN_TYPE_STD_PD, PIN_TYPE_STD};
-    unsigned long direc[4] = {0, PIN_DIR_MODE_IN, PIN_DIR_MODE_OUT, PIN_DIR_MODE_HW};
-
-    int i;
-    int j;
-    int k;
-    int l;
-    for (i = 0; i < 4; i++){
-        for (j = 0; j < 4; j++){
-            for (k = 0; k < 4; k++){
-                if(k != 0 && i != 0 && j != 0){
-                    MAP_PinConfigSet(pins[i], strength[j], type[k]);
-                }
-                for (l = 0; l < 4; l++){
-                    if(l != 0 && i != 0){
-                        MAP_PinDirModeSet(pins[i], direc[l]);
-                    }
-                    res = f_mount(&fs,"0",1);
-                    res = f_opendir(&dir,"/");
-                    if(res == FR_OK){
-                        Message("We got it\n");
-                    }
-                }
-            }
-        }
-    }
 
     res = f_mount(&fs,"0",1);
     while(res != FR_OK){

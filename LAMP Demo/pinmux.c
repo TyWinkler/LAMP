@@ -57,29 +57,44 @@ void
 PinMuxConfig(void){
 
     // Enable Peripheral Clocks 
-    MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
-    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
+    //MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GSPI, PRCM_RUN_MODE_CLK);
 
-    // UART
-    MAP_PinTypeUART(PIN_55, PIN_MODE_3); // Configure PIN_55 for UART0 UART0_TX
-    MAP_PinTypeUART(PIN_57, PIN_MODE_3); // Configure PIN_57 for UART0 UART0_RX
-
     // SPI
-    MAP_PinTypeSPI(PIN_05, PIN_MODE_7); // Configure PIN_05 for SPI0 GSPI_CLK
-    MAP_PinTypeSPI(PIN_06, PIN_MODE_7); // Configure PIN_06 for SPI0 GSPI_MISO
+    //MAP_PinTypeSPI(PIN_05, PIN_MODE_7); // Configure PIN_05 for SPI0 GSPI_CLK
+    //MAP_PinTypeSPI(PIN_06, PIN_MODE_7); // Configure PIN_06 for SPI0 GSPI_MISO
+    //MAP_PinTypeSPI(PIN_07, PIN_MODE_7); // Configure PIN_07 for SPI0 GSPI_MOSI
+
+    MAP_PinTypeSPI(PIN_45, PIN_MODE_7); // Configure PIN_45 for SPI0 GSPI_CLK
+    MAP_PinDirModeSet(PIN_45,PIN_DIR_MODE_OUT);
+    MAP_PinConfigSet(PIN_45, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinTypeSPI(PIN_53, PIN_MODE_7); // Configure PIN_53 for SPI0 GSPI_MISO
+    MAP_PinDirModeSet(PIN_45,PIN_DIR_MODE_IN);
+    MAP_PinConfigSet(PIN_53, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
     MAP_PinTypeSPI(PIN_07, PIN_MODE_7); // Configure PIN_07 for SPI0 GSPI_MOSI
 
     // LCD
-    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false); // Configure PIN_59 for GPIO Output - Reset
-    MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
-    MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false); // Configure PIN_61 for GPIO Output - D/C
-    MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
-    MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false); // Configure PIN_63 for GPIO Output - Chip Select
-    MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
+    //MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false); // Configure PIN_59 for GPIO Output - Reset
+    //MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
+    //MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false); // Configure PIN_61 for GPIO Output - D/C
+    //MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
+    //MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false); // Configure PIN_63 for GPIO Output - Chip Select
+    //MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
 
     // LED
-    MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false); // Configure PIN_50 for GPIO Output - LED Chip Select
-    MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
+    //MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false); // Configure PIN_50 for GPIO Output - LED Chip Select
+    //MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
+
+    // LCD
+    MAP_PinTypeGPIO(PIN_55, PIN_MODE_0, false); // Configure PIN_55 for GPIO Output - Reset
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x2, GPIO_DIR_MODE_OUT);
+    MAP_PinTypeGPIO(PIN_57, PIN_MODE_0, false); // Configure PIN_57 for GPIO Output - D/C
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x4, GPIO_DIR_MODE_OUT);
+    MAP_PinTypeGPIO(PIN_58, PIN_MODE_0, false); // Configure PIN_58 for GPIO Output - Chip Select
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x8, GPIO_DIR_MODE_OUT);
+
+    // LED
+    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false); // Configure PIN_59 for GPIO Output - Chip Select
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
 }
