@@ -47,6 +47,7 @@
 
 unsigned long pixels[NUMLEDS];
 unsigned long myColor = 0xFF0000;
+unsigned long LEDWrite = 0;
 
 //*****************************************************************************
 //

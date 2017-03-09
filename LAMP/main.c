@@ -256,7 +256,7 @@ int main(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 55);
 
     // Initialize the Audio(I2S) Module
     AudioInit();
@@ -313,21 +313,21 @@ int main(){
         LOOP_FOREVER();
     }
 
-        // Start the LED Task
-        lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 1, &g_LEDTask );
-        if(lRetVal < 0)
-        {
-            ERR_PRINT(lRetVal);
-            LOOP_FOREVER();
-        }
+    // Start the LED Task
+    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 2, &g_LEDTask );
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
-        // Start the LCD Task
-        lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 1, &g_LCDTask );
-        if(lRetVal < 0)
-        {
-            ERR_PRINT(lRetVal);
-            LOOP_FOREVER();
-        }
+    // Start the LCD Task
+    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
     osi_start(); // Start the task scheduler
 }

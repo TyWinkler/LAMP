@@ -42,6 +42,8 @@
 #include "hw_ints.h"
 #include "LPD8806.h"
 
+#include "i2s_if.h"
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
@@ -63,20 +65,20 @@
 //*****************************************************************************
 void LED( void *pvParameters ){
     reset();
-    unsigned long critical;
     while(1){
-        critical = osi_EnterCritical();
-        allColor(colorHex(myColor));
-//        if(myColor & 0x80000 || myColor & 0x1000000){
-//            myColor = myColor << 1;
-//            myColor++;
-//        } else{
-//            myColor = myColor << 1;
-//        }
-        myColor = myColor << 1 | myColor >> 31;
-        //myColor = myColor & 0x00FFFFFF;
-        osi_ExitCritical(critical);
-        osi_Sleep(1000);
+        if(LEDWrite){
+            allColor(colorHex(myColor));
+    //        if(myColor & 0x80000 || myColor & 0x1000000){
+    //            myColor = myColor << 1;
+    //            myColor++;
+    //        } else{
+    //            myColor = myColor << 1;
+    //        }
+            myColor = myColor << 1 | myColor >> 31;
+            //myColor = myColor & 0x00FFFFFF;
+            LEDWrite = 0;
+            osi_Sleep(1500);
+        }
     }
 }
 

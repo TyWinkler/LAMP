@@ -57,6 +57,8 @@
 #include "hw_common_reg.h"
 #include "ff.h"
 
+#include "LPD8806.h"
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
@@ -65,8 +67,10 @@ int g_iReceiveCount =0;
 int g_iRetVal =0;
 int iCount =0;
 //unsigned char *p;
+int songCount = 0;
 
-#define USERFILE        "call.wav"
+#define USERFILE1        "call.wav"
+#define USERFILE2        "stuck.wav"
 #define BUFFSIZE 1024
 unsigned char pBuffer[BUFFSIZE];
 
@@ -75,6 +79,8 @@ FATFS fs;
 FRESULT res;
 DIR dir;
 UINT Size;
+
+const TCHAR* myWav = "call.wav";
 
 extern unsigned long  g_ulStatus;
 extern unsigned char g_ucSpkrStartFlag;
@@ -116,7 +122,12 @@ ListDirectory()
 
 void openFile(){
     Message("\n\rReading user file...\n\r");
-    res = f_open(&fp,USERFILE,FA_READ);
+    res = f_open(&fp,myWav,FA_READ);
+    if(myWav == "stuck.wav"){
+        myWav = "call.wav";
+    } else {
+        myWav = "stuck.wav";
+    }
     f_lseek(&fp,44);
 }
 
@@ -129,7 +140,7 @@ void readFile(){
     }
     else
     {
-        Report("Failed to open %s\n\r",USERFILE);
+        Report("Failed to open %s\n\r",USERFILE1);
     }
 }
 
@@ -150,28 +161,25 @@ void closeFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
-    unsigned long critical = osi_EnterCritical();
     f_mount(&fs,"0",1);
     res = f_opendir(&dir,"/");
     ListDirectory();
     //open file
     openFile();
-    osi_ExitCritical(critical);
     g_ucSpkrStartFlag = 1;
     while(1)
     {
       while(g_ucSpkrStartFlag)
       {
         // Read from file and discard wav header
-        critical = osi_EnterCritical();
-          readFile();
-        osi_ExitCritical(critical);
+        readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
         while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){};
 
         if( Size > 0)
         {
           iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
+
           if(iRetVal < 0)
           {
             UART_PRINT("Unable to fill buffer");
@@ -180,18 +188,10 @@ void Speaker( void *pvParameters )
         }
         else
         { // we reach at the of file
-
         //close file
-            critical = osi_EnterCritical();
-            closeFile();
-            osi_ExitCritical(critical);
-
+        closeFile();
         // reopen the file
-        critical = osi_EnterCritical();
-            openFile();
-            osi_ExitCritical(critical);
-
-
+        openFile();
         }
         if(g_uiPlayWaterMark == 0)
         {
@@ -202,9 +202,7 @@ void Speaker( void *pvParameters )
         }
         g_iReceiveCount++;
       }
-
       MAP_UtilsDelay(1000);
-
     }
 }
 

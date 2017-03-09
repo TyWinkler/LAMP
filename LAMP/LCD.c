@@ -15,6 +15,7 @@
 #include "gpio.h"
 #include "LPD8806.h"
 
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
@@ -111,27 +112,27 @@ int LcdPrintf(char *pcFormat, ...){
 void LCD( void *pvParameters ){
     LCDReset();
     displaymytext();
-    unsigned long critical;
     unsigned long prevColor = myColor;
     while(1){
-        critical = osi_EnterCritical();
-        GrContextForegroundSet(&sContext, ClrBlack);
-        g_lLcdCursorY = 30;
-        LcdPrintf(" ");
-        LcdPrintf("The color is");
-        LcdPrintf(" ");
-        long dispColor = prevColor & 0x00FFFFFF;
-        LcdPrintf("%#08x", dispColor);
-        GrContextForegroundSet(&sContext, ClrWhite);
-        g_lLcdCursorY = 30;
-        LcdPrintf(" ");
-        LcdPrintf("The color is");
-        LcdPrintf(" ");
-        dispColor = myColor & 0x00FFFFFF;
-        LcdPrintf("%#08x", dispColor);
-        prevColor = myColor;
-        osi_ExitCritical(critical);
-        osi_Sleep(1000);
+        if(!LEDWrite){
+            GrContextForegroundSet(&sContext, ClrBlack);
+            g_lLcdCursorY = 30;
+            LcdPrintf(" ");
+            LcdPrintf("The color is");
+            LcdPrintf(" ");
+            long dispColor = prevColor & 0x00FFFFFF;
+            LcdPrintf("%#08x", dispColor);
+            GrContextForegroundSet(&sContext, ClrWhite);
+            g_lLcdCursorY = 30;
+            LcdPrintf(" ");
+            LcdPrintf("The color is");
+            LcdPrintf(" ");
+            dispColor = myColor & 0x00FFFFFF;
+            LcdPrintf("%#08x", dispColor);
+            prevColor = myColor;
+            LEDWrite = 1;
+            osi_Sleep(1500);
+        }
     }
 }
 
