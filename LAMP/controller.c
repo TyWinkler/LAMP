@@ -2,13 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "rom.h"
-#include "rom_map.h"
-#include "utils.h"
-#include "hw_ints.h"
-#include "LPD8806.h"
 
-#include "i2s_if.h"
 #include "osi.h"
 
 //*****************************************************************************
