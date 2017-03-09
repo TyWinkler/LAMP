@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS
+CG_TOOL_ROOT := C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -154,14 +154,14 @@ all: LAMP\ Demo.out
 LAMP\ Demo.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armcl" -mv7M4 --code_state=16 --float_support=vfplib -me --define=ccs --define=NOTERM --define=USE_FREERTOS --define=SL_PLATFORM_MULTI_THREADED --define=cc3200 -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"LAMP Demo.map" --heap_size=0x17000 --stack_size=0x500 -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/lib" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/grlib/ccs-cm3/Debug" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/driverlib/ccs/Release" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/grlib" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/inc" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="LAMP Demo_linkInfo.xml" --rom_model -o "LAMP Demo.out" $(ORDERED_OBJS)
+	"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armcl" -mv7M4 --code_state=16 --float_support=vfplib -me --define=ccs --define=NOTERM --define=USE_FREERTOS --define=SL_PLATFORM_MULTI_THREADED --define=cc3200 -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"LAMP Demo.map" --heap_size=0x17000 --stack_size=0x500 -i"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/lib" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/grlib/ccs-cm3/Debug" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/driverlib/ccs/Release" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/grlib" -i"C:/TI/CC3200SDK_1.2.0/cc3200-sdk/inc" -i"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="LAMP Demo_linkInfo.xml" --rom_model -o "LAMP Demo.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
 
 LAMP\ Demo.bin: $(EXE_OUTPUTS)
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armhex"  -o "LAMP Demo.bin" $(EXE_OUTPUTS__QUOTED)
+	"C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armhex"  -o "LAMP Demo.bin" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -176,7 +176,7 @@ clean:
 
 post-build:
 	-@echo 'convert to bin file'
-	-"C:/ti/ccsv7/utils/tiobj2bin/tiobj2bin" "LAMP Demo.out" "LAMP Demo.bin" "C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armofd" "C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armhex" "C:/ti/ccsv7/utils/tiobj2bin/mkhex4bin"
+	-"C:/TI/ccsv7/utils/tiobj2bin/tiobj2bin" "LAMP Demo.out" "LAMP Demo.bin" "C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armofd" "C:/TI/ccsv7/tools/compiler/ti-cgt-arm_16.12.0.STS/bin/armhex" "C:/TI/ccsv7/utils/tiobj2bin/mkhex4bin"
 	-@echo ' '
 
 .PHONY: all clean dependents

@@ -17,7 +17,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.Stellaris In-Circuit Debug Interface_0/Cortex_M4_0" value="${build_artifact:sdhost_fatfs}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Stellaris In-Circuit Debug Interface_0/Cortex_M4_0" value="sdhost_fatfs"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:sdhost_fatfs}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Stellaris In-Circuit Debug Interface_0/Cortex_M4_0" value="A:/Documents\Github\LAMP\trunk\sdhost_fatfs\Release\sdhost_fatfs.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Stellaris In-Circuit Debug Interface_0/Cortex_M4_0" value="C:/Users\Ty\Documents\GitHub\LAMP\trunk\sdhost_fatfs\Release\sdhost_fatfs.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/sdhost_fatfs"/>
 </listAttribute>

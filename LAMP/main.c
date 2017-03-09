@@ -215,13 +215,13 @@ int main(){
     BoardInit();
 
     PinMuxConfig(); // Pinmux Configuration
+
     SPIInit();
 
     //SDCARD
     MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
     MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
     MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
-    //MAP_PinConfigSet(PIN_01,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
 
     InitTerm(); // Initialising the UART terminal
     ClearTerm(); // Clearing the Terminal.
@@ -280,30 +280,6 @@ int main(){
 
     // Start Audio Tx/Rx
     Audio_Start(RecordPlay);
-
-    // Start the simplelink thread
-    //lRetVal = VStartSimpleLinkSpawnTask(9);
-    //if(lRetVal < 0)
-    //{
-    //    ERR_PRINT(lRetVal);
-    //    LOOP_FOREVER();
-    //}
-
-    // Start the Network Task
-    //lRetVal = osi_TaskCreate( Network, (signed char*)"NetworkTask",\OSI_STACK_SIZE, NULL, 1, &g_NetworkTask );
-    //if(lRetVal < 0)
-    //{
-    //    ERR_PRINT(lRetVal);
-    //    LOOP_FOREVER();
-    //}
-
-    // Start the Control Task
-//    lRetVal = ControlTaskCreate();
-//    if(lRetVal < 0)
-//    {
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
 
     // Start the Speaker Task
     lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );

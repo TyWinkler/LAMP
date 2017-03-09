@@ -74,44 +74,30 @@ PinMuxConfig(void)
     //
     MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
-    /*
-    //
-    // Configure PIN_06 for SDHOST0 SDHost_D0
-    //
-    MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
-
-    //
-    // Configure PIN_07 for SDHOST0 SDHost_CLK
-    //
-    MAP_PinTypeSDHost(PIN_07, PIN_MODE_8);
-
-    //
-    // Configure PIN_08 for SDHOST0 SDHost_CMD
-    //
-    MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
-    */
-
-
     //
     // Configure PIN_06 for SDHost0 SDCARD_DATA
     //
-    //MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
-    //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
-    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
-    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
+    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
+    //MAP_PinConfigSet(PIN_64,PIN_STRENGTH_6MA, PIN_TYPE_STD_PU);
 
     //
     // Configure PIN_01 for SDHost0 SDCARD_CLK
     //
-    MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
-    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
-    MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    MAP_PinTypeSDHost(PIN_07, PIN_MODE_8);
+    MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT);
+    //MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
+    //MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
+    //MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
-    // Configure PIN_08 for SDHost0 SDCARD_CMD
+    // Configure PIN_02 for SDHost0 SDCARD_CMD
     //
     MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
     MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+    //MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
+    //MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
 
     //
