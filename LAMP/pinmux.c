@@ -50,90 +50,51 @@
 #include "prcm.h"
 #include "rom.h"
 #include "rom_map.h"
+#include "sdhost.h"
 //*****************************************************************************
-void PinMuxConfig(void)
-{
+void PinMuxConfig(void){
 
-
-    //
-    // Set unused pins to PIN_MODE_0 with the exception of JTAG pins 16,17,19,20
-    //
-
-    //
     // Enable Peripheral Clocks
-    //
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
-    //MAP_PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
+    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GSPI, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_I2S, PRCM_RUN_MODE_CLK);
-    //
-    // Configure PIN_50 for GPIO Output
-    //
-    MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false);
+
+    // LEDs
+    MAP_PinTypeGPIO(PIN_50, PIN_MODE_0, false); // Configure PIN_50 for GPIO Output - Chip Select
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x1, GPIO_DIR_MODE_OUT);
-    //
-    // Configure PIN_59 for GPIO Output
-    //
-    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false);
+
+    // LCD Screen
+    MAP_PinTypeGPIO(PIN_59, PIN_MODE_0, false); // Configure PIN_59 for GPIO Output - Reset
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x10, GPIO_DIR_MODE_OUT);
-    //
-    // Configure PIN_61 for GPIO Output
-    //
-    MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false);
+    MAP_PinTypeGPIO(PIN_61, PIN_MODE_0, false); // Configure PIN_61 for GPIO Output - D/C
     MAP_GPIODirModeSet(GPIOA0_BASE, 0x40, GPIO_DIR_MODE_OUT);
-    //
-    // Configure PIN_63 for GPIO Output
-    //
-    MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false);
+    MAP_PinTypeGPIO(PIN_63, PIN_MODE_0, false); // Configure PIN_63 for GPIO Output - Chip Select
     MAP_GPIODirModeSet(GPIOA1_BASE, 0x1, GPIO_DIR_MODE_OUT);
-    //
-    // Configure PIN_64 for SDHost0 SDCARD_DATA
-    //
-    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
-    //
-    // Configure PIN_01 for SDHost0 SDCARD_CLK
-    //
-    MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
-    //
-    // Configure PIN_02 for SDHost0 SDCARD_CMD
-    //
-    MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
-    //
-    // Configure PIN_05 for SPI0 GSPI_CLK
-    //
-    MAP_PinTypeSPI(PIN_05, PIN_MODE_7);
-    //
-    // Configure PIN_06 for SPI0 GSPI_MISO
-    //
-    MAP_PinTypeSPI(PIN_06, PIN_MODE_7);
-    //
-    // Configure PIN_07 for SPI0 GSPI_MOSI
-    //
-    MAP_PinTypeSPI(PIN_07, PIN_MODE_7);
-    //
-    // Configure PIN_03 for I2C0 I2C_SCL
-    //
-    MAP_PinTypeI2C(PIN_03, PIN_MODE_5);
-    //
-    // Configure PIN_04 for I2C0 I2C_SDA
-    //
-    MAP_PinTypeI2C(PIN_04, PIN_MODE_5);
-    //
-    // Configure PIN_60 for McASP0 McASP0_McAXR1
-    //
-    MAP_PinTypeI2S(PIN_60, PIN_MODE_6);
-    //
-    // Configure PIN_45 for McASP0 McASP0_McAXR0
-    //
-    MAP_PinTypeI2S(PIN_45, PIN_MODE_6);
-    //
-    // Configure PIN_15 for McASP0 McASP0_McAFSX
-    //
-    MAP_PinTypeI2S(PIN_15, PIN_MODE_7);
-    //
-    // Configure PIN_53 for McASP0 McASP0_McACLK
-    //
-    MAP_PinTypeI2S(PIN_53, PIN_MODE_2);
+
+    // SPI
+    MAP_PinTypeSPI(PIN_05, PIN_MODE_7); // Configure PIN_05 for SPI0 GSPI_CLK
+    MAP_PinTypeSPI(PIN_06, PIN_MODE_7); // Configure PIN_06 for SPI0 GSPI_MISO
+    MAP_PinTypeSPI(PIN_07, PIN_MODE_7); // Configure PIN_07 for SPI0 GSPI_MOSI
+
+    // Speakers
+    MAP_PinTypeI2C(PIN_03, PIN_MODE_5); // Configure PIN_03 for I2C0 I2C_SCL
+    MAP_PinTypeI2C(PIN_04, PIN_MODE_5); // Configure PIN_04 for I2C0 I2C_SDA
+    MAP_PinTypeI2S(PIN_60, PIN_MODE_6); // Configure PIN_60 for McASP0 McASP0_McAXR1
+    MAP_PinTypeI2S(PIN_45, PIN_MODE_6); // Configure PIN_45 for McASP0 McASP0_McAXR0
+    MAP_PinTypeI2S(PIN_15, PIN_MODE_7); // Configure PIN_15 for McASP0 McASP0_McAFSX
+    MAP_PinTypeI2S(PIN_53, PIN_MODE_2); // Configure PIN_53 for McASP0 McASP0_McACLK
+
+    // SDCard Reader
+    MAP_PinTypeSDHost(PIN_64, PIN_MODE_6); // Configure PIN_64 for SDHost0 SDCARD_DATA
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
+    MAP_PinTypeSDHost(PIN_01, PIN_MODE_6); // Configure PIN_01 for SDHost0 SDCARD_CLK
+    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
+    MAP_PinTypeSDHost(PIN_02, PIN_MODE_6); // Configure PIN_02 for SDHost0 SDCARD_CMD
+    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
+    MAP_PRCMPeripheralReset(PRCM_SDHOST); // Reset MMCHS
+    MAP_SDHostInit(SDHOST_BASE); // Configure MMCHS
+    MAP_SDHostSetExpClk(SDHOST_BASE, MAP_PRCMPeripheralClockGet(PRCM_SDHOST), 15000000); // Configure card clock
 }

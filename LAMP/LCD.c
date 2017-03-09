@@ -1,6 +1,5 @@
 
 // Hardware & driverlib library includes
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,6 +13,7 @@
 #include "grlib.h"
 #include "gpio.h"
 #include "LPD8806.h"
+#include "osi.h"
 
 
 //*****************************************************************************
@@ -22,7 +22,6 @@
 
 static tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
-
 
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
@@ -45,11 +44,9 @@ int LcdPrintf(char *pcFormat, ...);
 
 void LCDReset(){
     unsigned long temp;
-        temp = 80000000 / (3 * 1000);
-    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,0);
+    temp = 80000000 / (3 * 1000);
     GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,0); //Pin 59
     UtilsDelay(10*temp);
-    //GPIOPinWrite(GPIOA1_BASE,GPIO_PIN_0,GPIO_PIN_0);
     GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_4,GPIO_PIN_4);
 }
 
@@ -64,8 +61,6 @@ void displaymytext(void){
     tRectangle screen = {0,0,width,height};
     DpyRectFill(&g_ssalowCC3200_ili9341, &screen, ClrBlack);
     GrContextForegroundSet(&sContext, ClrWhite);
-
-    // Put the CC3200 Banner on screen.
     GrContextFontSet(&sContext, &g_sFontCmss28);
 
 }

@@ -62,9 +62,6 @@
 #include "i2s_if.h"
 #include "pcm_handler.h"
 
-//SDCard reader
-#include "sdhost.h"
-
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
@@ -73,6 +70,7 @@ OsiTaskHandle g_SpeakerTask = NULL ;
 OsiTaskHandle g_NetworkTask = NULL ;
 OsiTaskHandle g_LEDTask = NULL;
 OsiTaskHandle g_LCDTask = NULL;
+OsiTaskHandle g_ControllerTask = NULL;
 
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
@@ -80,8 +78,6 @@ OsiTaskHandle g_LCDTask = NULL;
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
 #define PLAY_WATERMARK          30*1024
-
-unsigned char g_loopback = 1;
 
 #if defined(ccs)
 extern void (* const g_pfnVectors[])(void);
@@ -100,7 +96,7 @@ extern uVectorEntry __vector_table;
 extern void Speaker( void *pvParameters );
 extern void LED( void *pvParameters );
 extern void LCD( void *pvParameters );
-
+extern void Controller( void *pvParameters );
 
 //*****************************************************************************
 //
@@ -158,7 +154,6 @@ void vApplicationMallocFailedHook(){
     while(1){}
 }
 
-
 void SPIInit(){
     // Reset SPI
     SPIReset(GSPI_BASE);
@@ -176,6 +171,51 @@ void SPIInit(){
     SPIEnable(GSPI_BASE);
 }
 
+void createRxBuffer(){
+    pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
+    if(pRxBuffer == NULL){
+        UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
+        LOOP_FOREVER();
+    }
+}
+
+void configureAudio(){
+    long lRetVal = -1;
+
+    // Initialising the I2C Interface
+    lRetVal = I2C_IF_Open(1);
+    if(lRetVal < 0){
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    createRxBuffer();
+
+    // Configure Audio Codec
+    AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
+    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 55);
+
+    // Initialize the Audio(I2S) Module
+    AudioInit();
+
+    // Initialize the DMA Module
+    UDMAInit();
+
+    UDMAChannelSelect(UDMA_CH5_I2S_TX, NULL);
+    SetupPingPongDMATransferRx(pRxBuffer);
+
+    // Setup the Audio In/Out
+    lRetVal = AudioSetupDMAMode(DMAPingPongCompleteAppCB_opt, CB_EVENT_CONFIG_SZ, I2S_MODE_TX);
+    if(lRetVal < 0){
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, I2S_MODE_TX, 1);
+
+    // Start Audio Tx/Rx
+    Audio_Start(I2S_MODE_TX);
+}
 
 //*****************************************************************************
 //
@@ -208,7 +248,6 @@ void BoardInit(void){
 //******************************************************************************
 int main(){
     long lRetVal = -1;
-    unsigned char   RecordPlay;
 
     BoardInit();
 
@@ -216,89 +255,32 @@ int main(){
 
     SPIInit();
 
-    //SDCARD
-    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
-    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
-    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
+    configureAudio();
 
-    InitTerm(); // Initialising the UART terminal
-    ClearTerm(); // Clearing the Terminal.
-
-    //SDCARD
-    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK); // Enable MMCHS
-    MAP_PRCMPeripheralReset(PRCM_SDHOST); // Reset MMCHS
-    MAP_SDHostInit(SDHOST_BASE); // Configure MMCHS
-    MAP_SDHostSetExpClk(SDHOST_BASE, MAP_PRCMPeripheralClockGet(PRCM_SDHOST), 15000000); // Configure card clock
-
-    // Initialising the I2C Interface
-    lRetVal = I2C_IF_Open(1);
-    if(lRetVal < 0)
-    {
+    // Start the Controller Task
+    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 2, &g_ControllerTask );
+    if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
-    RecordPlay = I2S_MODE_TX;
-    g_loopback = 1;
-
-    // Create RX Buffer
-    if(RecordPlay & I2S_MODE_TX)
-    {
-        pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
-        if(pRxBuffer == NULL)
-        {
-            UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
-            LOOP_FOREVER();
-        }
-    }
-
-    // Configure Audio Codec
-    AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
-    AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 55);
-
-    // Initialize the Audio(I2S) Module
-    AudioInit();
-
-    // Initialize the DMA Module
-    UDMAInit();
-    if(RecordPlay & I2S_MODE_TX)
-    {
-       UDMAChannelSelect(UDMA_CH5_I2S_TX, NULL);
-        SetupPingPongDMATransferRx(pRxBuffer);
-    }
-
-    // Setup the Audio In/Out
-    lRetVal = AudioSetupDMAMode(DMAPingPongCompleteAppCB_opt, CB_EVENT_CONFIG_SZ, RecordPlay);
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }    
-    AudioCaptureRendererConfigure(AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, RecordPlay, 1);
-
-    // Start Audio Tx/Rx
-    Audio_Start(RecordPlay);
 
     // Start the Speaker Task
     lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
-    if(lRetVal < 0)
-    {
+    if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LED Task
     lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 2, &g_LEDTask );
-    if(lRetVal < 0)
-    {
+    if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LCD Task
     lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
-    if(lRetVal < 0)
-    {
+    if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
