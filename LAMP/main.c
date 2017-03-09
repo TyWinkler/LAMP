@@ -57,9 +57,7 @@
 
 //App include
 #include "pinmux.h"
-#include "network.h"
 #include "circ_buff.h"
-#include "control.h"
 #include "audioCodec.h"
 #include "i2s_if.h"
 #include "pcm_handler.h"
@@ -71,7 +69,6 @@
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 tCircularBuffer *pRxBuffer;
-tUDPSocket g_UdpSock;
 OsiTaskHandle g_SpeakerTask = NULL ;
 OsiTaskHandle g_NetworkTask = NULL ;
 OsiTaskHandle g_LEDTask = NULL;
@@ -81,6 +78,8 @@ OsiTaskHandle g_LCDTask = NULL;
 #define SAMPLERATE              44100
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
+#define PLAY_BUFFER_SIZE        70*1024
+#define PLAY_WATERMARK          30*1024
 
 unsigned char g_loopback = 1;
 
@@ -99,7 +98,6 @@ extern uVectorEntry __vector_table;
 //                    FUNCTION DECLARATIONS
 //******************************************************************************
 extern void Speaker( void *pvParameters );
-//extern void Network( void *pvParameters );
 extern void LED( void *pvParameters );
 extern void LCD( void *pvParameters );
 

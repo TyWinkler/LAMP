@@ -48,7 +48,6 @@
 #include "common.h"
 #include "uart_if.h"
 // Demo app includes
-#include "network.h"
 #include "circ_buff.h"
 
 //SDCard
@@ -62,7 +61,6 @@
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
-extern tUDPSocket g_UdpSock;
 int g_iReceiveCount =0;
 int g_iRetVal =0;
 int iCount =0;
@@ -71,8 +69,10 @@ int songCount = 0;
 
 #define USERFILE1        "call.wav"
 #define USERFILE2        "stuck.wav"
-#define BUFFSIZE 1024
+#define BUFFSIZE                1024
+#define PLAY_WATERMARK          30*1024
 unsigned char pBuffer[BUFFSIZE];
+unsigned char g_ucSpkrStartFlag;
 
 FIL fp;
 FATFS fs;
@@ -83,7 +83,6 @@ UINT Size;
 const TCHAR* myWav = "call.wav";
 
 extern unsigned long  g_ulStatus;
-extern unsigned char g_ucSpkrStartFlag;
 extern unsigned char g_uiPlayWaterMark;
 extern unsigned char g_loopback;
 //unsigned char speaker_data[16*1024];
