@@ -150,20 +150,22 @@ void closeFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
+    unsigned long critical = osi_EnterCritical();
     f_mount(&fs,"0",1);
     res = f_opendir(&dir,"/");
     ListDirectory();
     //open file
     openFile();
-
+    osi_ExitCritical(critical);
     g_ucSpkrStartFlag = 1;
     while(1)
     {
       while(g_ucSpkrStartFlag)
       {
         // Read from file and discard wav header
-        readFile();
-
+        critical = osi_EnterCritical();
+          readFile();
+        osi_ExitCritical(critical);
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
         while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){};
 
@@ -180,10 +182,14 @@ void Speaker( void *pvParameters )
         { // we reach at the of file
 
         //close file
-        closeFile();
+            critical = osi_EnterCritical();
+            closeFile();
+            osi_ExitCritical(critical);
 
         // reopen the file
-        openFile();
+        critical = osi_EnterCritical();
+            openFile();
+            osi_ExitCritical(critical);
 
 
         }

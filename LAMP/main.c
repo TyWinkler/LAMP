@@ -46,6 +46,8 @@
 #include "rom_map.h"
 #include "pin.h"
 #include "utils.h"
+#include "spi.h"
+
 
 //Common interface includes
 #include "common.h"
@@ -72,9 +74,13 @@ tCircularBuffer *pRxBuffer;
 tUDPSocket g_UdpSock;
 OsiTaskHandle g_SpeakerTask = NULL ;
 OsiTaskHandle g_NetworkTask = NULL ;
+OsiTaskHandle g_LEDTask = NULL;
+OsiTaskHandle g_LCDTask = NULL;
 
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
+#define SPI_IF_BIT_RATE         20000000
+#define TIMER_FREQ              80000000
 
 unsigned char g_loopback = 1;
 
@@ -94,6 +100,9 @@ extern uVectorEntry __vector_table;
 //******************************************************************************
 extern void Speaker( void *pvParameters );
 //extern void Network( void *pvParameters );
+extern void LED( void *pvParameters );
+extern void LCD( void *pvParameters );
+
 
 //*****************************************************************************
 //
@@ -151,6 +160,25 @@ void vApplicationMallocFailedHook(){
     while(1){}
 }
 
+
+void SPIInit(){
+    // Reset SPI
+    SPIReset(GSPI_BASE);
+
+    // Configure SPI interface
+    SPIConfigSetExpClk(GSPI_BASE,PRCMPeripheralClockGet(PRCM_GSPI),
+                     SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_0,
+                     (
+                     SPI_3PIN_MODE |
+                     SPI_TURBO_OFF |
+
+                     SPI_WL_8));
+
+    // Enable SPI for communication
+    SPIEnable(GSPI_BASE);
+}
+
+
 //*****************************************************************************
 //
 //! Board Initialization & Configuration
@@ -182,16 +210,18 @@ void BoardInit(void){
 //******************************************************************************
 int main(){
     long lRetVal = -1;
-    unsigned char	RecordPlay;
+    unsigned char   RecordPlay;
 
     BoardInit();
 
     PinMuxConfig(); // Pinmux Configuration
+    SPIInit();
 
     //SDCARD
-    MAP_PinDirModeSet(PIN_07,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
-    MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
-    MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
+    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT); // Set the SD card clock as output pin
+    MAP_PinConfigSet(PIN_02,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on data
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
+    //MAP_PinConfigSet(PIN_01,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU); // Enable Pull up on CMD
 
     InitTerm(); // Initialising the UART terminal
     ClearTerm(); // Clearing the Terminal.
@@ -226,7 +256,7 @@ int main(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 30);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
 
     // Initialize the Audio(I2S) Module
     AudioInit();
@@ -268,12 +298,12 @@ int main(){
     //}
 
     // Start the Control Task
-    lRetVal = ControlTaskCreate();
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }    
+//    lRetVal = ControlTaskCreate();
+//    if(lRetVal < 0)
+//    {
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
     // Start the Speaker Task
     lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
@@ -282,6 +312,22 @@ int main(){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
+
+        // Start the LED Task
+        lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 1, &g_LEDTask );
+        if(lRetVal < 0)
+        {
+            ERR_PRINT(lRetVal);
+            LOOP_FOREVER();
+        }
+
+        // Start the LCD Task
+        lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 1, &g_LCDTask );
+        if(lRetVal < 0)
+        {
+            ERR_PRINT(lRetVal);
+            LOOP_FOREVER();
+        }
 
     osi_start(); // Start the task scheduler
 }
