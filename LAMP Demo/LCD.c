@@ -118,7 +118,7 @@ void LCD( void *pvParameters ){
         GrContextForegroundSet(&sContext, ClrBlack);
         g_lLcdCursorY = 30;
         LcdPrintf(" ");
-        LcdPrintf("The color is");
+        LcdPrintf(" ");
         LcdPrintf(" ");
         long dispColor = prevColor & 0x00FFFFFF;
         LcdPrintf("%#08x", dispColor);

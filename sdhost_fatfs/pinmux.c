@@ -50,6 +50,7 @@
 #include "rom_map.h"
 #include "gpio.h"
 #include "prcm.h"
+#include <sdhost.h>
 
 //*****************************************************************************
 void
@@ -92,19 +93,46 @@ PinMuxConfig(void)
 
 
     //
-    // Configure PIN_64 for SDHost0 SDCARD_DATA
+    // Configure PIN_06 for SDHost0 SDCARD_DATA
     //
+    //MAP_PinTypeSDHost(PIN_06, PIN_MODE_8);
+    //MAP_PinConfigSet(PIN_06,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
     MAP_PinTypeSDHost(PIN_64, PIN_MODE_6);
+    MAP_PinConfigSet(PIN_64,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
     // Configure PIN_01 for SDHost0 SDCARD_CLK
     //
     MAP_PinTypeSDHost(PIN_01, PIN_MODE_6);
+    MAP_PinDirModeSet(PIN_01,PIN_DIR_MODE_OUT);
+    MAP_PinConfigSet(PIN_01, PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
 
     //
-    // Configure PIN_02 for SDHost0 SDCARD_CMD
+    // Configure PIN_08 for SDHost0 SDCARD_CMD
     //
-    MAP_PinTypeSDHost(PIN_02, PIN_MODE_6);
+    MAP_PinTypeSDHost(PIN_08, PIN_MODE_8);
+    MAP_PinConfigSet(PIN_08,PIN_STRENGTH_4MA, PIN_TYPE_STD_PU);
+
+
+    //
+    // Enable MMCHS
+    //
+    MAP_PRCMPeripheralClkEnable(PRCM_SDHOST,PRCM_RUN_MODE_CLK);
+
+    //
+    // Reset MMCHS
+    //
+    MAP_PRCMPeripheralReset(PRCM_SDHOST);
+
+    //
+    // Configure MMCHS
+    //
+    MAP_SDHostInit(SDHOST_BASE);
+
+    //
+    // Configure card clock
+    //
+    MAP_SDHostSetExpClk(SDHOST_BASE, MAP_PRCMPeripheralClockGet(PRCM_SDHOST),1500000);
 
 
 //    MAP_PinTypeGPIO(PIN_06, PIN_MODE_0, false);
