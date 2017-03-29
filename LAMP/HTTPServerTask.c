@@ -23,6 +23,8 @@
 #include "uart_if.h"
 #include "common.h"
 
+#include "api.h"
+
 #define APPLICATION_NAME        "HTTP Server"
 #define APPLICATION_VERSION     "1.1.1"
 #define AP_SSID_LEN_MAX         (33)
