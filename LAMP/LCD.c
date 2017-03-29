@@ -14,7 +14,7 @@
 #include "gpio.h"
 #include "LPD8806.h"
 #include "osi.h"
-
+#include "ff.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -22,6 +22,8 @@
 
 static tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
+extern const TCHAR* myWav;
+const TCHAR* prevWav;
 
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
@@ -52,7 +54,6 @@ void LCDReset(){
 
 void displaymytext(void){
     salowCC3200_ili9341Init();
-
     GrContextInit(&sContext, &g_ssalowCC3200_ili9341);
     GrContextBackgroundSet(&sContext, ClrBlack);
     GrContextForegroundSet(&sContext, ClrBlack);
@@ -62,7 +63,6 @@ void displaymytext(void){
     DpyRectFill(&g_ssalowCC3200_ili9341, &screen, ClrBlack);
     GrContextForegroundSet(&sContext, ClrWhite);
     GrContextFontSet(&sContext, &g_sFontCmss28);
-
 }
 
 int LcdPrintf(char *pcFormat, ...){
@@ -113,10 +113,14 @@ void LCD( void *pvParameters ){
             GrContextForegroundSet(&sContext, ClrBlack);
             g_lLcdCursorY = 30;
             LcdPrintf(" ");
-            LcdPrintf("The color is");
+            LcdPrintf(" ");
             LcdPrintf(" ");
             long dispColor = prevColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
+            LcdPrintf(" ");
+            if(prevWav != myWav){
+                LcdPrintf((char *)prevWav);
+            }
             GrContextForegroundSet(&sContext, ClrWhite);
             g_lLcdCursorY = 30;
             LcdPrintf(" ");
@@ -124,6 +128,9 @@ void LCD( void *pvParameters ){
             LcdPrintf(" ");
             dispColor = myColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
+            LcdPrintf(" ");
+            LcdPrintf((char *)myWav);
+            prevWav = myWav;
             prevColor = myColor;
             LEDWrite = 1;
             osi_Sleep(1500);

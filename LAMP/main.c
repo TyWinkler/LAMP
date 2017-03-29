@@ -48,7 +48,6 @@
 #include "utils.h"
 #include "spi.h"
 
-
 //Common interface includes
 #include "common.h"
 #include "udma_if.h"
@@ -62,17 +61,20 @@
 #include "i2s_if.h"
 #include "pcm_handler.h"
 
+//Network
+
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 tCircularBuffer *pRxBuffer;
 OsiTaskHandle g_SpeakerTask = NULL ;
-OsiTaskHandle g_NetworkTask = NULL ;
+OsiTaskHandle g_HTTPServerTask = NULL ;
 OsiTaskHandle g_LEDTask = NULL;
 OsiTaskHandle g_LCDTask = NULL;
 OsiTaskHandle g_ControllerTask = NULL;
 
-#define OSI_STACK_SIZE          1024
+#define OSI_STACK_SIZE          2048
 #define SAMPLERATE              44100
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
@@ -97,6 +99,7 @@ extern void Speaker( void *pvParameters );
 extern void LED( void *pvParameters );
 extern void LCD( void *pvParameters );
 extern void Controller( void *pvParameters );
+extern void HTTPServerTask( void *pvParameters );
 
 //*****************************************************************************
 //
@@ -171,14 +174,6 @@ void SPIInit(){
     SPIEnable(GSPI_BASE);
 }
 
-void createRxBuffer(){
-    pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
-    if(pRxBuffer == NULL){
-        UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
-        LOOP_FOREVER();
-    }
-}
-
 void configureAudio(){
     long lRetVal = -1;
 
@@ -189,7 +184,11 @@ void configureAudio(){
         LOOP_FOREVER();
     }
 
-    createRxBuffer();
+    pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
+    if(pRxBuffer == NULL){
+        UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
+        LOOP_FOREVER();
+    }
 
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
@@ -258,28 +257,42 @@ int main(){
     configureAudio();
 
     // Start the Controller Task
-    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 2, &g_ControllerTask );
+    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LED Task
-    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 2, &g_LEDTask );
+    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LCD Task
-    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
+    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 3, &g_LCDTask );
+    if(lRetVal < 0){
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    // Simplelinkspawntask
+    lRetVal = VStartSimpleLinkSpawnTask(3);
+    if(lRetVal < 0){
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    // Create HTTP Server Task
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", OSI_STACK_SIZE, NULL, 3, g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

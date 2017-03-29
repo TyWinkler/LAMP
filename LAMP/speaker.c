@@ -121,12 +121,12 @@ ListDirectory()
 
 void openFile(){
     Message("\n\rReading user file...\n\r");
-    res = f_open(&fp,myWav,FA_READ);
     if(myWav == "stuck.wav"){
         myWav = "call.wav";
     } else {
         myWav = "stuck.wav";
     }
+    res = f_open(&fp,myWav,FA_READ);
     f_lseek(&fp,44);
 }
 

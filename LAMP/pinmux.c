@@ -79,6 +79,11 @@ void PinMuxConfig(void){
     MAP_PinTypeSPI(PIN_06, PIN_MODE_7); // Configure PIN_06 for SPI0 GSPI_MISO
     MAP_PinTypeSPI(PIN_07, PIN_MODE_7); // Configure PIN_07 for SPI0 GSPI_MOSI
 
+    // Network
+    MAP_PinTypeGPIO(PIN_58, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA0_BASE, 0x8, GPIO_DIR_MODE_IN);
+    MAP_PinConfigSet(PIN_58,PIN_STRENGTH_2MA|PIN_STRENGTH_4MA,PIN_TYPE_STD_PD);
+
     // Speakers
     MAP_PinTypeI2C(PIN_03, PIN_MODE_5); // Configure PIN_03 for I2C0 I2C_SCL
     MAP_PinTypeI2C(PIN_04, PIN_MODE_5); // Configure PIN_04 for I2C0 I2C_SDA

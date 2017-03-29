@@ -26,8 +26,8 @@ extern unsigned char g_ucSpkrStartFlag;
 //*****************************************************************************
 void Controller( void *pvParameters ){
     while(1){
-        g_ucSpkrStartFlag = 0;
-        osi_Sleep(5000);
+        //g_ucSpkrStartFlag = 0;
+        //osi_Sleep(5000);
         g_ucSpkrStartFlag = 1;
         osi_Sleep(10000);
     }
