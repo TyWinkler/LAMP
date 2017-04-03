@@ -10,6 +10,7 @@
 //*****************************************************************************
 extern unsigned char g_ucSpkrStartFlag;
 extern unsigned long currentColor;
+unsigned int currentTime;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
