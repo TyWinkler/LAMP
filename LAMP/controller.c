@@ -9,6 +9,7 @@
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 extern unsigned char g_ucSpkrStartFlag;
+extern unsigned long currentColor;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
