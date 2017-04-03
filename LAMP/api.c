@@ -15,7 +15,7 @@
 struct theme{
     unsigned long color;
     TCHAR* song;
-    unsigned char active = 0;
+    unsigned char active;
 } themes[30];
 
 struct alarm{
@@ -23,7 +23,7 @@ struct alarm{
     unsigned int time;
     unsigned char dow;
     unsigned char running;
-    unsigned char active = 0;
+    unsigned char active;
 } alarms[30];
 
 extern unsigned long myColor;
