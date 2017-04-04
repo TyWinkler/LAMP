@@ -2,20 +2,26 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
+#include "hw_types.h"
+#include "hw_ints.h"
 #include "osi.h"
+#include "prcm.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 extern unsigned char g_ucSpkrStartFlag;
 extern unsigned long currentColor;
-unsigned int currentTime;
+time_t currentTime = 0;
+
+struct tm ts;
+char timeBuf[80];
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
-
 
 //*****************************************************************************
 //
@@ -27,10 +33,13 @@ unsigned int currentTime;
 //
 //*****************************************************************************
 void Controller( void *pvParameters ){
+    PRCMRTCInUseSet();
+    PRCMRTCSet(currentTime,0);
+
     while(1){
-        //g_ucSpkrStartFlag = 0;
-        //osi_Sleep(5000);
-        g_ucSpkrStartFlag = 1;
-        osi_Sleep(10000);
+        PRCMRTCGet((unsigned long*)currentTime,0);
+        ts = *localtime(&currentTime);
+        strftime(timeBuf, sizeof(timeBuf), "%a %Y-%m-%d %H:%M", &ts);
+        osi_Sleep(1000);
     }
 }

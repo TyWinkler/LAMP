@@ -23,6 +23,8 @@
 static tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
 extern const TCHAR* myWav;
+extern char timeBuf;
+char prevTime[80];
 const TCHAR* prevWav;
 
 long g_lLcdCursorY = 30;
@@ -118,8 +120,8 @@ void LCD( void *pvParameters ){
             long dispColor = prevColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
-            if(prevWav != myWav){
-                LcdPrintf((char *)prevWav);
+            if(prevTime != &timeBuf){
+                LcdPrintf(prevTime);
             }
             GrContextForegroundSet(&sContext, ClrWhite);
             g_lLcdCursorY = 30;
@@ -129,8 +131,8 @@ void LCD( void *pvParameters ){
             dispColor = myColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
-            LcdPrintf((char *)myWav);
-            prevWav = myWav;
+            LcdPrintf((char *)timeBuf);
+            strncpy(prevTime, (char *)timeBuf, 80);
             prevColor = myColor;
             LEDWrite = 1;
             osi_Sleep(1500);
