@@ -35,6 +35,8 @@ char timeBuf[80];
 void Controller( void *pvParameters ){
     PRCMRTCInUseSet();
     PRCMRTCSet(currentTime,0);
+    currentTime = 1491413900;
+
 
     while(1){
         PRCMRTCGet((unsigned long*)currentTime,0);
