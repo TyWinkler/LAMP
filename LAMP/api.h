@@ -16,4 +16,18 @@ extern void apiDeleteTheme(unsigned char themeId);
 extern void apiPlayTheme(unsigned char themeId);
 extern void apiUpdateTime(unsigned int time);
 
+typedef struct alarm{
+    unsigned char themeId;
+    unsigned int time;          //military time
+    unsigned char dow;
+    unsigned char running;
+    unsigned char active;
+} alarm;
+
+typedef struct theme{
+    unsigned long color;
+    TCHAR* song;
+    unsigned char active;
+} theme;
+
 #endif /* API_H_ */

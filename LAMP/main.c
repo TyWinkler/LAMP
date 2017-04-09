@@ -74,7 +74,7 @@ OsiTaskHandle g_LEDTask = NULL;
 OsiTaskHandle g_LCDTask = NULL;
 OsiTaskHandle g_ControllerTask = NULL;
 
-#define OSI_STACK_SIZE          2048
+#define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
@@ -292,7 +292,7 @@ int main(){
     }
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", OSI_STACK_SIZE, NULL, 3, g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 2048, NULL, 3, g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

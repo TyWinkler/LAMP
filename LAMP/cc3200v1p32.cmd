@@ -64,12 +64,12 @@ MEMORY
     //SRAM_DATA (RWX) : origin = 0x20013690, length = 0x1C970
 
     //HTTPServer
-    //SRAM_CODE (RWX) : origin = 0x20004000, length = 0x13000
-    //SRAM_DATA (RWX) : origin = 0x20017000, length = 0x19000
+    SRAM_CODE (RWX) : origin = 0x20004000, length = 0x13000
+    SRAM_DATA (RWX) : origin = 0x20017000, length = 0x19000
 
     //Test
-    SRAM_CODE (RWX) : origin = 0x20004000, length = 0x11000
-    SRAM_DATA (RWX) : origin = 0x20015000, length = 0x1FFFF
+    //SRAM_CODE (RWX) : origin = 0x20004000, length = 0x11000
+    //SRAM_DATA (RWX) : origin = 0x20015000, length = 0x1FFFF
 }
 
 /* Section allocation in memory */

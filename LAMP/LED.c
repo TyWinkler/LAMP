@@ -74,7 +74,7 @@ void LED( void *pvParameters ){
             allColor(colorHex(myColor));
             myColor = myColor << 1 | myColor >> 31;
             LEDWrite = 0;
-            osi_Sleep(1500);
+            osi_Sleep(500);
         }
     }
 }

@@ -11,20 +11,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ff.h"
+#include "api.h"
 
-struct theme{
-    unsigned long color;
-    TCHAR* song;
-    unsigned char active;
-} themes[30];
+//struct theme{
+//    unsigned long color;
+//    TCHAR* song;
+//    unsigned char active;
+//}
+theme themes[30];
 
-struct alarm{
-    unsigned char themeId;
-    unsigned int time;
-    unsigned char dow;
-    unsigned char running;
-    unsigned char active;
-} alarms[30];
+//struct alarm{
+//    unsigned char themeId;
+//    unsigned int time;          //military time
+//    unsigned char dow;
+//    unsigned char running;
+//    unsigned char active;
+//}
+alarm alarms[30];
 
 extern unsigned long myColor;
 extern unsigned char g_ucSpkrStartFlag;
