@@ -25,59 +25,58 @@
 
 #include "api.h"
 
-#define APPLICATION_NAME        "HTTP Server"
+#define APPLICATION_NAME        "TCP Socket"
 #define APPLICATION_VERSION     "1.1.1"
-#define AP_SSID_LEN_MAX         (33)
-#define ROLE_INVALID            (-5)
 
-#define LED_STRING              "LED"
-#define LED1_STRING             "LED1_"
-#define LED2_STRING             ",LED2_"
-#define LED_ON_STRING           "ON"
-#define LED_OFF_STRING          "OFF"
-
-#define OOB_TASK_PRIORITY               (1)
-#define OSI_STACK_SIZE                  (2048)
-#define SH_GPIO_3                       (3)  /* P58 - Device Mode */
-#define ROLE_INVALID                    (-5)
-#define AUTO_CONNECTION_TIMEOUT_COUNT   (50)   /* 5 Sec */
+#define IP_ADDR             0xc0a80064 /* 192.168.0.100 */
+#define PORT_NUM            5001
+#define BUF_SIZE            1400
+#define TCP_PACKET_COUNT    1000
 
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
-    LAN_CONNECTION_FAILED = -0x7D0,
-    INTERNET_CONNECTION_FAILED = LAN_CONNECTION_FAILED - 1,
-    DEVICE_NOT_IN_STATION_MODE = INTERNET_CONNECTION_FAILED - 1,
-
+    SOCKET_CREATE_ERROR = -0x7D0,
+    BIND_ERROR = SOCKET_CREATE_ERROR - 1,
+    LISTEN_ERROR = BIND_ERROR -1,
+    SOCKET_OPT_ERROR = LISTEN_ERROR -1,
+    CONNECT_ERROR = SOCKET_OPT_ERROR -1,
+    ACCEPT_ERROR = CONNECT_ERROR - 1,
+    SEND_ERROR = ACCEPT_ERROR -1,
+    RECV_ERROR = SEND_ERROR -1,
+    SOCKET_CLOSE_ERROR = RECV_ERROR -1,
+    DEVICE_NOT_IN_STATION_MODE = SOCKET_CLOSE_ERROR - 1,
     STATUS_CODE_MAX = -0xBB8
 }e_AppStatusCodes;
 
-//*****************************************************************************
-//                 GLOBAL VARIABLES -- Start
-//*****************************************************************************
+int BsdTcpServer(unsigned short usPort);
+static long WlanConnect();
+static void DisplayBanner();
+static void BoardInit();
+static void InitializeAppVariables();
+
 volatile unsigned long  g_ulStatus = 0;//SimpleLink Status
-unsigned long  g_ulPingPacketsRecv = 0; //Number of Ping Packets received
 unsigned long  g_ulGatewayIP = 0; //Network Gateway IP address
 unsigned char  g_ucConnectionSSID[SSID_LEN_MAX+1]; //Connection SSID
 unsigned char  g_ucConnectionBSSID[BSSID_LEN_MAX]; //Connection BSSID
-unsigned char POST_token[] = "__SL_P_ULD";
-unsigned char GET_token[]  = "__SL_G_ULD";
-int g_iSimplelinkRole = ROLE_INVALID;
-signed int g_uiIpAddress = 0;
-unsigned char g_ucSSID[AP_SSID_LEN_MAX];
+unsigned long  g_ulDestinationIp = IP_ADDR;
+unsigned int   g_uiPortNum = PORT_NUM;
+volatile unsigned long  g_ulPacketCount = TCP_PACKET_COUNT;
+unsigned char  g_ucConnectionStatus = 0;
+unsigned char  g_ucSimplelinkstarted = 0;
+unsigned long  g_ulIpAddr = 0;
+char g_cBsdBuf[BUF_SIZE];
 
-volatile unsigned short g_usMCNetworkUstate = 0;
-int g_uiSimplelinkRole = ROLE_INVALID;
-unsigned int g_uiDeviceModeConfig = ROLE_STA; //default is STA mode
-volatile unsigned char g_ucConnectTimeout =0;
-//*****************************************************************************
-//                 GLOBAL VARIABLES -- End
-//*****************************************************************************
-
-//*****************************************************************************
-// SimpleLink Asynchronous Event Handlers -- Start
-//*****************************************************************************
-
+static void InitializeAppVariables()
+{
+    g_ulStatus = 0;
+    g_ulGatewayIP = 0;
+    memset(g_ucConnectionSSID,0,sizeof(g_ucConnectionSSID));
+    memset(g_ucConnectionBSSID,0,sizeof(g_ucConnectionBSSID));
+    g_ulDestinationIp = IP_ADDR;
+    g_uiPortNum = PORT_NUM;
+    g_ulPacketCount = TCP_PACKET_COUNT;
+}
 
 //*****************************************************************************
 //
@@ -119,7 +118,7 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
                    SL_BSSID_LENGTH);
 
             UART_PRINT("[WLAN EVENT] STA Connected to the AP: %s ,"
-                        "BSSID: %x:%x:%x:%x:%x:%x\n\r",
+                        " BSSID: %x:%x:%x:%x:%x:%x\n\r",
                       g_ucConnectionSSID,g_ucConnectionBSSID[0],
                       g_ucConnectionBSSID[1],g_ucConnectionBSSID[2],
                       g_ucConnectionBSSID[3],g_ucConnectionBSSID[4],
@@ -150,7 +149,7 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
             else
             {
                 UART_PRINT("[WLAN ERROR]Device disconnected from the AP AP: %s,"
-                "BSSID: %x:%x:%x:%x:%x:%x on an ERROR..!! \n\r",
+                            "BSSID: %x:%x:%x:%x:%x:%x on an ERROR..!! \n\r",
                            g_ucConnectionSSID,g_ucConnectionBSSID[0],
                            g_ucConnectionBSSID[1],g_ucConnectionBSSID[2],
                            g_ucConnectionBSSID[3],g_ucConnectionBSSID[4],
@@ -158,110 +157,6 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
             }
             memset(g_ucConnectionSSID,0,sizeof(g_ucConnectionSSID));
             memset(g_ucConnectionBSSID,0,sizeof(g_ucConnectionBSSID));
-        }
-        break;
-
-        case SL_WLAN_STA_CONNECTED_EVENT:
-        {
-            // when device is in AP mode and any client connects to device cc3xxx
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_CONNECTION);
-            CLR_STATUS_BIT(g_ulStatus, STATUS_BIT_CONNECTION_FAILED);
-
-            //
-            // Information about the connected client (like SSID, MAC etc) will
-            // be available in 'slPeerInfoAsyncResponse_t' - Applications
-            // can use it if required
-            //
-            // slPeerInfoAsyncResponse_t *pEventData = NULL;
-            // pEventData = &pSlWlanEvent->EventData.APModeStaConnected;
-            //
-
-        }
-        break;
-
-        case SL_WLAN_STA_DISCONNECTED_EVENT:
-        {
-            // when client disconnects from device (AP)
-            CLR_STATUS_BIT(g_ulStatus, STATUS_BIT_CONNECTION);
-            CLR_STATUS_BIT(g_ulStatus, STATUS_BIT_IP_LEASED);
-
-            //
-            // Information about the connected client (like SSID, MAC etc) will
-            // be available in 'slPeerInfoAsyncResponse_t' - Applications
-            // can use it if required
-            //
-            // slPeerInfoAsyncResponse_t *pEventData = NULL;
-            // pEventData = &pSlWlanEvent->EventData.APModestaDisconnected;
-            //
-        }
-        break;
-
-        case SL_WLAN_SMART_CONFIG_COMPLETE_EVENT:
-        {
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_SMARTCONFIG_START);
-
-            //
-            // Information about the SmartConfig details (like Status, SSID,
-            // Token etc) will be available in 'slSmartConfigStartAsyncResponse_t'
-            // - Applications can use it if required
-            //
-            //  slSmartConfigStartAsyncResponse_t *pEventData = NULL;
-            //  pEventData = &pSlWlanEvent->EventData.smartConfigStartResponse;
-            //
-
-        }
-        break;
-
-        case SL_WLAN_SMART_CONFIG_STOP_EVENT:
-        {
-            // SmartConfig operation finished
-            CLR_STATUS_BIT(g_ulStatus, STATUS_BIT_SMARTCONFIG_START);
-
-            //
-            // Information about the SmartConfig details (like Status, padding
-            // etc) will be available in 'slSmartConfigStopAsyncResponse_t' -
-            // Applications can use it if required
-            //
-            // slSmartConfigStopAsyncResponse_t *pEventData = NULL;
-            // pEventData = &pSlWlanEvent->EventData.smartConfigStopResponse;
-            //
-        }
-        break;
-
-        case SL_WLAN_P2P_DEV_FOUND_EVENT:
-        {
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_P2P_DEV_FOUND);
-
-            //
-            // Information about P2P config details (like Peer device name, own
-            // SSID etc) will be available in 'slPeerInfoAsyncResponse_t' -
-            // Applications can use it if required
-            //
-            // slPeerInfoAsyncResponse_t *pEventData = NULL;
-            // pEventData = &pSlWlanEvent->EventData.P2PModeDevFound;
-            //
-        }
-        break;
-
-        case SL_WLAN_P2P_NEG_REQ_RECEIVED_EVENT:
-        {
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_P2P_REQ_RECEIVED);
-
-            //
-            // Information about P2P Negotiation req details (like Peer device
-            // name, own SSID etc) will be available in 'slPeerInfoAsyncResponse_t'
-            //  - Applications can use it if required
-            //
-            // slPeerInfoAsyncResponse_t *pEventData = NULL;
-            // pEventData = &pSlWlanEvent->EventData.P2PModeNegReqReceived;
-            //
-        }
-        break;
-
-        case SL_WLAN_CONNECTION_FAILED_EVENT:
-        {
-            // If device gets any connection failed event
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_CONNECTION_FAILED);
         }
         break;
 
@@ -301,53 +196,21 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 
             //Ip Acquired Event Data
             pEventData = &pNetAppEvent->EventData.ipAcquiredV4;
-            g_uiIpAddress = pEventData->ip;
+            g_ulIpAddr = pEventData->ip;
 
             //Gateway IP address
             g_ulGatewayIP = pEventData->gateway;
 
-            /*UART_PRINT("[NETAPP EVENT] IP Acquired: IP=%d.%d.%d.%d , "
-            "Gateway=%d.%d.%d.%d\n\r",
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.ip,3),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.ip,2),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.ip,1),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.ip,0),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.gateway,3),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.gateway,2),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.gateway,1),
-            SL_IPV4_BYTE(pNetAppEvent->EventData.ipAcquiredV4.gateway,0));
-            */
-        }
-        break;
-
-        case SL_NETAPP_IP_LEASED_EVENT:
-        {
-            SET_STATUS_BIT(g_ulStatus, STATUS_BIT_IP_LEASED);
-
-            //
-            // Information about the IP-Leased details(like IP-Leased,lease-time,
-            // mac etc) will be available in 'SlIpLeasedAsync_t' - Applications
-            // can use it if required
-            //
-            // SlIpLeasedAsync_t *pEventData = NULL;
-            // pEventData = &pNetAppEvent->EventData.ipLeased;
-            //
-
-        }
-        break;
-
-        case SL_NETAPP_IP_RELEASED_EVENT:
-        {
-            CLR_STATUS_BIT(g_ulStatus, STATUS_BIT_IP_LEASED);
-
-            //
-            // Information about the IP-Released details (like IP-address, mac
-            // etc) will be available in 'SlIpReleasedAsync_t' - Applications
-            // can use it if required
-            //
-            // SlIpReleasedAsync_t *pEventData = NULL;
-            // pEventData = &pNetAppEvent->EventData.ipReleased;
-            //
+            UART_PRINT("[NETAPP EVENT] IP Acquired: IP=%d.%d.%d.%d , "
+                        "Gateway=%d.%d.%d.%d\n\r",
+                            SL_IPV4_BYTE(g_ulIpAddr,3),
+                            SL_IPV4_BYTE(g_ulIpAddr,2),
+                            SL_IPV4_BYTE(g_ulIpAddr,1),
+                            SL_IPV4_BYTE(g_ulIpAddr,0),
+                            SL_IPV4_BYTE(g_ulGatewayIP,3),
+                            SL_IPV4_BYTE(g_ulGatewayIP,2),
+                            SL_IPV4_BYTE(g_ulGatewayIP,1),
+                            SL_IPV4_BYTE(g_ulGatewayIP,0));
         }
         break;
 
@@ -358,6 +221,23 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
         }
         break;
     }
+}
+
+//*****************************************************************************
+//
+//! \brief This function handles HTTP server events
+//!
+//! \param[in]  pServerEvent - Contains the relevant event information
+//! \param[in]    pServerResponse - Should be filled by the user with the
+//!                                      relevant response information
+//!
+//! \return None
+//!
+//****************************************************************************
+void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pHttpEvent,
+                                  SlHttpServerResponse_t *pHttpResponse)
+{
+    // Unused in this application
 }
 
 //*****************************************************************************
@@ -396,149 +276,39 @@ void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent)
 //*****************************************************************************
 void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
 {
-    //
-    // This application doesn't work w/ socket - Events are not expected
-    //
-
-}
-
-//*****************************************************************************
-//
-//! This function gets triggered when HTTP Server receives Application
-//! defined GET and POST HTTP Tokens.
-//!
-//! \param pHttpServerEvent Pointer indicating http server event
-//! \param pHttpServerResponse Pointer indicating http server response
-//!
-//! \return None
-//!
-//*****************************************************************************
-void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
-                               SlHttpServerResponse_t *pSlHttpServerResponse)
-{
-    unsigned char strLenVal = 0;
-
-    if(!pSlHttpServerEvent || !pSlHttpServerResponse)
+    if(!pSock)
     {
         return;
     }
 
-    switch (pSlHttpServerEvent->Event)
+    //
+    // This application doesn't work w/ socket - Events are not expected
+    //
+    switch( pSock->Event )
     {
-        case SL_NETAPP_HTTPGETTOKENVALUE_EVENT:
-        {
-          unsigned char status, *ptr;
+        case SL_SOCKET_TX_FAILED_EVENT:
+            switch( pSock->socketAsyncEvent.SockTxFailData.status)
+            {
+                case SL_ECLOSE:
+                    UART_PRINT("[SOCK ERROR] - close socket (%d) operation "
+                                "failed to transmit all queued packets\n\n",
+                                    pSock->socketAsyncEvent.SockTxFailData.sd);
+                    break;
+                default:
+                    UART_PRINT("[SOCK ERROR] - TX FAILED  :  socket %d , reason "
+                                "(%d) \n\n",
+                                pSock->socketAsyncEvent.SockTxFailData.sd, pSock->socketAsyncEvent.SockTxFailData.status);
+                  break;
+            }
+            break;
 
-          ptr = pSlHttpServerResponse->ResponseData.token_value.data;
-          pSlHttpServerResponse->ResponseData.token_value.len = 0;
-          if(memcmp(pSlHttpServerEvent->EventData.httpTokenName.data, GET_token,
-                    strlen((const char *)GET_token)) == 0)
-          {
-            status = GPIO_IF_LedStatus(MCU_RED_LED_GPIO);
-            strLenVal = strlen(LED1_STRING);
-            memcpy(ptr, LED1_STRING, strLenVal);
-            ptr += strLenVal;
-            pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            if(status & 0x01)
-            {
-              strLenVal = strlen(LED_ON_STRING);
-              memcpy(ptr, LED_ON_STRING, strLenVal);
-              ptr += strLenVal;
-              pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            }
-            else
-            {
-              strLenVal = strlen(LED_OFF_STRING);
-              memcpy(ptr, LED_OFF_STRING, strLenVal);
-              ptr += strLenVal;
-              pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            }
-            status = GPIO_IF_LedStatus(MCU_GREEN_LED_GPIO);
-            strLenVal = strlen(LED2_STRING);
-            memcpy(ptr, LED2_STRING, strLenVal);
-            ptr += strLenVal;
-            pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            if(status & 0x01)
-            {
-              strLenVal = strlen(LED_ON_STRING);
-              memcpy(ptr, LED_ON_STRING, strLenVal);
-              ptr += strLenVal;
-              pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            }
-            else
-            {
-              strLenVal = strlen(LED_OFF_STRING);
-              memcpy(ptr, LED_OFF_STRING, strLenVal);
-              ptr += strLenVal;
-              pSlHttpServerResponse->ResponseData.token_value.len += strLenVal;
-            }
-            *ptr = '\0';
-          }
-
-        }
-        break;
-
-        case SL_NETAPP_HTTPPOSTTOKENVALUE_EVENT:
-        {
-          unsigned char led;
-          unsigned char *ptr = pSlHttpServerEvent->EventData.httpPostData.token_name.data;
-
-          if(memcmp(ptr, POST_token, strlen((const char *)POST_token)) == 0)
-          {
-            ptr = pSlHttpServerEvent->EventData.httpPostData.token_value.data;
-            strLenVal = strlen(LED_STRING);
-            if(memcmp(ptr, LED_STRING, strLenVal) != 0)
-              break;
-            ptr += strLenVal;
-            led = *ptr;
-            strLenVal = strlen(LED_ON_STRING);
-            ptr += strLenVal;
-            if(led == '1')
-            {
-              if(memcmp(ptr, LED_ON_STRING, strLenVal) == 0)
-              {
-                      GPIO_IF_LedOn(MCU_RED_LED_GPIO);
-              }
-              else
-              {
-                      GPIO_IF_LedOff(MCU_RED_LED_GPIO);
-              }
-            }
-            else if(led == '2')
-            {
-              if(memcmp(ptr, LED_ON_STRING, strLenVal) == 0)
-              {
-                      GPIO_IF_LedOn(MCU_GREEN_LED_GPIO);
-              }
-              else
-              {
-                      GPIO_IF_LedOff(MCU_GREEN_LED_GPIO);
-              }
-            }
-
-          }
-        }
-          break;
         default:
+            UART_PRINT("[SOCK EVENT] - Unexpected Event [%x0x]\n\n",pSock->Event);
           break;
     }
+
 }
 
-
-//*****************************************************************************
-//
-//! \brief This function initializes the application variables
-//!
-//! \param    None
-//!
-//! \return None
-//!
-//*****************************************************************************
-static void InitializeAppVariables()
-{
-    g_ulStatus = 0;
-    g_uiIpAddress = 0;
-}
 
 
 //*****************************************************************************
@@ -688,245 +458,264 @@ static long ConfigureSimpleLinkToDefaultState()
     return lRetVal; // Success
 }
 
-
-
 //****************************************************************************
 //
-//!    \brief Connects to the Network in AP or STA Mode - If ForceAP Jumper is
-//!                                             Placed, Force it to AP mode
+//!    \brief Parse the input IP address from the user
 //!
-//! \return                        0 on success else error code
+//!    \param[in]                     ucCMD (char pointer to input string)
+//!
+//!    \return                        0 : if correct IP, -1 : incorrect IP
 //
 //****************************************************************************
-long ConnectToNetwork()
+int IpAddressParser(char *ucCMD)
 {
-    char ucAPSSID[32];
-    unsigned short len, config_opt;
-    long lRetVal = -1;
-
-    // staring simplelink
-    g_uiSimplelinkRole =  sl_Start(NULL,NULL,NULL);
-
-    // Device is not in STA mode and Force AP Jumper is not Connected
-    //- Switch to STA mode
-    if(g_uiSimplelinkRole != ROLE_STA && g_uiDeviceModeConfig == ROLE_STA )
+    volatile int i=0;
+    unsigned int uiUserInputData;
+    unsigned long ulUserIpAddress = 0;
+    char *ucInpString;
+    ucInpString = strtok(ucCMD, ".");
+    uiUserInputData = (int)strtoul(ucInpString,0,10);
+    while(i<4)
     {
-        //Switch to STA Mode
-        lRetVal = sl_WlanSetMode(ROLE_STA);
-        ASSERT_ON_ERROR(lRetVal);
-
-        lRetVal = sl_Stop(SL_STOP_TIMEOUT);
-
-        g_usMCNetworkUstate = 0;
-        g_uiSimplelinkRole =  sl_Start(NULL,NULL,NULL);
-    }
-
-    //Device is not in AP mode and Force AP Jumper is Connected -
-    //Switch to AP mode
-    if(g_uiSimplelinkRole != ROLE_AP && g_uiDeviceModeConfig == ROLE_AP )
-    {
-         //Switch to AP Mode
-        lRetVal = sl_WlanSetMode(ROLE_AP);
-        ASSERT_ON_ERROR(lRetVal);
-
-        lRetVal = sl_Stop(SL_STOP_TIMEOUT);
-
-        g_usMCNetworkUstate = 0;
-        g_uiSimplelinkRole =  sl_Start(NULL,NULL,NULL);
-    }
-
-    //No Mode Change Required
-    if(g_uiSimplelinkRole == ROLE_AP)
-    {
-       //waiting for the AP to acquire IP address from Internal DHCP Server
-       while(!IS_IP_ACQUIRED(g_ulStatus))
+        //
+       // Check Whether IP is valid
+       //
+       if((ucInpString != NULL) && (uiUserInputData < 256))
        {
-
+           ulUserIpAddress |= uiUserInputData;
+           if(i < 3)
+               ulUserIpAddress = ulUserIpAddress << 8;
+           ucInpString=strtok(NULL,".");
+           uiUserInputData = (int)strtoul(ucInpString,0,10);
+           i++;
        }
-
-       //Stop Internal HTTP Server
-       lRetVal = sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID);
-       ASSERT_ON_ERROR( lRetVal);
-
-       //Start Internal HTTP Server
-       lRetVal = sl_NetAppStart(SL_NET_APP_HTTP_SERVER_ID);
-       ASSERT_ON_ERROR( lRetVal);
-
-       char iCount=0;
-       //Read the AP SSID
-       memset(ucAPSSID,'\0',AP_SSID_LEN_MAX);
-       len = AP_SSID_LEN_MAX;
-       config_opt = WLAN_AP_OPT_SSID;
-       lRetVal = sl_WlanGet(SL_WLAN_CFG_AP_ID, &config_opt , &len,
-                                              (unsigned char*) ucAPSSID);
-        ASSERT_ON_ERROR(lRetVal);
-
-       Report("\n\rDevice is in AP Mode, Please Connect to AP [%s] and"
-          "type [mysimplelink.net] in the browser \n\r",ucAPSSID);
-
-       //Blink LED 3 times to Indicate AP Mode
-       for(iCount=0;iCount<3;iCount++)
+       else
        {
-           //Turn RED LED On
-           GPIO_IF_LedOn(MCU_RED_LED_GPIO);
-           osi_Sleep(400);
-
-           //Turn RED LED Off
-           GPIO_IF_LedOff(MCU_RED_LED_GPIO);
-           osi_Sleep(400);
+           return -1;
        }
-
     }
-    else
-    {
-        //Stop Internal HTTP Server
-        lRetVal = sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID);
-        ASSERT_ON_ERROR( lRetVal);
-
-        //Start Internal HTTP Server
-        lRetVal = sl_NetAppStart(SL_NET_APP_HTTP_SERVER_ID);
-        ASSERT_ON_ERROR( lRetVal);
-
-        //waiting for the device to Auto Connect
-        while ( (!IS_IP_ACQUIRED(g_ulStatus))&&
-               g_ucConnectTimeout < AUTO_CONNECTION_TIMEOUT_COUNT)
-        {
-            //Turn RED LED On
-            GPIO_IF_LedOn(MCU_RED_LED_GPIO);
-            osi_Sleep(50);
-
-            //Turn RED LED Off
-            GPIO_IF_LedOff(MCU_RED_LED_GPIO);
-            osi_Sleep(50);
-
-            g_ucConnectTimeout++;
-        }
-        //Couldn't connect Using Auto Profile
-        if(g_ucConnectTimeout == AUTO_CONNECTION_TIMEOUT_COUNT)
-        {
-            //Blink Red LED to Indicate Connection Error
-            GPIO_IF_LedOn(MCU_RED_LED_GPIO);
-
-            CLR_STATUS_BIT_ALL(g_ulStatus);
-
-            Report("Use Smart Config Application to configure the device.\n\r");
-            //Connect Using Smart Config
-            lRetVal = SmartConfigConnect();
-            ASSERT_ON_ERROR(lRetVal);
-
-            //Waiting for the device to Auto Connect
-            while(!IS_IP_ACQUIRED(g_ulStatus))
-            {
-                MAP_UtilsDelay(500);
-            }
-
-        }
-    //Turn RED LED Off
-    GPIO_IF_LedOff(MCU_RED_LED_GPIO);
-    UART_PRINT("\n\rDevice is in STA Mode, Connect to the AP[%s] and type"
-          "IP address [%d.%d.%d.%d] in the browser \n\r",g_ucConnectionSSID,
-          SL_IPV4_BYTE(g_uiIpAddress,3),SL_IPV4_BYTE(g_uiIpAddress,2),
-          SL_IPV4_BYTE(g_uiIpAddress,1),SL_IPV4_BYTE(g_uiIpAddress,0));
-
-    }
+    g_ulDestinationIp = ulUserIpAddress;
     return SUCCESS;
 }
 
-
 //****************************************************************************
 //
-//!    \brief Read Force AP GPIO and Configure Mode - 1(Access Point Mode)
-//!                                                  - 0 (Station Mode)
+//! \brief Opening a TCP server side socket and receiving data
 //!
-//! \return                        None
+//! This function opens a TCP socket in Listen mode and waits for an incoming
+//!    TCP connection.
+//! If a socket connection is established then the function will try to read
+//!    1000 TCP packets from the connected client.
+//!
+//! \param[in] port number on which the server will be listening on
+//!
+//! \return     0 on success, -1 on error.
+//!
+//! \note   This function will wait for an incoming connection till
+//!                     one is established
 //
 //****************************************************************************
-static void ReadDeviceConfiguration()
+int BsdTcpServer(unsigned short usPort)
 {
-    unsigned int uiGPIOPort;
-    unsigned char pucGPIOPin;
-    unsigned char ucPinValue;
+    SlSockAddrIn_t  sAddr;
+    SlSockAddrIn_t  sLocalAddr;
+    int             iCounter;
+    int             iAddrSize;
+    int             iSockID;
+    int             iStatus;
+    int             iNewSockID;
+    long            lNonBlocking = 0;
+    int             iTestBufLen;
 
-        //Read GPIO
-    GPIO_IF_GetPortNPin(SH_GPIO_3,&uiGPIOPort,&pucGPIOPin);
-    ucPinValue = GPIO_IF_Get(SH_GPIO_3,uiGPIOPort,pucGPIOPin);
+    // filling the buffer
+    for (iCounter=0 ; iCounter<BUF_SIZE ; iCounter++)
+    {
+        g_cBsdBuf[iCounter] = (char)(iCounter % 10);
+    }
 
-        //If Connected to VCC, Mode is AP
-    if(ucPinValue == 1)
+    iTestBufLen  = BUF_SIZE;
+
+    //filling the TCP server socket address
+    sLocalAddr.sin_family = SL_AF_INET;
+    sLocalAddr.sin_port = sl_Htons((unsigned short)usPort);
+    sLocalAddr.sin_addr.s_addr = 0;
+
+    // creating a TCP socket
+    iSockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
+    //UART_PRINT("Socket: %d \n",iSockID);
+    if( iSockID < 0 )
     {
-            //AP Mode
-            g_uiDeviceModeConfig = ROLE_AP;
+        // error
+        sl_Close(iSockID);
+        ASSERT_ON_ERROR(SOCKET_CREATE_ERROR);
     }
-    else
+
+    iAddrSize = sizeof(SlSockAddrIn_t);
+
+    // binding the TCP socket to the TCP server address
+    iStatus = sl_Bind(iSockID, (SlSockAddr_t *)&sLocalAddr, iAddrSize);
+    if( iStatus < 0 )
     {
-            //STA Mode
-            g_uiDeviceModeConfig = ROLE_STA;
+        // error
+        sl_Close(iSockID);
+        ASSERT_ON_ERROR(BIND_ERROR);
     }
+
+    // putting the socket for listening to the incoming TCP connection
+    iStatus = sl_Listen(iSockID, 0);
+    if( iStatus < 0 )
+    {
+        sl_Close(iSockID);
+        ASSERT_ON_ERROR(LISTEN_ERROR);
+    }
+
+    // setting socket option to make the socket as non blocking
+    iStatus = sl_SetSockOpt(iSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
+                            &lNonBlocking, sizeof(lNonBlocking));
+    if( iStatus < 0 )
+    {
+        sl_Close(iSockID);
+        ASSERT_ON_ERROR(SOCKET_OPT_ERROR);
+    }
+    iNewSockID = SL_EAGAIN;
+
+    // waiting for an incoming TCP connection
+    while( iNewSockID < 0 )
+    {
+        // accepts a connection form a TCP client, if there is any
+        // otherwise returns SL_EAGAIN
+        iNewSockID = sl_Accept(iSockID, ( struct SlSockAddr_t *)&sAddr,
+                                (SlSocklen_t*)&iAddrSize);
+        if( iNewSockID == SL_EAGAIN )
+        {
+           MAP_UtilsDelay(10000);
+        }
+        else if( iNewSockID < 0 )
+        {
+            // error
+            sl_Close(iNewSockID);
+            sl_Close(iSockID);
+            ASSERT_ON_ERROR(ACCEPT_ERROR);
+        }
+    }
+
+    // waits for 1000 packets from the connected TCP client
+    //while (lLoopCount < g_ulPacketCount)
+    //{
+        iStatus = sl_Recv(iNewSockID, g_cBsdBuf, iTestBufLen, 0);
+        //------------------------------------------------------
+        //
+        // Smita code goes here!!!
+        // g_cBsdBuf will contain the string array
+        //
+        //------------------------------------------------------
+        //common.h needs to be set to your AP it should direct connect
+        UART_PRINT(g_cBsdBuf);
+        if( iStatus <= 0 )
+        {
+          // error
+          sl_Close(iNewSockID);
+          sl_Close(iSockID);
+          ASSERT_ON_ERROR(RECV_ERROR);
+        }
+
+        //lLoopCount++;
+    //}
+
+    //Report("Recieved %u packets successfully\n\r",g_ulPacketCount);
+
+    // close the connected socket after receiving from connected TCP client
+    iStatus = sl_Close(iNewSockID);
+    ASSERT_ON_ERROR(iStatus);
+    // close the listening socket
+    iStatus = sl_Close(iSockID);
+    ASSERT_ON_ERROR(iStatus);
+
+    return SUCCESS;
+}
+
+//****************************************************************************
+//
+//!  \brief Connecting to a WLAN Accesspoint
+//!
+//!   This function connects to the required AP (SSID_NAME) with Security
+//!   parameters specified in te form of macros at the top of this file
+//!
+//!   \param[in]              None
+//!
+//!   \return     Status value
+//!
+//!   \warning    If the WLAN connection fails or we don't aquire an IP
+//!            address, It will be stuck in this function forever.
+//
+//****************************************************************************
+static long WlanConnect()
+{
+    SlSecParams_t secParams = {0};
+    long lRetVal = 0;
+
+    secParams.Key = (signed char*)SECURITY_KEY;
+    secParams.KeyLen = strlen(SECURITY_KEY);
+    secParams.Type = SECURITY_TYPE;
+
+    lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
+    ASSERT_ON_ERROR(lRetVal);
+
+    /* Wait */
+    while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
+    {
+        // Wait for WLAN Event
+#ifndef SL_PLATFORM_MULTI_THREADED
+        _SlNonOsMainLoopTask();
+#endif
+    }
+
+    return SUCCESS;
 
 }
 
-//*****************************************************************************
-//
-//! LED Routine
-//!
-//! \param pvParameters     Parameters to the task's entry function
-//!
-//! \return None
-//
-//*****************************************************************************
+
+
 void HTTPServerTask( void *pvParameters ){
     long lRetVal = -1;
     InitializeAppVariables();
-
-    //
-    // Following function configure the device to default state by cleaning
-    // the persistent settings stored in NVMEM (viz. connection profiles &
-    // policies, power policy etc)
-    //
-    // Applications may choose to skip this step if the developer is sure
-    // that the device is in its default state at start of applicaton
-    //
-    // Note that all profiles and persistent settings that were done on the
-    // device will be lost
-    //
     lRetVal = ConfigureSimpleLinkToDefaultState();
-    if(lRetVal < 0)
-    {
-        if (DEVICE_NOT_IN_STATION_MODE == lRetVal)
-            UART_PRINT("Failed to configure the device in its default state\n\r");
 
+    if(lRetVal < 0){
+      if (DEVICE_NOT_IN_STATION_MODE == lRetVal)
+         UART_PRINT("Failed to configure the device in its default state \n\r");
+
+      LOOP_FOREVER();
+    }
+
+    //
+    // Asumption is that the device is configured in station mode already
+    // and it is in its default state
+    //
+    lRetVal = sl_Start(0, 0, 0);
+    if (lRetVal < 0)
+    {
+        UART_PRINT("Failed to start the device \n\r");
         LOOP_FOREVER();
     }
 
-    UART_PRINT("Device is configured in default state \n\r");
-
-    memset(g_ucSSID,'\0',AP_SSID_LEN_MAX);
-
-    //Read Device Mode Configuration
-    ReadDeviceConfiguration();
-
-    //Connect to Network
-    lRetVal = ConnectToNetwork();
-
-    //Stop Internal HTTP Server
-    lRetVal = sl_NetAppStop(SL_NET_APP_HTTP_SERVER_ID);
+    // Connecting to WLAN AP - Set with static parameters defined at common.h
+    // After this call we will be connected and have IP address
+    lRetVal = WlanConnect();
     if(lRetVal < 0)
     {
-        ERR_PRINT(lRetVal);
+        UART_PRINT("Connection to AP failed \n\r");
         LOOP_FOREVER();
     }
 
-    //Start Internal HTTP Server
-    lRetVal = sl_NetAppStart(SL_NET_APP_HTTP_SERVER_ID);
+    lRetVal = BsdTcpServer(PORT_NUM);
     if(lRetVal < 0)
     {
-        ERR_PRINT(lRetVal);
+        UART_PRINT("TCP Server failed\n\r");
         LOOP_FOREVER();
     }
 
-    //Handle Async Events
-    while(1)
-    {
+    while (1){
 
     }
 }
