@@ -15,6 +15,7 @@
 #include "LPD8806.h"
 #include "osi.h"
 #include "ff.h"
+#include "LCD.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -37,10 +38,10 @@ long g_lLcdCursorY = 30;
                            g_lLcdCursorY += LCD_Y_SHIFT;\
                             }
 
-void LCDReset();
-void displaymytextnext();
-void displaymytext(void);
-int LcdPrintf(char *pcFormat, ...);
+//void LCDReset();
+//void displaymytextnext();
+//void displaymytext(void);
+//int LcdPrintf(char *pcFormat, ...);
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -107,8 +108,8 @@ int LcdPrintf(char *pcFormat, ...){
 //
 //*****************************************************************************
 void LCD( void *pvParameters ){
-    LCDReset();
-    displaymytext();
+//    LCDReset();
+//    displaymytext();
     unsigned long prevColor = myColor;
     while(1){
         if(!LEDWrite){

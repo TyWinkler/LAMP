@@ -18,6 +18,7 @@
 #include "rom.h"
 #include "rom_map.h"
 #include "prcm.h"
+#include "LPD8806.h"
 
 #include "gpio_if.h"
 #include "uart_if.h"
@@ -524,7 +525,7 @@ int BsdTcpServer(unsigned short usPort)
     int             iSockID;
     int             iStatus;
     int             iNewSockID;
-    long            lNonBlocking = 0;
+    long            lNonBlocking = 1;
     int             iTestBufLen;
 
     // filling the buffer
@@ -610,6 +611,7 @@ int BsdTcpServer(unsigned short usPort)
         //
         //------------------------------------------------------
         //common.h needs to be set to your AP it should direct connect
+        myColor = 0x00ff00;
         UART_PRINT(g_cBsdBuf);
         if( iStatus <= 0 )
         {
@@ -716,6 +718,6 @@ void HTTPServerTask( void *pvParameters ){
     }
 
     while (1){
-
+        //_SlNonOsMainLooptask();
     }
 }

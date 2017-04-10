@@ -47,6 +47,7 @@
 #include "pin.h"
 #include "utils.h"
 #include "spi.h"
+#include "LCD.h"
 
 //Common interface includes
 #include "common.h"
@@ -253,6 +254,8 @@ int main(){
     PinMuxConfig(); // Pinmux Configuration
 
     SPIInit();
+    LCDReset();
+    displaymytext();
 
     configureAudio();
 
@@ -264,35 +267,35 @@ int main(){
     }
 
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LED Task
-    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
+    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 2, &g_LEDTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
     // Start the LCD Task
-    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 3, &g_LCDTask );
+    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 
-    // Simplelinkspawntask
-    lRetVal = VStartSimpleLinkSpawnTask(3);
-    if(lRetVal < 0){
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+//    // Simplelinkspawntask
+//    lRetVal = VStartSimpleLinkSpawnTask(3);
+//    if(lRetVal < 0){
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 2048, NULL, 3, g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 2048, NULL, 4, &g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

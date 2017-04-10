@@ -173,7 +173,7 @@ void Speaker( void *pvParameters )
         // Read from file and discard wav header
         readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
-        while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){};
+        if((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){osi_Sleep(10);}
 
         if( Size > 0)
         {

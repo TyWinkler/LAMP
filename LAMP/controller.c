@@ -10,6 +10,7 @@
 #include "hw_ints.h"
 #include "osi.h"
 #include "prcm.h"
+#include "LCD.h"
 
 #define LEDoff 0x00000000
 
@@ -72,13 +73,14 @@ void Controller( void *pvParameters ){
     //int  = currentTime / 30758400;
     static int prev_min = 0;
 
+
     while(1){
         //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         time(&currentTime);
         ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(timeBuf, 80, "%b %d %I:%M %p", ts);
-//          LcdPrintf(timeBuf);         // update LCD time
+            LcdPrintf(timeBuf);         // update LCD time
             int i;
             for(i = 0; i < 30; i++){
                 if(alarms[i].active &&
