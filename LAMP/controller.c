@@ -17,7 +17,7 @@
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 extern unsigned char g_ucSpkrStartFlag;
-extern unsigned long currentColor;
+extern unsigned long myColor;
 extern alarm alarms[30];
 extern theme themes[30];
 extern TCHAR* myWav;
@@ -37,19 +37,19 @@ static int snoozetime = 0;
 void playTheme(theme* playme){
     myWav = playme->song;
     g_ucSpkrStartFlag = true;
-    currentColor = playme->color;
+    myColor = playme->color;
 }
 
 void snooze(void){
     g_ucSpkrStartFlag = false;
-    currentColor = LEDoff;
+    myColor = LEDoff;
     snoozing = 1;
     snoozetime = (currentAlarm->time%100 + 10)%60;
 }
 
 void alarmOff(void){
     g_ucSpkrStartFlag = false;
-    currentColor = LEDoff;
+    myColor = LEDoff;
     snoozing = 0;
     currentAlarm->running = 0;
 }
