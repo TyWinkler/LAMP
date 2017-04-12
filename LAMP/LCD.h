@@ -12,6 +12,7 @@ void LCDReset(void);
 void displaymytextnext(void);
 void displaymytext(void);
 int LcdPrintf(char *pcFormat, ...);
+void clearScreen();
 
 
 #endif /* LCD_H_ */

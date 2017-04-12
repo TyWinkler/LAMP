@@ -68,6 +68,18 @@ void displaymytext(void){
     GrContextFontSet(&sContext, &g_sFontCmss28);
 }
 
+void clearScreen(){
+    GrContextBackgroundSet(&sContext, ClrBlack);
+    GrContextForegroundSet(&sContext, ClrBlack);
+    const int width = GrContextDpyWidthGet(&sContext);
+    const int height = GrContextDpyHeightGet(&sContext);
+    tRectangle screen = {0,0,width,height};
+    DpyRectFill(&g_ssalowCC3200_ili9341, &screen, ClrBlack);
+    GrContextForegroundSet(&sContext, ClrWhite);
+    GrContextFontSet(&sContext, &g_sFontCmss28);
+    g_lLcdCursorY = 30;
+}
+
 int LcdPrintf(char *pcFormat, ...){
     int iRet = 0;
     char *pcBuff, *pcTemp;
@@ -113,6 +125,7 @@ void LCD( void *pvParameters ){
     unsigned long prevColor = myColor;
     while(1){
         if(!LEDWrite){
+            unsigned long key = osi_EnterCritical();
             GrContextForegroundSet(&sContext, ClrBlack);
             g_lLcdCursorY = 30;
             LcdPrintf(" ");
@@ -136,6 +149,7 @@ void LCD( void *pvParameters ){
             strncpy(prevTime, (char *)timeBuf, 80);
             prevColor = myColor;
             LEDWrite = 1;
+            osi_ExitCritical(key);
             osi_Sleep(1500);
         }
     }

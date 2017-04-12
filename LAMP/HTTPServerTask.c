@@ -36,9 +36,8 @@
 //
 //*****************************************************************************
 
-#include "HTTPServerTask.h"
-
 #include <stdio.h>
+#include <stdlib.h>
 
 // Simplelink includes
 #include "simplelink.h"
@@ -53,6 +52,7 @@
 //common interface includes
 #include "common.h"
 #include "LPD8806.h"
+#include "LCD.h"
 
 //*****************************************************************************
 //                          LOCAL DEFINES
@@ -91,7 +91,6 @@ typedef enum{
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
-tUDPSocket g_UdpSock;
 volatile unsigned long  g_ulStatus = 0;//SimpleLink Status
 unsigned long  g_uiIpAddress = 0; //Device IP address
 unsigned char  g_ucConnectionSSID[SSID_LEN_MAX+1]; //Connection SSID
@@ -407,9 +406,13 @@ long ConnectToNetwork()
     long lRetVal = -1;
     //unsigned int uiConnectTimeoutCnt =0;
 
+    LcdPrintf("slStart");
+
     //Start Simplelink Device
     lRetVal =  sl_Start(NULL,NULL,NULL);
     ASSERT_ON_ERROR(lRetVal);
+
+    LcdPrintf("Started");
 
     if(lRetVal != ROLE_STA)
     {
@@ -430,7 +433,7 @@ long ConnectToNetwork()
         lRetVal = ConfigureMode(ROLE_STA);
         if(lRetVal !=ROLE_STA)
         {
-            UART_PRINT("Unable to set STA mode...\n\r");
+            //UART_PRINT("Unable to set STA mode...\n\r");
             lRetVal = sl_Stop(SL_STOP_TIMEOUT);
             CLR_STATUS_BIT_ALL(g_ulStatus);
             return DEVICE_NOT_IN_STATION_MODE;
@@ -479,17 +482,21 @@ long ConnectToNetwork()
     secParams.KeyLen = strlen(SECURITY_KEY);
     secParams.Type = SECURITY_TYPE;
 
+    LcdPrintf("slWlan");
+
     lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
     ASSERT_ON_ERROR(lRetVal);
 
+    LcdPrintf("Conected");
+
     /* Wait */
-    while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
-    {
+    //while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
+    //{
         // Wait for WLAN Event
 #ifndef SL_PLATFORM_MULTI_THREADED
-        _SlNonOsMainLoopTask();
+        //_SlNonOsMainLoopTask();
 #endif
-    }
+    //}
 
     return SUCCESS;
 
@@ -537,6 +544,8 @@ int BsdTcpServer(unsigned short usPort)
     sLocalAddr.sin_port = sl_Htons((unsigned short)usPort);
     sLocalAddr.sin_addr.s_addr = 0;
 
+    LcdPrintf("Creating socket");
+
     // creating a TCP socket
     iSockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
     //UART_PRINT("Socket: %d \n",iSockID);
@@ -557,6 +566,8 @@ int BsdTcpServer(unsigned short usPort)
         sl_Close(iSockID);
         ASSERT_ON_ERROR(BIND_ERROR);
     }
+    clearScreen();
+    LcdPrintf("Listening");
 
     // putting the socket for listening to the incoming TCP connection
     iStatus = sl_Listen(iSockID, 0);
@@ -565,6 +576,8 @@ int BsdTcpServer(unsigned short usPort)
         sl_Close(iSockID);
         ASSERT_ON_ERROR(LISTEN_ERROR);
     }
+
+    LcdPrintf("Nonblocking");
 
     // setting socket option to make the socket as non blocking
     iStatus = sl_SetSockOpt(iSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
@@ -581,11 +594,13 @@ int BsdTcpServer(unsigned short usPort)
     {
         // accepts a connection form a TCP client, if there is any
         // otherwise returns SL_EAGAIN
+        clearScreen();
+        LcdPrintf("Waiting to connect");
         iNewSockID = sl_Accept(iSockID, ( struct SlSockAddr_t *)&sAddr,
                                 (SlSocklen_t*)&iAddrSize);
         if( iNewSockID == SL_EAGAIN )
         {
-           MAP_UtilsDelay(10000);
+            MAP_UtilsDelay(10000);
         }
         else if( iNewSockID < 0 )
         {
@@ -608,8 +623,10 @@ int BsdTcpServer(unsigned short usPort)
         //
         //------------------------------------------------------
         //common.h needs to be set to your AP it should direct connect
-        myColor = 0x00ff00;
-        UART_PRINT(g_cBsdBuf);
+
+        myColor = myColor << 8;
+        clearScreen();
+        LcdPrintf(g_cBsdBuf);
         if( iStatus <= 0 )
         {
           // error
@@ -617,19 +634,18 @@ int BsdTcpServer(unsigned short usPort)
           sl_Close(iSockID);
           ASSERT_ON_ERROR(RECV_ERROR);
         }
-
+    }
         //lLoopCount++;
     //}
-    }
 
     //Report("Recieved %u packets successfully\n\r",g_ulPacketCount);
 
     // close the connected socket after receiving from connected TCP client
-    iStatus = sl_Close(iNewSockID);
-    ASSERT_ON_ERROR(iStatus);
+    //iStatus = sl_Close(iNewSockID);
+    //ASSERT_ON_ERROR(iStatus);
     // close the listening socket
-    iStatus = sl_Close(iSockID);
-    ASSERT_ON_ERROR(iStatus);
+    //iStatus = sl_Close(iSockID);
+    //ASSERT_ON_ERROR(iStatus);
 
     return SUCCESS;
 }
@@ -658,11 +674,16 @@ void HTTPServerTask( void *pvParameters )
         LOOP_FOREVER();
     }
 
-    lRetVal = BsdTcpServer(PORT_NUM);
-    if(lRetVal < 0)
-    {
-        UART_PRINT("TCP Server failed\n\r");
-        LOOP_FOREVER();
+    LcdPrintf("Connected");
+
+    while(1){
+        lRetVal = BsdTcpServer(PORT_NUM);
+        if(lRetVal < 0)
+        {
+            UART_PRINT("TCP Server failed\n\r");
+            LOOP_FOREVER();
+        }
+        osi_Sleep(100);
     }
 
 }
