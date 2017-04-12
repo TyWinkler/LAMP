@@ -407,13 +407,17 @@ long ConnectToNetwork()
     long lRetVal = -1;
     //unsigned int uiConnectTimeoutCnt =0;
 
+#ifdef DEBUG
     LcdPrintf("slStart");
+#endif
 
     //Start Simplelink Device
     lRetVal =  sl_Start(NULL,NULL,NULL);
     ASSERT_ON_ERROR(lRetVal);
 
+#ifdef DEBUG
     LcdPrintf("Started");
+#endif
 
     if(lRetVal != ROLE_STA)
     {
@@ -483,12 +487,16 @@ long ConnectToNetwork()
     secParams.KeyLen = strlen(SECURITY_KEY);
     secParams.Type = SECURITY_TYPE;
 
+#ifdef DEBUG
     LcdPrintf("slWlan");
+#endif
 
     lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
     ASSERT_ON_ERROR(lRetVal);
 
+#ifdef DEBUG
     LcdPrintf("Connected");
+#endif
 
     /* Wait */
     //while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
@@ -505,76 +513,122 @@ long ConnectToNetwork()
 
 int APIparse(char *commands){
     char *token= strtok(commands, "=");
+#ifdef DEBUG
     LcdPrintf(token);
+#endif
     if(strncmp(token, "api_call",8) != 0){
+#ifdef DEBUG
+        LcdPrintf("uhh?");
+#endif
         return -1;
     }
 
     //takes api_call type (i.e. set_color, add_alarm, etc.)
     token= strtok(NULL, "&");
+#ifdef DEBUG
     LcdPrintf(token);
+#endif
 
     //SET COLOR
     if(strncmp(token, "set_color",9)==0){
         long color;
         token= strtok(NULL, "=");
+#ifdef DEBUG
         LcdPrintf(token);
+#endif
         if(strncmp(token, "color",5)==0){
             token=strtok(NULL, ""); //will this take the last token?
+#ifdef DEBUG
             LcdPrintf(token);
-            color=strtol(token, NULL, 16);
+#endif
+            color=strtol(token + 2, NULL, 16) & 0x00FFFFFF;
+#ifdef DEBUG
+            char test[50];
+            sprintf (test, "%x", color);
+            LcdPrintf(test);
+#endif
             apiSetColorIm(color);
             return 1;
         }
     }
 
     //ADD ALARM
-    if(strcmp(token, "add_alarm")==0){
+    if(strncmp(token, "add_alarm",9)==0){
         long time= -1;
-        char themeID = -1;
-        char dow = -1;
-        char alarmID = -1;
-        char running = -1;
+        int themeID = -1;
+        int dow = -1;
+        int alarmID = -1;
+        int running = -1;
 
         token=strtok(NULL, "=");
+#ifdef DEBUG
+        LcdPrintf(token);
+#endif
         //parse time
-        if(strcmp(token, "time")==0){
+        if(strncmp(token, "time",4)==0){
             token=strtok(NULL, "&");
-            if(strcmp(token, "NA") != 0){
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strncmp(token, "NA",2) != 0){
                 time=strtol(token, NULL, 10);
             }
 
             //parse theme_id
             token=strtok(NULL, "=");
-            if(strcmp(token, "theme_id")==0){
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strncmp(token, "theme_id",8)==0){
                 token= strtok(NULL, "&");
-                if(strcmp(token, "NA")!=0){
-                    themeID = token;
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
+                if(strncmp(token, "NA",2)!=0){
+                    themeID = -1;
                     //token should just contain the one char if not NA
                 }
             }
 
             //parse dow
-            token = strcmp(NULL, "=");
-            if(strcmp(token, "dow")==0){
+            token = strtok(NULL, "=");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strncmp(token, "dow",3)==0){
                 token=strtok(NULL, "&");
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
                 //what is dow? Why is it being sent as a string of bits, but passed as a char?
                 //TODO: convert dow string to char
             }
 
             //parse alarm id
             token=strtok(NULL, "=");
-            if(strcmp(token, "alarm_id")==0){
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strncmp(token, "alarm_id",8)==0){
                 token= strtok(NULL, "&");
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
                     alarmID = token[0];
                     //token should just contain the one char
             }
 
             //parse running
             token=strtok(NULL, "=");
-            if(strcmp(token, "running")==0){
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strncmp(token, "running",7)==0){
                 token= strtok(NULL, "&");   //last token, check
-                if(strcmp(token, "NA") != 0){
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
+                if(strncmp(token, "NA",2) != 0){
                     running= token[0];
                     //token should just contain the one char
                 }
@@ -686,11 +740,12 @@ int BsdTcpServer(unsigned short usPort)
     sLocalAddr.sin_port = sl_Htons((unsigned short)usPort);
     sLocalAddr.sin_addr.s_addr = 0;
 
+#ifdef DEBUG
     LcdPrintf("Creating socket");
+#endif
 
     // creating a TCP socket
     iSockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
-    //UART_PRINT("Socket: %d \n",iSockID);
     if( iSockID < 0 )
     {
         // error
@@ -708,8 +763,11 @@ int BsdTcpServer(unsigned short usPort)
         sl_Close(iSockID);
         ASSERT_ON_ERROR(BIND_ERROR);
     }
+
+#ifdef DEBUG
     clearScreen();
     LcdPrintf("Listening");
+#endif
 
     // putting the socket for listening to the incoming TCP connection
     iStatus = sl_Listen(iSockID, 0);
@@ -719,7 +777,9 @@ int BsdTcpServer(unsigned short usPort)
         ASSERT_ON_ERROR(LISTEN_ERROR);
     }
 
+#ifdef DEBUG
     LcdPrintf("Nonblocking");
+#endif
 
     // setting socket option to make the socket as non blocking
     iStatus = sl_SetSockOpt(iSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
@@ -736,13 +796,15 @@ int BsdTcpServer(unsigned short usPort)
     {
         // accepts a connection form a TCP client, if there is any
         // otherwise returns SL_EAGAIN
+#ifdef DEBUG
         clearScreen();
         LcdPrintf("Waiting to connect");
+#endif
         iNewSockID = sl_Accept(iSockID, ( struct SlSockAddr_t *)&sAddr,
                                 (SlSocklen_t*)&iAddrSize);
         if( iNewSockID == SL_EAGAIN )
         {
-            MAP_UtilsDelay(10000);
+            osi_Sleep(1000);
         }
         else if( iNewSockID < 0 )
         {
@@ -765,9 +827,12 @@ int BsdTcpServer(unsigned short usPort)
         //
         //------------------------------------------------------
         //common.h needs to be set to your AP it should direct connect
+#ifdef DEBUG
         clearScreen();
         LcdPrintf(g_cBsdBuf);
+#endif
         APIparse(g_cBsdBuf);
+        osi_Sleep(1000);
         if( iStatus <= 0 )
         {
           // error
@@ -816,7 +881,9 @@ void HTTPServerTask( void *pvParameters )
         LOOP_FOREVER();
     }
 
+#ifdef DEBUG
     LcdPrintf("Connected");
+#endif
 
     while(1){
         lRetVal = BsdTcpServer(PORT_NUM);

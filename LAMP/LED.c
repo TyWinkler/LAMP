@@ -70,7 +70,7 @@
 void LED( void *pvParameters ){
     reset();
     while(1){
-        if(LEDWrite){
+        if(1){
             unsigned long key = osi_EnterCritical();
             allColor(colorHex(myColor));
             osi_ExitCritical(key);

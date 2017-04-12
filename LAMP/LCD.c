@@ -27,6 +27,7 @@ extern const TCHAR* myWav;
 extern char timeBuf;
 char prevTime[80];
 const TCHAR* prevWav;
+char *myTime;
 
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
@@ -124,30 +125,33 @@ void LCD( void *pvParameters ){
 //    displaymytext();
     unsigned long prevColor = myColor;
     while(1){
-        if(!LEDWrite){
+        if(1){
             unsigned long key = osi_EnterCritical();
             GrContextForegroundSet(&sContext, ClrBlack);
-            g_lLcdCursorY = 30;
-            LcdPrintf(" ");
+            g_lLcdCursorY = 35;
+            if(prevTime != myTime){
+                LcdPrintf(prevTime);
+            } else {
+                LcdPrintf(" ");
+            }
             LcdPrintf(" ");
             LcdPrintf(" ");
             long dispColor = prevColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
-            if(prevTime != &timeBuf){
-                LcdPrintf(prevTime);
-            }
+
             GrContextForegroundSet(&sContext, ClrWhite);
-            g_lLcdCursorY = 30;
+            g_lLcdCursorY = 35;
+            LcdPrintf(myTime);
             LcdPrintf(" ");
-            LcdPrintf("The color is");
-            LcdPrintf(" ");
+            LcdPrintf("The current color is");
             dispColor = myColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
-            LcdPrintf((char *)timeBuf);
-            strncpy(prevTime, (char *)timeBuf, 80);
+
+            strcpy(prevTime,myTime);
             prevColor = myColor;
+
             LEDWrite = 1;
             osi_ExitCritical(key);
             osi_Sleep(1500);

@@ -46,53 +46,119 @@ void apiSetColorIm(unsigned long color){
 }
 
 //creates an alarm if one does not exist or edits an existing one
-void apiEditAlarm(unsigned int time, unsigned char themeId, unsigned char dow, unsigned char alarmId, unsigned char running){
-    if(time != NULL){
-        alarms[alarmId].time = time;
+void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
+    int i;
+    int storageId = -1;
+    for(i = 0; i < 30; i++){
+        if(alarms[i].alarmId == alarmId){
+            storageId = i;
+            break;
+        }
     }
-    if(themeId != NULL){
-        alarms[alarmId].themeId = themeId;
+    if(storageId == -1){
+        for(i = 0; i < 30; i++){
+            if(alarms[i].active == 0){
+                alarms[i].alarmId = alarmId;
+                storageId = i;
+            }
+        }
     }
-    if(dow != NULL){
-        alarms[alarmId].dow = dow;
-    }
-    if(running != NULL){
-        alarms[alarmId].running = running;
-    }
-    if(alarms[alarmId].active == 0){
-        alarms[alarmId].active = 1;
+    if(storageId != -1){
+        if(time != -1){
+            alarms[storageId].time = time;
+        }
+        if(themeId != -1){
+            alarms[storageId].themeId = themeId;
+        }
+        if(dow != -1){
+            alarms[storageId].dow = dow;
+        }
+        if(running != -1){
+            alarms[storageId].running = running;
+        }
+        if(alarms[storageId].active == 0){
+            alarms[storageId].active = 1;
+        }
     }
 }
 
 //creates a theme if one dose not exist or edits an existing one
-void apiEditTheme(unsigned char themeId, unsigned long color, TCHAR* song){
-    if(color != NULL){
-        themes[themeId].color = color;
+void apiEditTheme(int themeId, long color, TCHAR* song){
+    int i;
+    int storageId = -1;
+    for(i = 0; i < 30; i++){
+        if(themes[i].themeId == themeId){
+            storageId = i;
+            break;
+        }
     }
-    if(!strcmp(song,"NA")){
-        themes[themeId].song = song;
+    if(storageId == -1){
+        for(i = 0; i < 30; i++){
+            if(themes[i].active == 0){
+                themes[i].themeId = themeId;
+                storageId = i;
+            }
+        }
     }
-    if(themes[themeId].active == 0){
-        themes[themeId].active = 1;
+    if(storageId != -1){
+        if(color != NULL){
+            themes[storageId].color = color;
+        }
+        if(!strcmp(song,"NA")){
+            themes[storageId].song = song;
+        }
+        if(themes[themeId].active == 0){
+            themes[storageId].active = 1;
+        }
     }
 }
 
 //deletes an alarm if it exists
-void apiDeleteAlarm(unsigned char alarmId){
-    alarms[alarmId].active = 0;
+void apiDeleteAlarm(int alarmId){
+    int i;
+    int storageId = -1;
+    for(i = 0; i < 30; i++){
+        if(alarms[i].alarmId == alarmId){
+            storageId = i;
+            break;
+        }
+    }
+    if(storageId != -1){
+        alarms[storageId].active = 0;
+    }
 }
 
 //deletes a theme if it exists
-void apiDeleteTheme(unsigned char themeId){
-    themes[themeId].active = 0;
+void apiDeleteTheme(int themeId){
+    int i;
+    int storageId = -1;
+    for(i = 0; i < 30; i++){
+        if(themes[i].themeId == themeId){
+            storageId = i;
+            break;
+        }
+    }
+    if(storageId != -1){
+        themes[storageId].active = 0;
+    }
 }
 
 //plays theme immediately
-void apiPlayTheme(unsigned char themeId){
-    myColor = themes[themeId].color;
-    if(themes[themeId].song != NULL){
-        myWav = themes[themeId].song;
-        g_ucSpkrStartFlag = 1;
+void apiPlayTheme(int themeId){
+    int i;
+    int storageId = -1;
+    for(i = 0; i < 30; i++){
+        if(themes[i].themeId == themeId){
+            storageId = i;
+            break;
+        }
+    }
+    if(storageId != -1){
+        myColor = themes[storageId].color;
+        if(themes[storageId].song != NULL){
+            myWav = themes[storageId].song;
+            g_ucSpkrStartFlag = 1;
+        }
     }
 }
 

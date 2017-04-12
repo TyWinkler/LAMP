@@ -8,6 +8,8 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+extern char *myTime;
+
 void LCDReset(void);
 void displaymytextnext(void);
 void displaymytext(void);
