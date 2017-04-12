@@ -74,6 +74,8 @@ OsiTaskHandle g_HTTPServerTask = NULL ;
 OsiTaskHandle g_LEDTask = NULL;
 OsiTaskHandle g_LCDTask = NULL;
 OsiTaskHandle g_ControllerTask = NULL;
+OsiMsgQ_t g_ControlMsgQueue;
+
 
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
@@ -81,6 +83,13 @@ OsiTaskHandle g_ControllerTask = NULL;
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
 #define PLAY_WATERMARK          30*1024
+
+typedef struct
+{
+  //Queue_Elem _elem;
+  P_OSI_SPAWN_ENTRY pEntry;
+  void* pValue;
+}tTxMsg;
 
 #if defined(ccs)
 extern void (* const g_pfnVectors[])(void);
@@ -287,15 +296,21 @@ int main(){
         LOOP_FOREVER();
     }
 
-//    // Simplelinkspawntask
-//    lRetVal = VStartSimpleLinkSpawnTask(3);
-//    if(lRetVal < 0){
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
+    //
+    // Start the simplelink thread
+    //
+    lRetVal = VStartSimpleLinkSpawnTask(9);
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    lRetVal = osi_MsgQCreate(&g_ControlMsgQueue,"g_ControlMsgQueue", sizeof(tTxMsg),1);
+    ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 2048, NULL, 4, &g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 1, &g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

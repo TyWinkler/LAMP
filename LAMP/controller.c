@@ -73,10 +73,11 @@ void Controller( void *pvParameters ){
     //int  = currentTime / 30758400;
     static int prev_min = 0;
 
+    time(&currentTime);
 
     while(1){
         //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-        time(&currentTime);
+
         ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(timeBuf, 80, "%b %d %I:%M %p", ts);
