@@ -53,6 +53,7 @@
 #include "common.h"
 #include "LPD8806.h"
 #include "LCD.h"
+#include "api.h"
 
 //*****************************************************************************
 //                          LOCAL DEFINES
@@ -487,7 +488,7 @@ long ConnectToNetwork()
     lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
     ASSERT_ON_ERROR(lRetVal);
 
-    LcdPrintf("Conected");
+    LcdPrintf("Connected");
 
     /* Wait */
     //while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
@@ -500,6 +501,147 @@ long ConnectToNetwork()
 
     return SUCCESS;
 
+}
+
+int APIparse(char *commands){
+    char *token= strtok(commands, "=");
+    LcdPrintf(token);
+    if(strncmp(token, "api_call",8) != 0){
+        return -1;
+    }
+
+    //takes api_call type (i.e. set_color, add_alarm, etc.)
+    token= strtok(NULL, "&");
+    LcdPrintf(token);
+
+    //SET COLOR
+    if(strncmp(token, "set_color",9)==0){
+        long color;
+        token= strtok(NULL, "=");
+        LcdPrintf(token);
+        if(strncmp(token, "color",5)==0){
+            token=strtok(NULL, ""); //will this take the last token?
+            LcdPrintf(token);
+            color=strtol(token, NULL, 16);
+            apiSetColorIm(color);
+            return 1;
+        }
+    }
+
+    //ADD ALARM
+    if(strcmp(token, "add_alarm")==0){
+        long time= -1;
+        char themeID = -1;
+        char dow = -1;
+        char alarmID = -1;
+        char running = -1;
+
+        token=strtok(NULL, "=");
+        //parse time
+        if(strcmp(token, "time")==0){
+            token=strtok(NULL, "&");
+            if(strcmp(token, "NA") != 0){
+                time=strtol(token, NULL, 10);
+            }
+
+            //parse theme_id
+            token=strtok(NULL, "=");
+            if(strcmp(token, "theme_id")==0){
+                token= strtok(NULL, "&");
+                if(strcmp(token, "NA")!=0){
+                    themeID = token;
+                    //token should just contain the one char if not NA
+                }
+            }
+
+            //parse dow
+            token = strcmp(NULL, "=");
+            if(strcmp(token, "dow")==0){
+                token=strtok(NULL, "&");
+                //what is dow? Why is it being sent as a string of bits, but passed as a char?
+                //TODO: convert dow string to char
+            }
+
+            //parse alarm id
+            token=strtok(NULL, "=");
+            if(strcmp(token, "alarm_id")==0){
+                token= strtok(NULL, "&");
+                    alarmID = token[0];
+                    //token should just contain the one char
+            }
+
+            //parse running
+            token=strtok(NULL, "=");
+            if(strcmp(token, "running")==0){
+                token= strtok(NULL, "&");   //last token, check
+                if(strcmp(token, "NA") != 0){
+                    running= token[0];
+                    //token should just contain the one char
+                }
+            }
+
+            apiEditAlarm(time, themeID, dow, alarmID, running);
+            return 1;
+
+        }
+    }
+
+    //ADD THEME
+    if(strcmp(token, "add_theme")==0){
+        char themeID;
+        long color;
+        TCHAR* song;
+        token=strtok(NULL, "=");
+
+        //get theme ID
+        if(strcmp(token, "theme_id")==0){
+            token=strtok(NULL, "&");
+            themeID=token[0];
+        }
+
+
+
+    }
+
+    //DELETE ALARM
+    if(strcmp(token, "delete_alarm")==0){
+        token=strtok(NULL, "=");
+        char alarmID;
+        if(strcmp(token, "alarm_id")==0){
+            token=strtok(NULL, "&");
+            alarmID=token[0];
+            apiDeleteAlarm(alarmID);
+            return 1;
+        }
+
+    }
+
+    //DELETE THEME
+    if(strcmp(token, "delete_theme")==0){
+        token=strtok(NULL, "=");
+        char themeID;
+        if(strcmp(token, "theme_id")==0){
+            token=strtok(NULL, "&");
+            themeID=token[0];
+            apiDeleteTheme(themeID);
+            return 1;
+        }
+    }
+
+    //PLAY THEME
+    if(strcmp(token, "play_theme")==0){
+        char themeID;
+        token=strtok(NULL, "=");
+        if(strcmp(token, "theme_id")==0){
+            token=strtok(NULL, "&");
+            themeID=token[0];
+            apiPlayTheme(themeID);
+            return 1;
+        }
+
+    }
+
+    return -1;
 }
 
 //****************************************************************************
@@ -623,16 +765,16 @@ int BsdTcpServer(unsigned short usPort)
         //
         //------------------------------------------------------
         //common.h needs to be set to your AP it should direct connect
-
-        myColor = myColor << 8;
         clearScreen();
         LcdPrintf(g_cBsdBuf);
+        APIparse(g_cBsdBuf);
         if( iStatus <= 0 )
         {
           // error
           sl_Close(iNewSockID);
           sl_Close(iSockID);
-          ASSERT_ON_ERROR(RECV_ERROR);
+          break;
+          //ASSERT_ON_ERROR(RECV_ERROR);
         }
     }
         //lLoopCount++;
