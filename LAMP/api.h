@@ -14,7 +14,7 @@ extern void apiEditTheme(int themeId, long color, TCHAR* song);
 extern void apiDeleteAlarm(int alarmId);
 extern void apiDeleteTheme(int themeId);
 extern void apiPlayTheme(int themeId);
-extern void apiUpdateTime(unsigned int time);
+extern void apiUpdateTime(unsigned long time);
 
 typedef struct alarm{
     unsigned int alarmId;

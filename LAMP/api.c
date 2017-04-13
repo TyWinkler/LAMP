@@ -13,6 +13,10 @@
 #include "ff.h"
 #include "api.h"
 #include "LCD.h"
+#include "osi.h"
+#include "hw_types.h"
+#include "hw_ints.h"
+#include "prcm.h"
 
 //struct theme{
 //    unsigned long color;
@@ -44,7 +48,9 @@ void apiOff(){
 
 //immediately changes the color
 void apiSetColorIm(unsigned long color){
+    unsigned long key = osi_EnterCritical();
     myColor = color;
+    osi_ExitCritical(key);
 }
 
 //creates an alarm if one does not exist or edits an existing one
@@ -160,26 +166,45 @@ void apiDeleteTheme(int themeId){
 
 //plays theme immediately
 void apiPlayTheme(int themeId){
+    unsigned long key = osi_EnterCritical();
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
         if(themes[i].themeId == themeId){
+#ifdef DEBUG
+            //clearScreen();
+            LcdPrintf("Found at %d",i);
+#endif
             storageId = i;
             break;
         }
     }
     if(storageId != -1){
         myColor = themes[storageId].color;
+#ifdef DEBUG
+                LcdPrintf("My color is %#08x",myColor);
+#endif
         if(themes[storageId].song != NULL){
             myWav = themes[storageId].song;
+#ifdef DEBUG
+            LcdPrintf(myWav);
+#endif
             songChanged = 1;
-            g_ucSpkrStartFlag = 1;
+            if(myWav == "NA"){
+                g_ucSpkrStartFlag = 0;
+            } else {
+                g_ucSpkrStartFlag = 1;
+            }
         }
     }
+    osi_ExitCritical(key);
 }
 
 
 //updates the time displayed on the device
-void apiUpdateTime(unsigned int time){
+void apiUpdateTime(unsigned long time){
+    unsigned long key = osi_EnterCritical();
     currentTime = time;
+    PRCMRTCSet(currentTime,0);
+    osi_ExitCritical(key);
 }

@@ -678,7 +678,7 @@ int APIparse(char *commands){
 #ifdef DEBUG
                 LcdPrintf(token);
 #endif
-            themeID=token[0];
+            themeID=token[0] - 0x30;
             token=strtok(NULL, "=");
 #ifdef DEBUG
                 LcdPrintf(token);
@@ -752,7 +752,7 @@ int APIparse(char *commands){
         char themeID;
         if(strcmp(token, "theme_id")==0){
             token=strtok(NULL, "&");
-            themeID=token[0];
+            themeID=token[0] - 0x30;
             apiDeleteTheme(themeID);
             return 1;
         }
@@ -764,11 +764,26 @@ int APIparse(char *commands){
         token=strtok(NULL, "=");
         if(strcmp(token, "theme_id")==0){
             token=strtok(NULL, "&");
-            themeID=token[0];
+            themeID=token[0] - 0x30;
+#ifdef DEBUG
+            LcdPrintf("%d",themeID);
+#endif
             apiPlayTheme(themeID);
             return 1;
         }
 
+    }
+
+    //SET TIME
+    if(strcmp(token, "set_time")==0){
+        token=strtok(NULL, "=");
+        unsigned long time;
+        if(strcmp(token, "time")==0){
+            token=strtok(NULL, "&");
+            time = strtol(token, NULL, 10);
+            apiUpdateTime(time);
+            return 1;
+        }
     }
 
     return -1;

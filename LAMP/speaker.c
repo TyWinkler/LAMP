@@ -167,7 +167,7 @@ void Speaker( void *pvParameters )
     ListDirectory();
     //open file
     openFile();
-    g_ucSpkrStartFlag = 0;
+    g_ucSpkrStartFlag = 1;
     while(1)
     {
       while(g_ucSpkrStartFlag)

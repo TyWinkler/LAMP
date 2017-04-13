@@ -127,7 +127,7 @@ void LCD( void *pvParameters ){
     unsigned long prevColor = myColor;
     //char *prevSong;
     while(1){
-        if(!DEBUG){
+        if(1){
             unsigned long key = osi_EnterCritical();
             GrContextForegroundSet(&sContext, ClrBlack);
             g_lLcdCursorY = 35;
