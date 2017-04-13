@@ -511,6 +511,20 @@ long ConnectToNetwork()
 
 }
 
+
+//*********************************************
+//
+//
+//This function is used for parsing the string defining necessary API calls
+//  that is sent via TCP sockets
+//The appropriate API calls are made within the function, assuming the expected
+//  parameters are correctly received.
+//The function returns a 1 if an API call was successfully made, but returns a
+//  -1 for error if an API call was not successfully made
+//
+//
+//*********************************************
+
 int APIparse(char *commands){
     char *token= strtok(commands, "=");
 #ifdef DEBUG
@@ -640,21 +654,53 @@ int APIparse(char *commands){
         }
     }
 
+    //API OFF
+    if(strcmp(token, "off")==0){
+        apiOff();
+        return 1;
+    }
+
     //ADD THEME
     if(strcmp(token, "add_theme")==0){
         char themeID;
         long color;
         TCHAR* song;
+        char special;
         token=strtok(NULL, "=");
 
         //get theme ID
         if(strcmp(token, "theme_id")==0){
             token=strtok(NULL, "&");
             themeID=token[0];
+            token=strtok(NULL, "=");
+
+            //take color value
+            if(strcmp(token, "color")==0){
+                token=strtok(NULL, "&");
+                color=strtol(token[2], NULL, 16);
+
+                //take song name
+                token=strtok(NULL, "=");
+                if(strcmp(token, "song")==0){
+                    token=strtok(NULL, "&");
+                    song=token;
+                    //PASSING NA FOR NOW FOR SONG
+                }
+                token=strtok(NULL, "=");
+                if(strcmp(token, "volume")==0){
+                    token=strtok(NULL, "&");
+                    //don't know what to do with volume
+                    //token will hold string value of volume at this point
+                }
+                token=strtok(NULL, "=");
+                if(strcmp(token, "special")==0){
+                    token=strtok(NULL, "");
+                    special= token[0];
+                    apiEditTheme(themeID, color, song);
+                    return 1;
+                }
+            }
         }
-
-
-
     }
 
     //DELETE ALARM
