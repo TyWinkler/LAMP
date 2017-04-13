@@ -74,7 +74,12 @@ void Controller( void *pvParameters ){
    // int years = currentTime / 30758400;
     //int  = currentTime / 30758400;
     static int prev_min = 0;
-
+#ifdef DEBUG2
+    apiEditTheme(1,0xff0000,"stuck.wav");
+    clearScreen();
+    LcdPrintf("Active = %d",themes[0].active);
+    apiPlayTheme(1);
+#endif
     while(1){
         //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         time(&currentTime);

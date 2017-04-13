@@ -528,6 +528,7 @@ long ConnectToNetwork()
 int APIparse(char *commands){
     char *token= strtok(commands, "=");
 #ifdef DEBUG
+    clearScreen();
     LcdPrintf(token);
 #endif
     if(strncmp(token, "api_call",8) != 0){
@@ -655,7 +656,7 @@ int APIparse(char *commands){
     }
 
     //API OFF
-    if(strcmp(token, "off")==0){
+    if(strncmp(token, "off",3)==0){
         apiOff();
         return 1;
     }
@@ -667,38 +668,67 @@ int APIparse(char *commands){
         TCHAR* song;
         char special;
         token=strtok(NULL, "=");
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
 
         //get theme ID
         if(strcmp(token, "theme_id")==0){
             token=strtok(NULL, "&");
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
             themeID=token[0];
             token=strtok(NULL, "=");
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
 
             //take color value
             if(strcmp(token, "color")==0){
                 token=strtok(NULL, "&");
-                color=strtol(token[2], NULL, 16);
-
-                //take song name
-                token=strtok(NULL, "=");
-                if(strcmp(token, "song")==0){
-                    token=strtok(NULL, "&");
-                    song=token;
-                    //PASSING NA FOR NOW FOR SONG
-                }
-                token=strtok(NULL, "=");
-                if(strcmp(token, "volume")==0){
-                    token=strtok(NULL, "&");
-                    //don't know what to do with volume
-                    //token will hold string value of volume at this point
-                }
-                token=strtok(NULL, "=");
-                if(strcmp(token, "special")==0){
-                    token=strtok(NULL, "");
-                    special= token[0];
-                    apiEditTheme(themeID, color, song);
-                    return 1;
-                }
+#ifdef DEBUG
+                LcdPrintf(token);
+#endif
+                color = strtol(token + 2, NULL, 16);
+            }
+            //take song name
+            token=strtok(NULL, "=");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strcmp(token, "song")==0){
+                token=strtok(NULL, "&");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+                song=token;
+                //PASSING NA FOR NOW FOR SONG
+            }
+            token=strtok(NULL, "=");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strcmp(token, "volume")==0){
+                token=strtok(NULL, "&");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+                //don't know what to do with volume
+                //token will hold string value of volume at this point
+            }
+            token=strtok(NULL, "=");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+            if(strcmp(token, "special")==0){
+                token=strtok(NULL, "");
+#ifdef DEBUG
+            LcdPrintf(token);
+#endif
+                special= token[0];
+                apiEditTheme(themeID, color, song);
+                return 1;
             }
         }
     }
@@ -878,7 +908,8 @@ int BsdTcpServer(unsigned short usPort)
         LcdPrintf(g_cBsdBuf);
 #endif
         APIparse(g_cBsdBuf);
-        osi_Sleep(1000);
+
+        osi_Sleep(50);
         if( iStatus <= 0 )
         {
           // error

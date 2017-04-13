@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "ff.h"
 #include "api.h"
+#include "LCD.h"
 
 //struct theme{
 //    unsigned long color;
@@ -33,6 +34,7 @@ extern unsigned long myColor;
 extern unsigned char g_ucSpkrStartFlag;
 extern const TCHAR* myWav;
 extern unsigned int currentTime;
+extern unsigned char songChanged;
 
 //Turns off speaker and lights
 void apiOff(){
@@ -88,19 +90,32 @@ void apiEditTheme(int themeId, long color, TCHAR* song){
     int storageId = -1;
     for(i = 0; i < 30; i++){
         if(themes[i].themeId == themeId){
+#ifdef DEBUG2
+            LcdPrintf("Found theme at %d",i);
+#endif
             storageId = i;
             break;
         }
     }
     if(storageId == -1){
+#ifdef DEBUG2
+        LcdPrintf("Looking for spot to store");
+#endif
         for(i = 0; i < 30; i++){
             if(themes[i].active == 0){
+#ifdef DEBUG2
+                LcdPrintf("Stored at %d",i);
+#endif
                 themes[i].themeId = themeId;
                 storageId = i;
+                break;
             }
         }
     }
     if(storageId != -1){
+#ifdef DEBUG2
+        LcdPrintf("Setting variables");
+#endif
         if(color != NULL){
             themes[storageId].color = color;
         }
@@ -157,6 +172,7 @@ void apiPlayTheme(int themeId){
         myColor = themes[storageId].color;
         if(themes[storageId].song != NULL){
             myWav = themes[storageId].song;
+            songChanged = 1;
             g_ucSpkrStartFlag = 1;
         }
     }

@@ -127,19 +127,19 @@ void LCD( void *pvParameters ){
     unsigned long prevColor = myColor;
     //char *prevSong;
     while(1){
-        if(1){
+        if(!DEBUG){
             unsigned long key = osi_EnterCritical();
             GrContextForegroundSet(&sContext, ClrBlack);
             g_lLcdCursorY = 35;
-            if(prevTime != myTime){
-                LcdPrintf(prevTime);
-            } else {
-                LcdPrintf(" ");
-            }
+            LcdPrintf(prevTime);
             LcdPrintf(" ");
             LcdPrintf(" ");
             long dispColor = prevColor & 0x00FFFFFF;
-            LcdPrintf("%#08x", dispColor);
+            if(prevColor != myColor){
+                LcdPrintf("%#08x", dispColor);
+            } else {
+                LcdPrintf(" ");
+            }
             LcdPrintf(" ");
             LcdPrintf(" ");
             //if(!strcmp(myWav,prevSong) || g_ucSpkrStartFlag){
