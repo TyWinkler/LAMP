@@ -31,6 +31,7 @@ static theme* currentTheme;
 static char currentAlarmHasPlayed = 0;
 static char snoozing = 0;
 static int snoozetime = 0;
+int timeHasChanged = 0;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -66,27 +67,33 @@ void hasAlarmPlayed(void){
 }
 
 void Controller( void *pvParameters ){
-    //PRCMRTCInUseSet();
-    //PRCMRTCSet(currentTime,0);
-    //unsigned short throwaway;
+
+    PRCMRTCInUseSet();
+    time(&currentTime);
+    PRCMRTCSet(currentTime,0);
+    unsigned short throwaway;
     //_tz.timezone = 0;
     //time_t* toss = 0;
    // int years = currentTime / 30758400;
     //int  = currentTime / 30758400;
     static int prev_min = 0;
-#ifdef DEBUG2
-    apiEditTheme(1,0xff0000,"stuck.wav");
-    clearScreen();
-    LcdPrintf("Active = %d",themes[0].active);
-    apiPlayTheme(1);
-#endif
+
+//#ifdef DEBUG2
+//    apiEditTheme(1,0xff0000,"stuck.wav");
+//    clearScreen();
+//    LcdPrintf("Active = %d",themes[0].active);
+//    apiPlayTheme(1);
+//#endif
+
     while(1){
-        //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-        time(&currentTime);
+
+        PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         ts = localtime(&currentTime);
+
         if(prev_min != ts->tm_min){
             strftime(timeBuf, 80, "%b %d %I:%M %p", ts);
             myTime = timeBuf;
+            timeHasChanged = 1;
             int i;
             for(i = 0; i < 30; i++){
                 if(alarms[i].active &&
