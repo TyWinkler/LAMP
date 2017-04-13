@@ -19,6 +19,7 @@
 //*****************************************************************************
 extern unsigned char g_ucSpkrStartFlag;
 extern unsigned long myColor;
+extern unsigned char songChanged;
 extern alarm alarms[30];
 extern theme themes[30];
 extern TCHAR* myWav;
@@ -38,6 +39,7 @@ static int snoozetime = 0;
 void playTheme(theme* playme){
     myWav = playme->song;
     g_ucSpkrStartFlag = true;
+    songChanged = true;
     myColor = playme->color;
 }
 

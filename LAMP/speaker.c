@@ -73,6 +73,7 @@ int songCount = 0;
 #define PLAY_WATERMARK          30*1024
 unsigned char pBuffer[BUFFSIZE];
 unsigned char g_ucSpkrStartFlag;
+unsigned char songChanged = 0;
 
 FIL fp;
 FATFS fs;
@@ -121,16 +122,20 @@ ListDirectory()
 
 void openFile(){
     Message("\n\rReading user file...\n\r");
-    if(myWav == "stuck.wav"){
-        myWav = "call.wav";
-    } else {
-        myWav = "stuck.wav";
-    }
     res = f_open(&fp,myWav,FA_READ);
     f_lseek(&fp,44);
 }
 
+void closeFile(){
+    f_close(&fp);
+}
+
 void readFile(){
+    if(songChanged){
+        closeFile();
+        openFile();
+        songChanged = 0;
+    }
     if(res == FR_OK)
     {
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
@@ -143,9 +148,6 @@ void readFile(){
     }
 }
 
-void closeFile(){
-    f_close(&fp);
-}
 
 
 //*****************************************************************************
@@ -165,7 +167,7 @@ void Speaker( void *pvParameters )
     ListDirectory();
     //open file
     openFile();
-    g_ucSpkrStartFlag = 1;
+    g_ucSpkrStartFlag = 0;
     while(1)
     {
       while(g_ucSpkrStartFlag)
@@ -201,7 +203,7 @@ void Speaker( void *pvParameters )
         }
         g_iReceiveCount++;
       }
-      MAP_UtilsDelay(1000);
+      osi_Sleep(1000);
     }
 }
 

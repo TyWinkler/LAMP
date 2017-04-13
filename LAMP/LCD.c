@@ -29,6 +29,7 @@ char prevTime[80];
 const TCHAR* prevWav;
 char *myTime;
 
+extern unsigned char g_ucSpkrStartFlag;
 long g_lLcdCursorY = 30;
 #define DEFAULT_LCD_FONT g_sFontCm20;
 #define LCD_Y_SHIFT        20
@@ -124,6 +125,7 @@ void LCD( void *pvParameters ){
 //    LCDReset();
 //    displaymytext();
     unsigned long prevColor = myColor;
+    //char *prevSong;
     while(1){
         if(1){
             unsigned long key = osi_EnterCritical();
@@ -139,6 +141,12 @@ void LCD( void *pvParameters ){
             long dispColor = prevColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
+            LcdPrintf(" ");
+            //if(!strcmp(myWav,prevSong) || g_ucSpkrStartFlag){
+            //    LcdPrintf(prevSong);
+            //} else {
+            //    LcdPrintf(" ");
+            //}
 
             GrContextForegroundSet(&sContext, ClrWhite);
             g_lLcdCursorY = 35;
@@ -148,7 +156,14 @@ void LCD( void *pvParameters ){
             dispColor = myColor & 0x00FFFFFF;
             LcdPrintf("%#08x", dispColor);
             LcdPrintf(" ");
+            //LcdPrintf("The current song is");
+            //if(g_ucSpkrStartFlag){
+            //    LcdPrintf(myWav);
+            //} else {
+            //    LcdPrintf(" ");
+            //}
 
+            //prevSong = myWav;
             strcpy(prevTime,myTime);
             prevColor = myColor;
 

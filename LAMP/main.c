@@ -276,7 +276,7 @@ int main(){
     }
 
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 1, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 4, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
