@@ -665,7 +665,7 @@ int APIparse(char *commands){
     if(strcmp(token, "add_theme")==0){
         char themeID;
         long color;
-        TCHAR* song;
+        char song[30];
         char special;
         token=strtok(NULL, "=");
 #ifdef DEBUG
@@ -702,7 +702,7 @@ int APIparse(char *commands){
 #ifdef DEBUG
             LcdPrintf(token);
 #endif
-                song=token;
+                strcpy(song,token);
                 //PASSING NA FOR NOW FOR SONG
             }
             token=strtok(NULL, "=");

@@ -36,9 +36,10 @@ alarm alarms[30];
 
 extern unsigned long myColor;
 extern unsigned char g_ucSpkrStartFlag;
-extern const TCHAR* myWav;
+//extern const unsigned char* myWav;
 extern unsigned int currentTime;
 extern unsigned char songChanged;
+extern char songname[];
 
 //Turns off speaker and lights
 void apiOff(){
@@ -91,7 +92,7 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
 }
 
 //creates a theme if one dose not exist or edits an existing one
-void apiEditTheme(int themeId, long color, TCHAR* song){
+void apiEditTheme(int themeId, long color, char* song){
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
@@ -119,15 +120,19 @@ void apiEditTheme(int themeId, long color, TCHAR* song){
         }
     }
     if(storageId != -1){
-#ifdef DEBUG2
-        LcdPrintf("Setting variables");
+#ifdef DEBUG
+        clearScreen();
+        LcdPrintf(song);
 #endif
         if(color != NULL){
             themes[storageId].color = color;
         }
-        if(!strcmp(song,"NA")){
-            themes[storageId].song = song;
-        }
+        //if(!strcmp(song,"NA")){
+            strcpy(themes[storageId].song, song);
+        //}
+#ifdef DEBUG
+        LcdPrintf(themes[storageId].song);
+#endif
         if(themes[themeId].active == 0){
             themes[storageId].active = 1;
         }
@@ -185,16 +190,20 @@ void apiPlayTheme(int themeId){
                 LcdPrintf("My color is %#08x",myColor);
 #endif
         if(themes[storageId].song != NULL){
-            myWav = themes[storageId].song;
+            strcpy(songname,themes[storageId].song);
 #ifdef DEBUG
-            LcdPrintf(myWav);
+            LcdPrintf(songname);
+            LcdPrintf(themes[storageId].song);
 #endif
             songChanged = 1;
-            if(myWav == "NA"){
+            if(!strcmp(songname,"NA")){
                 g_ucSpkrStartFlag = 0;
             } else {
                 g_ucSpkrStartFlag = 1;
             }
+#ifdef DEBUG
+            LcdPrintf("%d",g_ucSpkrStartFlag);
+#endif
         }
     }
     osi_ExitCritical(key);

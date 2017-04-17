@@ -57,6 +57,7 @@
 #include "ff.h"
 
 #include "LPD8806.h"
+#include "LCD.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -80,8 +81,8 @@ FATFS fs;
 FRESULT res = FR_NOT_READY;
 DIR dir;
 UINT Size;
-
-const TCHAR* myWav = "call.wav";
+char songname[30] = {'N','A'};
+//const char* myWav = songname;
 
 extern unsigned long  g_ulStatus;
 extern unsigned char g_uiPlayWaterMark;
@@ -122,7 +123,7 @@ ListDirectory()
 
 FRESULT openFile(){
     Message("\n\rReading user file...\n\r");
-    res = f_open(&fp,myWav,FA_READ);
+    res = f_open(&fp,(TCHAR*)songname,FA_READ);
     f_lseek(&fp,44);
     return res;
 }
@@ -133,6 +134,10 @@ void closeFile(){
 
 void readFile(){
     if(songChanged){
+#ifdef DEBUG
+        clearScreen();
+        LcdPrintf("Song Changed");
+#endif
         closeFile();
         openFile();
         songChanged = 0;
@@ -145,6 +150,9 @@ void readFile(){
     }
     else
     {
+#ifdef DEBUG
+        LcdPrintf("Didnt Reads");
+#endif
         Report("Failed to open %s\n\r",USERFILE1);
     }
 }
@@ -171,7 +179,7 @@ void Speaker( void *pvParameters )
     ListDirectory();
     //open file
     openFile();
-    g_ucSpkrStartFlag = 1;
+    g_ucSpkrStartFlag = 0;
     while(1)
     {
       while(g_ucSpkrStartFlag)

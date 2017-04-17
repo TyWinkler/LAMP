@@ -15,7 +15,7 @@
 #include "grlib.h"
 
 #define LEDoff 0x00000000
-#define DEBUG2
+//#define DEBUG2
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -25,7 +25,7 @@ extern unsigned long myColor;
 extern unsigned char songChanged;
 extern alarm alarms[30];
 extern theme themes[30];
-extern TCHAR* myWav;
+//extern TCHAR* myWav;
 time_t currentTime;
 struct tm* ts;
 char myTime[20];
@@ -44,7 +44,7 @@ extern tContext sContext;
 //*****************************************************************************
 
 void playTheme(theme* playme){
-    myWav = playme->song;
+    //myWav = playme->song;
     g_ucSpkrStartFlag = true;
     songChanged = true;
     myColor = playme->color;
@@ -83,6 +83,8 @@ void Controller( void *pvParameters ){
    // int years = currentTime / 30758400;
     //int  = currentTime / 30758400;
     static int prev_min = 0;
+    reset();
+    allColor(colorHex(LEDoff));
 
 #ifdef DEBUG2
     apiEditTheme(1,0x001010,"stuck.wav");
@@ -123,9 +125,11 @@ void Controller( void *pvParameters ){
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }
-
+#ifndef DEBUG
         LCD();
+#endif
         LED();
+
         osi_Sleep(500);
     }
 }

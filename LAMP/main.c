@@ -274,7 +274,7 @@ int main(){
     }
 
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 4, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
@@ -297,22 +297,22 @@ int main(){
     //
     // Start the simplelink thread
     //
-//    lRetVal = VStartSimpleLinkSpawnTask(9);
-//    if(lRetVal < 0)
-//    {
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
+    lRetVal = VStartSimpleLinkSpawnTask(9);
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
-//    lRetVal = osi_MsgQCreate(&g_ControlMsgQueue,"g_ControlMsgQueue", sizeof(tTxMsg),1);
-//    ASSERT_ON_ERROR(lRetVal);
+    lRetVal = osi_MsgQCreate(&g_ControlMsgQueue,"g_ControlMsgQueue", sizeof(tTxMsg),1);
+    ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-//    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 9, &g_HTTPServerTask );
-//    if(lRetVal < 0){
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 9, &g_HTTPServerTask );
+    if(lRetVal < 0){
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
     osi_start(); // Start the task scheduler
 }
