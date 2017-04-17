@@ -11,8 +11,11 @@
 #include "osi.h"
 #include "prcm.h"
 #include "LCD.h"
+#include "LPD8806.h"
+#include "grlib.h"
 
 #define LEDoff 0x00000000
+#define DEBUG2
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -25,13 +28,16 @@ extern theme themes[30];
 extern TCHAR* myWav;
 time_t currentTime;
 struct tm* ts;
-char timeBuf[20];
+char myTime[20];
+char prevTime[20];
 static alarm* currentAlarm;
 static theme* currentTheme;
 static char currentAlarmHasPlayed = 0;
 static char snoozing = 0;
 static int snoozetime = 0;
-int timeHasChanged = 0;
+static int timeHasChanged = 0;
+extern const tDisplay g_ssalowCC3200_ili9341;
+extern tContext sContext;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -78,12 +84,13 @@ void Controller( void *pvParameters ){
     //int  = currentTime / 30758400;
     static int prev_min = 0;
 
-//#ifdef DEBUG2
-//    apiEditTheme(1,0xff0000,"stuck.wav");
-//    clearScreen();
-//    LcdPrintf("Active = %d",themes[0].active);
-//    apiPlayTheme(1);
-//#endif
+#ifdef DEBUG2
+    apiEditTheme(1,0x001010,"stuck.wav");
+    clearScreen();
+    g_lLcdCursorY = 120;
+    LcdPrintf("Active = %d",themes[0].active);
+    apiPlayTheme(1);
+#endif
 
     while(1){
 
@@ -91,8 +98,7 @@ void Controller( void *pvParameters ){
         ts = localtime(&currentTime);
 
         if(prev_min != ts->tm_min){
-            strftime(timeBuf, 80, "%b %d %I:%M %p", ts);
-            myTime = timeBuf;
+            strftime(myTime, 80, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
             int i;
             for(i = 0; i < 30; i++){
@@ -117,6 +123,68 @@ void Controller( void *pvParameters ){
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }
+
+        LCD();
+        LED();
         osi_Sleep(500);
+    }
+}
+
+//*****************************************************************************
+//
+//! LCD Routine
+//!
+//! \param pvParameters     Parameters to the task's entry function
+//!
+//! \return None
+//
+//*****************************************************************************
+void LCD(void){
+    static unsigned long prevColor = 1;
+    long dispColor;
+
+            if(timeHasChanged){
+                g_lLcdCursorY = 35;
+                GrContextForegroundSet(&sContext, ClrBlack);
+                LcdPrintf(prevTime);
+                GrContextForegroundSet(&sContext, ClrWhite);
+                g_lLcdCursorY = 35;
+                LcdPrintf(myTime);
+                timeHasChanged = 0;
+            }
+            if(prevColor != myColor){
+                g_lLcdCursorY = 70;
+                GrContextForegroundSet(&sContext, ClrBlack);
+                dispColor = prevColor & 0x00FFFFFF;
+                LcdPrintf("");
+                LcdPrintf("%#08x", dispColor);
+
+                g_lLcdCursorY = 70;
+                GrContextForegroundSet(&sContext, ClrWhite);
+                LcdPrintf("The current color is%n");
+                dispColor = myColor & 0x00FFFFFF;
+                LcdPrintf("%#08x", dispColor);
+            }
+
+            strcpy(prevTime,myTime);
+            prevColor = myColor;
+//            LEDWrite = 1;
+}
+
+//*****************************************************************************
+//
+//! LED Routine
+//!
+//! \param pvParameters     Parameters to the task's entry function
+//!
+//! \return None
+//
+//*****************************************************************************
+void LED(void){
+    static int prev_color = 0;
+    if(prev_color != myColor){
+        reset();
+        allColor(colorHex(myColor));
+        prev_color = myColor;
     }
 }

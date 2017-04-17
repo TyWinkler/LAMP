@@ -77,7 +77,7 @@ unsigned char songChanged = 0;
 
 FIL fp;
 FATFS fs;
-FRESULT res;
+FRESULT res = FR_NOT_READY;
 DIR dir;
 UINT Size;
 
@@ -120,10 +120,11 @@ ListDirectory()
 
 }
 
-void openFile(){
+FRESULT openFile(){
     Message("\n\rReading user file...\n\r");
     res = f_open(&fp,myWav,FA_READ);
     f_lseek(&fp,44);
+    return res;
 }
 
 void closeFile(){
@@ -162,8 +163,11 @@ void readFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
-    f_mount(&fs,"0",1);
-    res = f_opendir(&dir,"/");
+    while(res != FR_OK){
+        f_mount(&fs,"0",1);
+        res = f_opendir(&dir,"/");
+        osi_Sleep(200);
+    }
     ListDirectory();
     //open file
     openFile();
@@ -192,7 +196,8 @@ void Speaker( void *pvParameters )
         //close file
         closeFile();
         // reopen the file
-        openFile();
+        res = openFile();
+        if(res != FR_OK) break;
         }
         if(g_uiPlayWaterMark == 0)
         {

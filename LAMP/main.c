@@ -106,8 +106,6 @@ extern uVectorEntry __vector_table;
 //                    FUNCTION DECLARATIONS
 //******************************************************************************
 extern void Speaker( void *pvParameters );
-extern void LED( void *pvParameters );
-extern void LCD( void *pvParameters );
 extern void Controller( void *pvParameters );
 extern void HTTPServerTask( void *pvParameters );
 
@@ -283,38 +281,38 @@ int main(){
     }
 
     // Start the LED Task
-    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
-    if(lRetVal < 0){
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    // Start the LCD Task
-    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
-    if(lRetVal < 0){
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+//    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
+//    if(lRetVal < 0){
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
+//
+//    // Start the LCD Task
+//    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
+//    if(lRetVal < 0){
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
     //
     // Start the simplelink thread
     //
-    lRetVal = VStartSimpleLinkSpawnTask(9);
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+//    lRetVal = VStartSimpleLinkSpawnTask(9);
+//    if(lRetVal < 0)
+//    {
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
-    lRetVal = osi_MsgQCreate(&g_ControlMsgQueue,"g_ControlMsgQueue", sizeof(tTxMsg),1);
-    ASSERT_ON_ERROR(lRetVal);
+//    lRetVal = osi_MsgQCreate(&g_ControlMsgQueue,"g_ControlMsgQueue", sizeof(tTxMsg),1);
+//    ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 9, &g_HTTPServerTask );
-    if(lRetVal < 0){
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+//    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 9, &g_HTTPServerTask );
+//    if(lRetVal < 0){
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
     osi_start(); // Start the task scheduler
 }

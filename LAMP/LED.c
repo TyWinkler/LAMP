@@ -58,24 +58,5 @@
 //*****************************************************************************
 
 
-//*****************************************************************************
-//
-//! LED Routine
-//!
-//! \param pvParameters     Parameters to the task's entry function
-//!
-//! \return None
-//
-//*****************************************************************************
-void LED( void *pvParameters ){
-    reset();
-    while(1){
-        if(1){
-            unsigned long key = osi_EnterCritical();
-            allColor(colorHex(myColor));
-            osi_ExitCritical(key);
-            osi_Sleep(500);
-        }
-    }
-}
+
 

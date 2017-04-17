@@ -6,6 +6,7 @@
 #ifndef LPD8806_H_
 #define LPD8806_H_
 
+void LED(void);
 extern void LPD8806Init(void);
 extern void allColor(unsigned long color);
 extern void reset(void);

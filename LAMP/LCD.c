@@ -21,29 +21,9 @@
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 
-static tContext sContext;
+tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
-extern const TCHAR* myWav;
-extern char timeBuf;
-char prevTime[80];
-const TCHAR* prevWav;
-char *myTime;
-
-extern unsigned char g_ucSpkrStartFlag;
 long g_lLcdCursorY = 30;
-#define DEFAULT_LCD_FONT g_sFontCm20;
-#define LCD_Y_SHIFT        20
-#define NEXT_LCD_CURSOR_Y  (g_lLcdCursorY + LCD_Y_SHIFT)
-#define LCD_MESSAGE(msg)    {\
-                           GrStringDrawCentered(&sContext, msg, -1,\
-                           GrContextDpyWidthGet(&sContext) / 2, NEXT_LCD_CURSOR_Y, 0);\
-                           g_lLcdCursorY += LCD_Y_SHIFT;\
-                            }
-
-//void LCDReset();
-//void displaymytextnext();
-//void displaymytext(void);
-//int LcdPrintf(char *pcFormat, ...);
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -111,66 +91,3 @@ int LcdPrintf(char *pcFormat, ...){
     free(pcBuff);
     return iRet;
 }
-
-//*****************************************************************************
-//
-//! LCD Routine
-//!
-//! \param pvParameters     Parameters to the task's entry function
-//!
-//! \return None
-//
-//*****************************************************************************
-void LCD( void *pvParameters ){
-//    LCDReset();
-//    displaymytext();
-    unsigned long prevColor = myColor;
-    //char *prevSong;
-    while(1){
-        if(1){
-            unsigned long key = osi_EnterCritical();
-            GrContextForegroundSet(&sContext, ClrBlack);
-            g_lLcdCursorY = 35;
-            LcdPrintf(prevTime);
-            LcdPrintf(" ");
-            LcdPrintf(" ");
-            long dispColor = prevColor & 0x00FFFFFF;
-            if(prevColor != myColor){
-                LcdPrintf("%#08x", dispColor);
-            } else {
-                LcdPrintf(" ");
-            }
-            LcdPrintf(" ");
-            LcdPrintf(" ");
-            //if(!strcmp(myWav,prevSong) || g_ucSpkrStartFlag){
-            //    LcdPrintf(prevSong);
-            //} else {
-            //    LcdPrintf(" ");
-            //}
-
-            GrContextForegroundSet(&sContext, ClrWhite);
-            g_lLcdCursorY = 35;
-            LcdPrintf(myTime);
-            LcdPrintf(" ");
-            LcdPrintf("The current color is");
-            dispColor = myColor & 0x00FFFFFF;
-            LcdPrintf("%#08x", dispColor);
-            LcdPrintf(" ");
-            //LcdPrintf("The current song is");
-            //if(g_ucSpkrStartFlag){
-            //    LcdPrintf(myWav);
-            //} else {
-            //    LcdPrintf(" ");
-            //}
-
-            //prevSong = myWav;
-            strcpy(prevTime,myTime);
-            prevColor = myColor;
-
-            LEDWrite = 1;
-            osi_ExitCritical(key);
-            osi_Sleep(1500);
-        }
-    }
-}
-
