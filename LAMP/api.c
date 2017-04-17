@@ -40,11 +40,19 @@ extern unsigned char g_ucSpkrStartFlag;
 extern unsigned int currentTime;
 extern unsigned char songChanged;
 extern char songname[];
+extern unsigned int specialColor;
+
+FIL fp;
+extern FATFS fs;
+extern FRESULT res;
+extern DIR dir;
+UINT Size;
 
 //Turns off speaker and lights
 void apiOff(){
     myColor = 0x000000;
     g_ucSpkrStartFlag = 0;
+    specialColor = 0;
 }
 
 //immediately changes the color
@@ -88,11 +96,12 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
         if(alarms[storageId].active == 0){
             alarms[storageId].active = 1;
         }
+        storeAlarms();
     }
 }
 
 //creates a theme if one dose not exist or edits an existing one
-void apiEditTheme(int themeId, long color, char* song){
+void apiEditTheme(int themeId, long color, char* song, int special){
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
@@ -127,15 +136,15 @@ void apiEditTheme(int themeId, long color, char* song){
         if(color != NULL){
             themes[storageId].color = color;
         }
-        //if(!strcmp(song,"NA")){
-            strcpy(themes[storageId].song, song);
-        //}
+        strcpy(themes[storageId].song, song);
 #ifdef DEBUG
         LcdPrintf(themes[storageId].song);
 #endif
         if(themes[themeId].active == 0){
             themes[storageId].active = 1;
         }
+        themes[storageId].special = special;
+        storeThemes();
     }
 }
 
@@ -151,6 +160,7 @@ void apiDeleteAlarm(int alarmId){
     }
     if(storageId != -1){
         alarms[storageId].active = 0;
+        storeAlarms();
     }
 }
 
@@ -167,6 +177,7 @@ void apiDeleteTheme(int themeId){
     if(storageId != -1){
         themes[storageId].active = 0;
     }
+    storeThemes();
 }
 
 //plays theme immediately
@@ -191,20 +202,14 @@ void apiPlayTheme(int themeId){
 #endif
         if(themes[storageId].song != NULL){
             strcpy(songname,themes[storageId].song);
-#ifdef DEBUG
-            LcdPrintf(songname);
-            LcdPrintf(themes[storageId].song);
-#endif
             songChanged = 1;
             if(!strcmp(songname,"NA")){
                 g_ucSpkrStartFlag = 0;
             } else {
                 g_ucSpkrStartFlag = 1;
             }
-#ifdef DEBUG
-            LcdPrintf("%d",g_ucSpkrStartFlag);
-#endif
         }
+        specialColor = themes[storageId].special;
     }
     osi_ExitCritical(key);
 }
@@ -216,4 +221,44 @@ void apiUpdateTime(unsigned long time){
     currentTime = time;
     PRCMRTCSet(currentTime,0);
     osi_ExitCritical(key);
+}
+
+void getAlarms(){
+    res = f_open(&fp,"alarms",FA_READ);
+    if(res == FR_OK) {
+        f_read(&fp,alarms,sizeof(struct alarm) * 30,&Size);
+        f_close(&fp);
+    } else {
+        LcdPrintf("Failed to open themes");
+    }
+}
+
+void storeAlarms(){
+    res = f_open(&fp,"alarms",FA_CREATE_ALWAYS|FA_WRITE);
+    if(res == FR_OK) {
+        f_write(&fp,alarms,sizeof(struct alarm) * 30,&Size);
+        f_close(&fp);
+    } else {
+        LcdPrintf("Failed to create a new file");
+    }
+}
+
+void getThemes(){
+    res = f_open(&fp,"themes",FA_READ);
+    if(res == FR_OK) {
+        f_read(&fp,themes,sizeof(struct theme) * 30,&Size);
+        f_close(&fp);
+    } else {
+        LcdPrintf("Failed to open themes");
+    }
+}
+
+void storeThemes(){
+    res = f_open(&fp,"themes",FA_CREATE_ALWAYS|FA_WRITE);
+    if(res == FR_OK) {
+        f_write(&fp,themes,sizeof(struct theme) * 30,&Size);
+        f_close(&fp);
+    } else {
+        LcdPrintf("Failed to create a new file");
+    }
 }

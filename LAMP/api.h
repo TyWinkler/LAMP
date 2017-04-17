@@ -10,11 +10,15 @@
 extern void apiOff();
 extern void apiSetColorIm(unsigned long color);
 extern void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running);
-extern void apiEditTheme(int themeId, long color, char* song);
+extern void apiEditTheme(int themeId, long color, char* song, int special);
 extern void apiDeleteAlarm(int alarmId);
 extern void apiDeleteTheme(int themeId);
 extern void apiPlayTheme(int themeId);
 extern void apiUpdateTime(unsigned long time);
+extern void getAlarms();
+extern void storeAlarms();
+extern void getThemes();
+extern void storeThemes();
 
 typedef struct alarm{
     unsigned int alarmId;
@@ -30,6 +34,7 @@ typedef struct theme{
     unsigned long color;
     char song[30];
     unsigned char active;
+    unsigned int special;
 } theme;
 
 #endif /* API_H_ */

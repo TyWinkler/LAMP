@@ -38,6 +38,7 @@ static int snoozetime = 0;
 static int timeHasChanged = 0;
 extern const tDisplay g_ssalowCC3200_ili9341;
 extern tContext sContext;
+unsigned int specialColor = 0;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -85,13 +86,14 @@ void Controller( void *pvParameters ){
     static int prev_min = 0;
     reset();
     allColor(colorHex(LEDoff));
+    getThemes();
+    getAlarms();
 
-#ifdef DEBUG2
-    apiEditTheme(1,0x001010,"stuck.wav");
-    clearScreen();
-    g_lLcdCursorY = 120;
-    LcdPrintf("Active = %d",themes[0].active);
-    apiPlayTheme(1);
+#define RESETSPECIAL
+#ifdef RESETSPECIAL
+    apiEditTheme(0,0x000000,"NA",1);
+    apiEditTheme(1,0x000000,"NA",2);
+    apiEditTheme(2,0x000000,"NA",3);
 #endif
 
     while(1){
@@ -186,9 +188,18 @@ void LCD(void){
 //*****************************************************************************
 void LED(void){
     static int prev_color = 0;
-    if(prev_color != myColor){
+    if(prev_color != myColor && specialColor == 0){
         reset();
         allColor(colorHex(myColor));
         prev_color = myColor;
+    } else if(specialColor == 1){
+        //Sunrise
+        allColor(colorHex(0x0000FF));
+    } else if(specialColor == 2){
+        //Fire
+        allColor(colorHex(0xFF0000));
+    } else if(specialColor == 3){
+        //Rainbow
+        allColor(colorHex(0x00FF00));
     }
 }

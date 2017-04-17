@@ -77,11 +77,11 @@ unsigned char g_ucSpkrStartFlag;
 unsigned char songChanged = 0;
 
 FIL fp;
-FATFS fs;
-FRESULT res = FR_NOT_READY;
-DIR dir;
+extern FATFS fs;
+extern FRESULT res;
+extern DIR dir;
 UINT Size;
-char songname[30] = {'N','A'};
+char songname[30] = {"call.wav"};
 //const char* myWav = songname;
 
 extern unsigned long  g_ulStatus;
@@ -151,7 +151,7 @@ void readFile(){
     else
     {
 #ifdef DEBUG
-        LcdPrintf("Didnt Reads");
+        LcdPrintf("Didnt Read speaker");
 #endif
         Report("Failed to open %s\n\r",USERFILE1);
     }
@@ -171,19 +171,19 @@ void readFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
-    while(res != FR_OK){
-        f_mount(&fs,"0",1);
-        res = f_opendir(&dir,"/");
-        osi_Sleep(200);
-    }
+
     ListDirectory();
     //open file
     openFile();
-    g_ucSpkrStartFlag = 0;
+    g_ucSpkrStartFlag = 1;
     while(1)
     {
       while(g_ucSpkrStartFlag)
       {
+#ifdef DEBUG
+          //clearScreen();
+          //LcdPrintf("playing...");
+#endif
         // Read from file and discard wav header
         readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */

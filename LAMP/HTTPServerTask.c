@@ -727,7 +727,7 @@ int APIparse(char *commands){
             LcdPrintf(token);
 #endif
                 special= token[0];
-                apiEditTheme(themeID, color, song);
+                apiEditTheme(themeID, color, song, 0);
                 return 1;
             }
         }

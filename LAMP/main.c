@@ -62,6 +62,7 @@
 #include "i2s_if.h"
 #include "pcm_handler.h"
 
+#include "ff.h"
 //Network
 
 
@@ -75,6 +76,10 @@ OsiTaskHandle g_LEDTask = NULL;
 OsiTaskHandle g_LCDTask = NULL;
 OsiTaskHandle g_ControllerTask = NULL;
 OsiMsgQ_t g_ControlMsgQueue;
+
+FATFS fs;
+FRESULT res = FR_NOT_READY;
+DIR dir;
 
 
 #define OSI_STACK_SIZE          1024
@@ -201,7 +206,7 @@ void configureAudio(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 55);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 70);
 
     // Initialize the Audio(I2S) Module
     AudioInit();
@@ -266,6 +271,12 @@ int main(){
 
     configureAudio();
 
+    while(res != FR_OK){
+        LcdPrintf("Trying to open");
+        f_mount(&fs,"0",1);
+        res = f_opendir(&dir,"/");
+    }
+
     // Start the Controller Task
     lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
     if(lRetVal < 0){
@@ -274,7 +285,7 @@ int main(){
     }
 
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 4, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
