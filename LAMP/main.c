@@ -199,7 +199,7 @@ void configureAudio(){
 
     pRxBuffer = CreateCircularBuffer(PLAY_BUFFER_SIZE);
     if(pRxBuffer == NULL){
-        UART_PRINT("Unable to Allocate Memory for Rx Buffer\n\r");
+        LcdPrintf("Unable to Allocate Memory for Rx Buffer");
         LOOP_FOREVER();
     }
 
@@ -324,7 +324,7 @@ int main(){
     ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 9, &g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 5, &g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

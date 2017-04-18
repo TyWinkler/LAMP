@@ -98,6 +98,9 @@ unsigned char  g_ucConnectionSSID[SSID_LEN_MAX+1]; //Connection SSID
 unsigned char  g_ucConnectionBSSID[BSSID_LEN_MAX]; //Connection BSSID
 char g_cBsdBuf[BUF_SIZE];
 
+extern int wifiChanged;
+extern int wifiConnected;
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -491,22 +494,27 @@ long ConnectToNetwork()
     LcdPrintf("slWlan");
 #endif
 
-    lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
-    ASSERT_ON_ERROR(lRetVal);
+    lRetVal = -1;
+    while(lRetVal < 0){
+        lRetVal = sl_WlanConnect((signed char*)SSID_NAME, strlen(SSID_NAME), 0, &secParams, 0);
+        ASSERT_ON_ERROR(lRetVal);
+    }
 
 #ifdef DEBUG
     LcdPrintf("Connected");
 #endif
 
     /* Wait */
-    //while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus)))
-    //{
+    while((!IS_CONNECTED(g_ulStatus)) || (!IS_IP_ACQUIRED(g_ulStatus))){
         // Wait for WLAN Event
+        osi_Sleep(1000);
 #ifndef SL_PLATFORM_MULTI_THREADED
         //_SlNonOsMainLoopTask();
 #endif
-    //}
+    }
 
+    wifiConnected = 1;
+    wifiChanged = 1;
     return SUCCESS;
 
 }

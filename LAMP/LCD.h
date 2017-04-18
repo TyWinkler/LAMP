@@ -24,4 +24,5 @@ void displaymytext(void);
 int LcdPrintf(char *pcFormat, ...);
 void clearScreen();
 extern long g_lLcdCursorY;
+extern long g_lLcdCursorX;
 #endif /* LCD_H_ */

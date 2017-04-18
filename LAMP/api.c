@@ -204,7 +204,7 @@ void apiPlayTheme(int themeId){
         if(themes[storageId].song != NULL){
             strcpy(songname,themes[storageId].song);
             songChanged = 1;
-            if(!strcmp(songname,"NA")){
+            if(strcmp(songname,"NA") == 0){
                 g_ucSpkrStartFlag = 0;
             } else {
                 g_ucSpkrStartFlag = 1;

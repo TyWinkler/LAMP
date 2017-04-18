@@ -58,11 +58,14 @@
 
 #include "LPD8806.h"
 #include "LCD.h"
+#include "grlib.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 int g_iReceiveCount =0;
+int prevCount =0;
+UINT prevSize;
 int g_iRetVal =0;
 int iCount =0;
 //unsigned char *p;
@@ -76,19 +79,20 @@ unsigned char pBuffer[BUFFSIZE];
 unsigned char g_ucSpkrStartFlag;
 unsigned char songChanged = 0;
 
-FIL fp;
+extern FIL fp;
 extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;
-UINT Size;
+extern UINT Size;
 char songname[30] = "call.wav";
 //const char* myWav = songname;
 
 extern unsigned long  g_ulStatus;
-extern unsigned char g_uiPlayWaterMark;
+extern unsigned int g_uiPlayWaterMark;
 extern unsigned char g_loopback;
 //unsigned char speaker_data[16*1024];
 extern tCircularBuffer *pRxBuffer;
+extern tContext sContext;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -134,23 +138,18 @@ void closeFile(){
 
 void readFile(){
     if(songChanged){
-#ifdef DEBUG
-        LcdPrintf("Song Changed");
-#endif
         closeFile();
-        openFile();
+        res = openFile();
         songChanged = 0;
     }
     if(res == FR_OK)
     {
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
-        clearScreen();
+        //clearScreen();
     }
     else
     {
-#ifdef DEBUG
         LcdPrintf("Didnt Read speaker");
-#endif
         Report("Failed to open %s\n\r",USERFILE1);
     }
 }
@@ -185,7 +184,7 @@ void Speaker( void *pvParameters )
         // Read from file and discard wav header
         readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
-        if((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){osi_Sleep(10);}
+        while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){osi_Sleep(10);}
 
         if( Size > 0)
         {
@@ -199,11 +198,11 @@ void Speaker( void *pvParameters )
         }
         else
         { // we reach at the of file
-        //close file
-        closeFile();
-        // reopen the file
-        res = openFile();
-        if(res != FR_OK) break;
+            //close file
+            closeFile();
+            // reopen the file
+            res = openFile();
+            //if(res != FR_OK) break;
         }
         if(g_uiPlayWaterMark == 0)
         {
@@ -213,8 +212,21 @@ void Speaker( void *pvParameters )
           }
         }
         g_iReceiveCount++;
+        unsigned long key = osi_EnterCritical();
+        g_lLcdCursorY = 130;
+        GrContextForegroundSet(&sContext, ClrBlack);
+        LcdPrintf("Count: %d",prevCount);
+        LcdPrintf("Size: %d",prevSize);
+        g_lLcdCursorY = 130;
+        GrContextForegroundSet(&sContext, ClrWhite);
+        LcdPrintf("Count: %d",g_iReceiveCount);
+        LcdPrintf("Size: %d",Size);
+        prevSize = Size;
+        prevCount = g_iReceiveCount;
+        osi_ExitCritical(key);
+
       }
-      osi_Sleep(1000);
+      osi_Sleep(100);
     }
 }
 
