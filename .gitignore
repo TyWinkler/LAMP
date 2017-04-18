@@ -55,3 +55,4 @@ sdhost_fatfs/Release/makefile
 *.bin
 LAMP/.launches/LAMP.launch
 LAMP Demo/UniCast/makefile
+Shake.wav
