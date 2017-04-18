@@ -81,7 +81,7 @@ extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;
 UINT Size;
-char songname[30] = {"call.wav"};
+char songname[30] = "call.wav";
 //const char* myWav = songname;
 
 extern unsigned long  g_ulStatus;
@@ -135,7 +135,6 @@ void closeFile(){
 void readFile(){
     if(songChanged){
 #ifdef DEBUG
-        clearScreen();
         LcdPrintf("Song Changed");
 #endif
         closeFile();
@@ -145,8 +144,7 @@ void readFile(){
     if(res == FR_OK)
     {
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
-        Report("Read : %d Bytes\n\n\r",Size);
-        Report("%s",pBuffer);
+        clearScreen();
     }
     else
     {
@@ -195,7 +193,7 @@ void Speaker( void *pvParameters )
 
           if(iRetVal < 0)
           {
-            UART_PRINT("Unable to fill buffer");
+            LcdPrintf("Unable to fill buffer");
             LOOP_FOREVER();
           }
         }

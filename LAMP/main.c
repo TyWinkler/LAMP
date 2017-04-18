@@ -278,18 +278,22 @@ int main(){
     }
 
     // Start the Controller Task
+#ifdef CONTROLLER
     lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
+#endif
 
+#ifdef SPEAKER
     // Start the Speaker Task
     lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
+#endif
 
     // Start the LED Task
 //    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
@@ -305,6 +309,7 @@ int main(){
 //        LOOP_FOREVER();
 //    }
 
+#ifdef NETWORK
     //
     // Start the simplelink thread
     //
@@ -324,6 +329,7 @@ int main(){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
+#endif
 
     osi_start(); // Start the task scheduler
 }
