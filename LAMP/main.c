@@ -272,7 +272,7 @@ int main(){
     configureAudio();
 
     while(res != FR_OK){
-        LcdPrintf("Trying to open");
+        //LcdPrintf("Trying to open");
         f_mount(&fs,"0",1);
         res = f_opendir(&dir,"/");
     }

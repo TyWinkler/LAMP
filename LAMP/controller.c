@@ -36,6 +36,7 @@ static char currentAlarmHasPlayed = 0;
 static char snoozing = 0;
 static int snoozetime = 0;
 static int timeHasChanged = 0;
+int colorStage = 0;
 extern const tDisplay g_ssalowCC3200_ili9341;
 extern tContext sContext;
 unsigned int specialColor = 0;
@@ -194,7 +195,38 @@ void LED(void){
         prev_color = myColor;
     } else if(specialColor == 1){
         //Sunrise
-        allColor(colorHex(0x0000FF));
+        if(colorStage == 0){
+            myColor = 0x02004f;
+            allColor(colorHex(myColor));
+            if(myColor == 0x2004f){
+                colorStage++;
+            }
+        } else if(colorStage == 1){
+            myColor = mergeColors(myColor,0x2824c1,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x2824c1){
+                colorStage++;
+            }
+        } else if(colorStage == 2){
+            myColor = mergeColors(myColor,0x899317,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x899317){
+                colorStage++;
+            }
+        } else if(colorStage == 3){
+            myColor = mergeColors(myColor,0xfff054,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xfff054){
+                colorStage++;
+            }
+        } else if(colorStage == 4){
+            myColor = mergeColors(myColor,0xfefffc,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xfefffc){
+                colorStage++;
+            }
+        }
+
     } else if(specialColor == 2){
         //Fire
         allColor(colorHex(0xFF0000));

@@ -17,4 +17,5 @@ extern void setPixel(unsigned int p, unsigned long color);
 extern void clearStrip(void);
 extern unsigned long myColor;
 extern unsigned long LEDWrite;
+extern unsigned long mergeColors(unsigned long start, unsigned long end,int speed);
 #endif /* LPD8806_H_ */

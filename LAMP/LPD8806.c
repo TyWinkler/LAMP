@@ -238,3 +238,41 @@ void allColor(unsigned long color){
 void clearStrip(){
     allColor(0x000000);
 }
+
+//*****************************************************************************
+//
+//! Merge Colors
+//!
+//! This functions will bring the start color to the end color if called repeatedly
+//!
+//! \return unsigned long color
+//
+//*****************************************************************************
+unsigned long mergeColors(unsigned long start, unsigned long end, int speed){
+    unsigned long startColor = start;
+    if(((end & 0xFF0000) - (startColor & 0xFF0000)) < speed){
+        startColor = (end & 0xFF0000) | (startColor & 0x00FFFF);
+    }
+    if(((end & 0x00FF00) - (startColor & 0x00FF00)) < speed){
+        startColor = (end & 0x00FF00) | (startColor & 0xFF00FF);
+    }
+    if(((end & 0x0000FF) - (startColor & 0x0000FF)) < speed){
+        startColor = (end & 0x0000FF) | (startColor & 0xFFFF00);
+    }
+    if((start & 0xFF0000) > (end & 0xFF0000)){
+        startColor -= 0x010000 * speed;
+    } else if((start & 0xFF0000) < (end & 0xFF0000)){
+        startColor += 0x010000 * speed;
+    }
+    if((start & 0x00FF00) > (end & 0x00FF00)){
+        startColor -= 0x000100 * speed;
+    } else if((start & 0x00FF00) < (end & 0x00FF00)){
+        startColor += 0x000100 * speed;
+    }
+    if((start & 0x0000FF) > (end & 0x0000FF)){
+        startColor -= 0x000001 * speed;
+    } else if((start & 0x0000FF) < (end & 0x0000FF)){
+        startColor += 0x000001 * speed;
+    }
+    return startColor;
+}

@@ -41,6 +41,7 @@ extern unsigned int currentTime;
 extern unsigned char songChanged;
 extern char songname[];
 extern unsigned int specialColor;
+extern int colorStage;
 
 FIL fp;
 extern FATFS fs;
@@ -210,6 +211,7 @@ void apiPlayTheme(int themeId){
             }
         }
         specialColor = themes[storageId].special;
+        colorStage = 0;
     }
     osi_ExitCritical(key);
 }
