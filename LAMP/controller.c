@@ -74,6 +74,8 @@ void hasAlarmPlayed(void){
     } else currentAlarmHasPlayed = 0;
 }
 
+int once = 0; // test
+
 void Controller( void *pvParameters ){
 
     PRCMRTCInUseSet();
@@ -87,14 +89,15 @@ void Controller( void *pvParameters ){
     static int prev_min = 0;
     reset();
     allColor(colorHex(LEDoff));
-    getThemes();
-    getAlarms();
+//    getThemes();
+//    getAlarms();
 
 #define RESETSPECIAL
 #ifdef RESETSPECIAL
-    apiEditTheme(0,0x000000,"NA",1);
-    apiEditTheme(1,0x000000,"NA",2);
-    apiEditTheme(2,0x000000,"NA",3);
+    apiEditTheme(0,0x000505,"Shake.wav",0);
+//    apiEditTheme(1,0x000000,"NA",2);
+//    apiEditTheme(2,0x000000,"NA",3);
+
 #endif
 
     while(1){
@@ -132,7 +135,10 @@ void Controller( void *pvParameters ){
         LCD();
 #endif
         LED();
-
+        if(once){
+            apiPlayTheme(0); // test
+            once = 0;
+        }
         osi_Sleep(500);
     }
 }

@@ -71,9 +71,9 @@ int songCount = 0;
 #define USERFILE1        "call.wav"
 #define USERFILE2        "stuck.wav"
 #define BUFFSIZE                1024
-#define PLAY_WATERMARK          30*1024
+#define PLAY_WATERMARK          50*1024
 unsigned char pBuffer[BUFFSIZE];
-unsigned char g_ucSpkrStartFlag;
+unsigned char g_ucSpkrStartFlag = 0;
 unsigned char songChanged = 0;
 
 FIL fp;
@@ -144,12 +144,12 @@ void readFile(){
     if(res == FR_OK)
     {
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
-        clearScreen();
+        //clearScreen();
     }
     else
     {
 #ifdef DEBUG
-        LcdPrintf("Didnt Read speaker");
+        LcdPrintf("Didn't Read speaker");
 #endif
         Report("Failed to open %s\n\r",USERFILE1);
     }
@@ -169,14 +169,15 @@ void readFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
+    strcpy(songname,"Shake.wav");
 
-    ListDirectory();
+//    ListDirectory();
     //open file
     openFile();
     g_ucSpkrStartFlag = 1;
     while(1)
     {
-      while(g_ucSpkrStartFlag)
+      while(g_ucSpkrStartFlag != 0)
       {
 #ifdef DEBUG
           //clearScreen();
@@ -185,7 +186,9 @@ void Speaker( void *pvParameters )
         // Read from file and discard wav header
         readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
-        if((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){osi_Sleep(10);}
+        while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){
+            osi_Sleep(10);
+        }
 
         if( Size > 0)
         {

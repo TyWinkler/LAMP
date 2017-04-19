@@ -87,7 +87,7 @@ DIR dir;
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
-#define PLAY_WATERMARK          30*1024
+#define PLAY_WATERMARK          50*1024
 
 typedef struct
 {
@@ -206,7 +206,7 @@ void configureAudio(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 70);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
 
     // Initialize the Audio(I2S) Module
     AudioInit();
@@ -279,7 +279,7 @@ int main(){
 
     // Start the Controller Task
 #ifdef CONTROLLER
-    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
+    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 2, &g_ControllerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
@@ -288,26 +288,12 @@ int main(){
 
 #ifdef SPEAKER
     // Start the Speaker Task
-    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 2, &g_SpeakerTask );
+    lRetVal = osi_TaskCreate( Speaker, (signed char*)"Speaker",OSI_STACK_SIZE, NULL, 3, &g_SpeakerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 #endif
-
-    // Start the LED Task
-//    lRetVal = osi_TaskCreate( LED, (signed char*)"LED",OSI_STACK_SIZE, NULL, 3, &g_LEDTask );
-//    if(lRetVal < 0){
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
-//
-//    // Start the LCD Task
-//    lRetVal = osi_TaskCreate( LCD, (signed char*)"LCD",OSI_STACK_SIZE, NULL, 2, &g_LCDTask );
-//    if(lRetVal < 0){
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
 
 #ifdef NETWORK
     //
