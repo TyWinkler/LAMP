@@ -73,13 +73,13 @@ int songCount = 0;
 
 #define USERFILE1        "call.wav"
 #define USERFILE2        "stuck.wav"
-#define BUFFSIZE                1024
-#define PLAY_WATERMARK          50*1024
+#define BUFFSIZE                1024*10
+#define PLAY_WATERMARK          70*1024
 unsigned char pBuffer[BUFFSIZE];
 unsigned char g_ucSpkrStartFlag = 0;
 unsigned char songChanged = 0;
 
-extern FIL fp;
+static FIL fp;
 extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;
@@ -145,7 +145,6 @@ void readFile(){
     if(res == FR_OK)
     {
         f_read(&fp,pBuffer,BUFFSIZE,&Size);
-        //clearScreen();
     }
     else
     {
@@ -170,13 +169,13 @@ void readFile(){
 void Speaker( void *pvParameters )
 {
     long iRetVal;
-    strcpy(songname,"Shake.wav");
+    strcpy(songname,"stuck.wav");
 
 //    ListDirectory();
     //open file
     openFile();
     g_ucSpkrStartFlag = 1;
-    osi_Sleep(500);
+    //osi_Sleep(500);
     while(1)
     {
       while(g_ucSpkrStartFlag != 0)
@@ -189,6 +188,9 @@ void Speaker( void *pvParameters )
         readFile();
         /* Wait to avoid buffer overflow as reading speed is faster than playback */
         while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){
+            g_lLcdCursorY = 30;
+            GrContextForegroundSet(&sContext, ClrWhite);
+            LcdPrintf("Buffer Full");
             osi_Sleep(10);
         }
         if( Size > 0)
@@ -204,9 +206,14 @@ void Speaker( void *pvParameters )
         else
         { // we reach at the of file
             //close file
+            g_lLcdCursorY = 30;
+            GrContextForegroundSet(&sContext, ClrWhite);
+            LcdPrintf("Trying to close file");
             closeFile();
             // reopen the file
+            LcdPrintf("Opening file");
             res = openFile();
+            LcdPrintf("File opened");
             //if(res != FR_OK) break;
         }
         if(g_uiPlayWaterMark == 0)
@@ -229,9 +236,9 @@ void Speaker( void *pvParameters )
         prevSize = Size;
         prevCount = g_iReceiveCount;
         //osi_ExitCritical(key);
-        osi_Sleep(100);
+        osi_Sleep(10);
       }
-      osi_Sleep(100);
+      osi_Sleep(10);
     }
 }
 

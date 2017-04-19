@@ -33,8 +33,6 @@
 									<listOptionValue builtIn="false" value="ccs"/>
 									<listOptionValue builtIn="false" value="TI_CODEC"/>
 									<listOptionValue builtIn="false" value="PLAY_BACK"/>
-									<listOptionValue builtIn="false" value="MULTICAST"/>
-									<listOptionValue builtIn="false" value="CONTROLLER"/>
 									<listOptionValue builtIn="false" value="SPEAKER"/>
 									<listOptionValue builtIn="false" value="SL_PLATFORM_MULTI_THREADED"/>
 									<listOptionValue builtIn="false" value="USE_FREERTOS"/>

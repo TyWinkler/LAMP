@@ -135,17 +135,17 @@ void Controller( void *pvParameters ){
             prev_min = ts->tm_min;
         }
 #ifndef DEBUG
-        key = osi_EnterCritical();
+        //key = osi_EnterCritical();
         LCD();
-        osi_ExitCritical(key);
+        //osi_ExitCritical(key);
 #endif
-        key = osi_EnterCritical();
+        //key = osi_EnterCritical();
         LED();
         if(once){
             apiPlayTheme(0); // test
             once = 0;
         }
-        osi_ExitCritical(key);
+        //osi_ExitCritical(key);
         osi_Sleep(500);
     }
 }

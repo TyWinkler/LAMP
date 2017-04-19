@@ -43,7 +43,7 @@ extern char songname[];
 extern unsigned int specialColor;
 extern int colorStage;
 
-FIL fp;
+static FIL fp;
 extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;
@@ -58,9 +58,9 @@ void apiOff(){
 
 //immediately changes the color
 void apiSetColorIm(unsigned long color){
-    unsigned long key = osi_EnterCritical();
+    //unsigned long key = osi_EnterCritical();
     myColor = color;
-    osi_ExitCritical(key);
+    //osi_ExitCritical(key);
 }
 
 //creates an alarm if one does not exist or edits an existing one
@@ -183,7 +183,7 @@ void apiDeleteTheme(int themeId){
 
 //plays theme immediately
 void apiPlayTheme(int themeId){
-    unsigned long key = osi_EnterCritical();
+    //unsigned long key = osi_EnterCritical();
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
@@ -213,16 +213,16 @@ void apiPlayTheme(int themeId){
         specialColor = themes[storageId].special;
         colorStage = 0;
     }
-    osi_ExitCritical(key);
+    //osi_ExitCritical(key);
 }
 
 
 //updates the time displayed on the device
 void apiUpdateTime(unsigned long time){
-    unsigned long key = osi_EnterCritical();
+    //unsigned long key = osi_EnterCritical();
     currentTime = time;
     PRCMRTCSet(currentTime,0);
-    osi_ExitCritical(key);
+    //osi_ExitCritical(key);
 }
 
 void getAlarms(){

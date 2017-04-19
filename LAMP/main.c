@@ -260,7 +260,7 @@ void BoardInit(void){
 //******************************************************************************
 int main(){
     long lRetVal = -1;
-
+    unsigned long key = osi_EnterCritical();
     BoardInit();
 
     PinMuxConfig(); // Pinmux Configuration
@@ -316,6 +316,6 @@ int main(){
         LOOP_FOREVER();
     }
 #endif
-
+    osi_ExitCritical(key);
     osi_start(); // Start the task scheduler
 }
