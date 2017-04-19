@@ -36,10 +36,13 @@ static char currentAlarmHasPlayed = 0;
 static char snoozing = 0;
 static int snoozetime = 0;
 static int timeHasChanged = 0;
+int wifiConnected = 0;
+int wifiChanged = 0;
 int colorStage = 0;
 extern const tDisplay g_ssalowCC3200_ili9341;
 extern tContext sContext;
 unsigned int specialColor = 0;
+unsigned long key;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -132,13 +135,17 @@ void Controller( void *pvParameters ){
             prev_min = ts->tm_min;
         }
 #ifndef DEBUG
+        key = osi_EnterCritical();
         LCD();
+        osi_ExitCritical(key);
 #endif
+        key = osi_EnterCritical();
         LED();
         if(once){
             apiPlayTheme(0); // test
             once = 0;
         }
+        osi_ExitCritical(key);
         osi_Sleep(500);
     }
 }
@@ -155,7 +162,39 @@ void Controller( void *pvParameters ){
 void LCD(void){
     static unsigned long prevColor = 1;
     long dispColor;
-
+            if(wifiConnected){
+                if(wifiChanged){
+                    g_lLcdCursorY = 0;
+                    g_lLcdCursorX = 30;
+                    GrContextForegroundSet(&sContext, ClrBlack);
+                    GrContextFontSet(&sContext, &g_sFontCmss16);
+                    LcdPrintf("Please connect to WiFi!");
+                    GrContextFontSet(&sContext, &g_sFontCmss28);
+                    wifiChanged = 0;
+                }
+                g_lLcdCursorY = 0;
+                g_lLcdCursorX = 30;
+                GrContextForegroundSet(&sContext, ClrLime);
+                GrContextFontSet(&sContext, &g_sFontCmss16);
+                LcdPrintf("Connected!");
+                GrContextFontSet(&sContext, &g_sFontCmss28);
+            } else {
+                if(wifiChanged){
+                    g_lLcdCursorY = 0;
+                    g_lLcdCursorX = 30;
+                    GrContextForegroundSet(&sContext, ClrBlack);
+                    GrContextFontSet(&sContext, &g_sFontCmss16);
+                    LcdPrintf("Connected!");
+                    GrContextFontSet(&sContext, &g_sFontCmss28);
+                    wifiChanged = 0;
+                }
+                g_lLcdCursorY = 0;
+                g_lLcdCursorX = 30;
+                GrContextForegroundSet(&sContext, ClrBlue);
+                GrContextFontSet(&sContext, &g_sFontCmss16);
+                LcdPrintf("Please connect to WiFi!");
+                GrContextFontSet(&sContext, &g_sFontCmss28);
+            }
             if(timeHasChanged){
                 g_lLcdCursorY = 35;
                 GrContextForegroundSet(&sContext, ClrBlack);

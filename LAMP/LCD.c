@@ -24,6 +24,7 @@
 tContext sContext;
 extern const tDisplay g_ssalowCC3200_ili9341;
 long g_lLcdCursorY = 30;
+long g_lLcdCursorX = 30;
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
