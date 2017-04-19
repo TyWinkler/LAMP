@@ -176,6 +176,7 @@ void Speaker( void *pvParameters )
     //open file
     openFile();
     g_ucSpkrStartFlag = 1;
+    osi_Sleep(500);
     while(1)
     {
       while(g_ucSpkrStartFlag != 0)
@@ -216,7 +217,7 @@ void Speaker( void *pvParameters )
           }
         }
         g_iReceiveCount++;
-        unsigned long key = osi_EnterCritical();
+        //unsigned long key = osi_EnterCritical();
         g_lLcdCursorY = 130;
         GrContextForegroundSet(&sContext, ClrBlack);
         LcdPrintf("Count: %d",prevCount);
@@ -227,8 +228,8 @@ void Speaker( void *pvParameters )
         LcdPrintf("Size: %d",Size);
         prevSize = Size;
         prevCount = g_iReceiveCount;
-        osi_ExitCritical(key);
-
+        //osi_ExitCritical(key);
+        osi_Sleep(100);
       }
       osi_Sleep(100);
     }
