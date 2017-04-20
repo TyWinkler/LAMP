@@ -43,7 +43,7 @@ extern char songname[];
 extern unsigned int specialColor;
 extern int colorStage;
 
-static FIL fp;
+FIL fp;
 extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;

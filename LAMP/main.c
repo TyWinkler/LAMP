@@ -87,7 +87,7 @@ DIR dir;
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
-#define PLAY_WATERMARK          50*1024
+#define PLAY_WATERMARK          30*1024
 
 typedef struct
 {
@@ -260,7 +260,7 @@ void BoardInit(void){
 //******************************************************************************
 int main(){
     long lRetVal = -1;
-    unsigned long key = osi_EnterCritical();
+
     BoardInit();
 
     PinMuxConfig(); // Pinmux Configuration
@@ -279,7 +279,7 @@ int main(){
 
     // Start the Controller Task
 #ifdef CONTROLLER
-    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 2, &g_ControllerTask );
+    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
@@ -310,12 +310,12 @@ int main(){
     ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 5, &g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 4, &g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
 #endif
-    osi_ExitCritical(key);
+
     osi_start(); // Start the task scheduler
 }

@@ -13,6 +13,9 @@
 #include "LCD.h"
 #include "LPD8806.h"
 #include "grlib.h"
+#include "rom_map.h"
+#include "utils.h"
+#include "speaker.h"
 
 #define LEDoff 0x00000000
 //#define DEBUG2
@@ -90,21 +93,20 @@ void Controller( void *pvParameters ){
    // int years = currentTime / 30758400;
     //int  = currentTime / 30758400;
     static int prev_min = 0;
-    reset();
     allColor(colorHex(LEDoff));
 //    getThemes();
 //    getAlarms();
 
-#define RESETSPECIAL
+//#define RESETSPECIAL
 #ifdef RESETSPECIAL
-    apiEditTheme(0,0x000505,"Shake.wav",0);
-//    apiEditTheme(1,0x000000,"NA",2);
-//    apiEditTheme(2,0x000000,"NA",3);
+    apiEditTheme(0,0x000000,"NA",1);
+    apiEditTheme(1,0x000000,"NA",2);
+    apiEditTheme(2,0x000000,"NA",3);
 
 #endif
 
     while(1){
-
+        //key = osi_EnterCritical();
         PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         ts = localtime(&currentTime);
 
@@ -135,18 +137,11 @@ void Controller( void *pvParameters ){
             prev_min = ts->tm_min;
         }
 #ifndef DEBUG
-        //key = osi_EnterCritical();
         LCD();
-        //osi_ExitCritical(key);
 #endif
-        //key = osi_EnterCritical();
         LED();
-        if(once){
-            apiPlayTheme(0); // test
-            once = 0;
-        }
         //osi_ExitCritical(key);
-        osi_Sleep(500);
+        osi_Sleep(100);
     }
 }
 
@@ -235,7 +230,6 @@ void LCD(void){
 void LED(void){
     static int prev_color = 0;
     if(prev_color != myColor && specialColor == 0){
-        reset();
         allColor(colorHex(myColor));
         prev_color = myColor;
     } else if(specialColor == 1){

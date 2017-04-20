@@ -58,14 +58,11 @@
 
 #include "LPD8806.h"
 #include "LCD.h"
-#include "grlib.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
 int g_iReceiveCount =0;
-int prevCount =0;
-UINT prevSize;
 int g_iRetVal =0;
 int iCount =0;
 //unsigned char *p;
@@ -74,83 +71,53 @@ int songCount = 0;
 #define USERFILE1        "call.wav"
 #define USERFILE2        "stuck.wav"
 #define BUFFSIZE                1024*10
-#define PLAY_WATERMARK          70*1024
+#define PLAY_WATERMARK          30*1024
 unsigned char pBuffer[BUFFSIZE];
-unsigned char g_ucSpkrStartFlag = 0;
+unsigned char g_ucSpkrStartFlag;
 unsigned char songChanged = 0;
 
-static FIL fp;
+static FIL songfp;
 extern FATFS fs;
 extern FRESULT res;
 extern DIR dir;
-extern UINT Size;
+static UINT Size;
+
 char songname[30] = "call.wav";
-//const char* myWav = songname;
+const TCHAR* myWav = songname;
 
 extern unsigned long  g_ulStatus;
-extern unsigned int g_uiPlayWaterMark;
+extern unsigned char g_uiPlayWaterMark;
 extern unsigned char g_loopback;
 //unsigned char speaker_data[16*1024];
 extern tCircularBuffer *pRxBuffer;
-extern tContext sContext;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
 
-static void
-ListDirectory()
-{
-    FILINFO fno;
-    FRESULT res;
-    unsigned long ulSize;
-    tBoolean bIsInKB;
-
-    for(;;)
-    {
-        res = f_readdir(&dir, &fno);           // Read a directory item
-        if (res != FR_OK || fno.fname[0] == 0)
-        {
-        break;                                // Break on error or end of dir
-        }
-        ulSize = fno.fsize;
-        bIsInKB = false;
-        if(ulSize > 1024)
-        {
-            ulSize = ulSize/1024;
-            bIsInKB = true;
-        }
-        Report("->%-15s%5d %-2s    %-5s\n\r",fno.fname,ulSize,\
-                (bIsInKB == true)?"KB":"B",(fno.fattrib&AM_DIR)?"Dir":"File");
-    }
-
-}
-
-FRESULT openFile(){
+void openFile(){
     Message("\n\rReading user file...\n\r");
-    res = f_open(&fp,(TCHAR*)songname,FA_READ);
-    f_lseek(&fp,44);
-    return res;
+    res = f_open(&songfp,myWav,FA_READ);
+    f_lseek(&songfp,44);
 }
 
 void closeFile(){
-    f_close(&fp);
+    f_close(&songfp);
 }
 
 void readFile(){
     if(songChanged){
         closeFile();
-        res = openFile();
+        openFile();
         songChanged = 0;
     }
     if(res == FR_OK)
     {
-        f_read(&fp,pBuffer,BUFFSIZE,&Size);
+        f_read(&songfp,pBuffer,BUFFSIZE,&Size);
+        Report("Read : %d Bytes\n\n\r",Size);
+        Report("%s",pBuffer);
     }
     else
     {
-#ifdef DEBUG
-        LcdPrintf("Didn't Read speaker");
-#endif
         Report("Failed to open %s\n\r",USERFILE1);
     }
 }
@@ -159,86 +126,41 @@ void readFile(){
 
 //*****************************************************************************
 //
-//! Speaker Routine 
+//! Speaker Routine
 //!
 //! \param pvParameters     Parameters to the task's entry function
 //!
 //! \return None
 //
 //*****************************************************************************
-void Speaker( void *pvParameters )
-{
+void Speaker( void *pvParameters ){
     long iRetVal;
-    strcpy(songname,"stuck.wav");
-
-//    ListDirectory();
+    //f_mount(&fs,"0",1);
+    //res = f_opendir(&dir,"/");
     //open file
     openFile();
     g_ucSpkrStartFlag = 1;
-    //osi_Sleep(500);
-    while(1)
-    {
-      while(g_ucSpkrStartFlag != 0)
-      {
-#ifdef DEBUG
-          //clearScreen();
-          //LcdPrintf("playing...");
-#endif
-        // Read from file and discard wav header
-        readFile();
-        /* Wait to avoid buffer overflow as reading speed is faster than playback */
-        while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){
-            g_lLcdCursorY = 30;
-            GrContextForegroundSet(&sContext, ClrWhite);
-            LcdPrintf("Buffer Full");
-            osi_Sleep(10);
-        }
-        if( Size > 0)
-        {
-          iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
+    while(1){
+        while(g_ucSpkrStartFlag){
+            // Read from file and discard wav header
 
-          if(iRetVal < 0)
-          {
-            LcdPrintf("Unable to fill buffer");
-            LOOP_FOREVER();
-          }
+            readFile();
+            /* Wait to avoid buffer overflow as reading speed is faster than playback */
+            while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){}
+            if( Size > 0){
+                iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
+                if(iRetVal < 0){
+                    LcdPrintf("Unable to fill buffer");
+                    LOOP_FOREVER();
+                }
+            } else { // we reach at the of file
+                //close file
+                closeFile();
+                // reopen the file
+                openFile();
+            }
+            g_iReceiveCount++;
         }
-        else
-        { // we reach at the of file
-            //close file
-            g_lLcdCursorY = 30;
-            GrContextForegroundSet(&sContext, ClrWhite);
-            LcdPrintf("Trying to close file");
-            closeFile();
-            // reopen the file
-            LcdPrintf("Opening file");
-            res = openFile();
-            LcdPrintf("File opened");
-            //if(res != FR_OK) break;
-        }
-        if(g_uiPlayWaterMark == 0)
-        {
-          if(IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)
-          {
-            g_uiPlayWaterMark = 1;
-          }
-        }
-        g_iReceiveCount++;
-        //unsigned long key = osi_EnterCritical();
-        g_lLcdCursorY = 130;
-        GrContextForegroundSet(&sContext, ClrBlack);
-        LcdPrintf("Count: %d",prevCount);
-        LcdPrintf("Size: %d",prevSize);
-        g_lLcdCursorY = 130;
-        GrContextForegroundSet(&sContext, ClrWhite);
-        LcdPrintf("Count: %d",g_iReceiveCount);
-        LcdPrintf("Size: %d",Size);
-        prevSize = Size;
-        prevCount = g_iReceiveCount;
-        //osi_ExitCritical(key);
         osi_Sleep(10);
-      }
-      osi_Sleep(10);
     }
 }
-
