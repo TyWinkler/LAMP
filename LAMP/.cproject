@@ -31,11 +31,11 @@
 							<tool id="com.ti.ccstudio.buildDefinitions.TMS470_16.9.exe.compilerDebug.1576091340" name="ARM Compiler" superClass="com.ti.ccstudio.buildDefinitions.TMS470_16.9.exe.compilerDebug">
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_16.9.compilerID.DEFINE.1654321000" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_16.9.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;USE_FREERTOS&quot;"/>
+									<listOptionValue builtIn="false" value="CONTROLLER"/>
 									<listOptionValue builtIn="false" value="SPEAKER"/>
 									<listOptionValue builtIn="false" value="&quot;ccs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;SL_PLATFORM_MULTI_THREADED&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;SPEAKER&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;CONTROLLER&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;cc3200&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;NOTERM&quot;"/>
 								</option>

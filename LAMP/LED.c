@@ -46,7 +46,7 @@
 #include "LPD8806.h"
 
 #include "i2s_if.h"
-#include "osi.h"
+//#include "osi.h"
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start

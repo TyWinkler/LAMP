@@ -77,6 +77,10 @@ OsiTaskHandle g_LCDTask = NULL;
 OsiTaskHandle g_ControllerTask = NULL;
 OsiMsgQ_t g_ControlMsgQueue;
 
+OsiSyncObj_t g_SpeakerSyncObj;
+OsiSyncObj_t g_ControllerSyncObj;
+OsiSyncObj_t g_NetworkSyncObj;
+
 FATFS fs;
 FRESULT res = FR_NOT_READY;
 DIR dir;
@@ -206,7 +210,7 @@ void configureAudio(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 50);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 60);
 
     // Initialize the Audio(I2S) Module
     AudioInit();
@@ -276,6 +280,10 @@ int main(){
         f_mount(&fs,"0",1);
         res = f_opendir(&dir,"/");
     }
+
+    osi_SyncObjCreate(&g_SpeakerSyncObj);
+    osi_SyncObjCreate(&g_ControllerSyncObj);
+    osi_SyncObjCreate(&g_NetworkSyncObj);
 
     // Start the Controller Task
 #ifdef CONTROLLER

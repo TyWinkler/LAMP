@@ -47,6 +47,9 @@ extern tContext sContext;
 unsigned int specialColor = 0;
 unsigned long key;
 
+extern OsiSyncObj_t g_ControllerSyncObj;
+extern OsiSyncObj_t g_SpeakerSyncObj;
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -96,6 +99,11 @@ void Controller( void *pvParameters ){
     allColor(colorHex(LEDoff));
 //    getThemes();
 //    getAlarms();
+    PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+    ts = localtime(&currentTime);
+    strftime(myTime, 80, "%b %d %I:%M %p", ts);
+    timeHasChanged = 1;
+    LCD();
 
 //#define RESETSPECIAL
 #ifdef RESETSPECIAL
@@ -106,10 +114,13 @@ void Controller( void *pvParameters ){
 #endif
 
     while(1){
-        //key = osi_EnterCritical();
+
+        osi_SyncObjWait(&g_ControllerSyncObj,60000);
+        key = osi_EnterCritical();
         PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         ts = localtime(&currentTime);
-
+        osi_ExitCritical(key);
+        key = osi_EnterCritical();
         if(prev_min != ts->tm_min){
             strftime(myTime, 80, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
@@ -136,12 +147,13 @@ void Controller( void *pvParameters ){
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }
+        osi_ExitCritical(key);
 #ifndef DEBUG
         LCD();
 #endif
         LED();
         //osi_ExitCritical(key);
-        osi_Sleep(100);
+        //osi_Sleep(100);
     }
 }
 
