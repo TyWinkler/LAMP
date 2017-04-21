@@ -49,11 +49,14 @@ extern FRESULT res;
 extern DIR dir;
 UINT Size;
 
+extern OsiSyncObj_t g_ControllerSyncObj;
+
 //Turns off speaker and lights
 void apiOff(){
     myColor = 0x000000;
     g_ucSpkrStartFlag = 0;
     specialColor = 0;
+    osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 
 //immediately changes the color
@@ -61,6 +64,7 @@ void apiSetColorIm(unsigned long color){
     //unsigned long key = osi_EnterCritical();
     myColor = color;
     //osi_ExitCritical(key);
+    osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 
 //creates an alarm if one does not exist or edits an existing one
@@ -214,6 +218,7 @@ void apiPlayTheme(int themeId){
         colorStage = 0;
     }
     //osi_ExitCritical(key);
+    osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 
 
@@ -223,6 +228,7 @@ void apiUpdateTime(unsigned long time){
     currentTime = time;
     PRCMRTCSet(currentTime,0);
     //osi_ExitCritical(key);
+    osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 
 void getAlarms(){

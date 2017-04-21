@@ -26,6 +26,8 @@ extern const tDisplay g_ssalowCC3200_ili9341;
 long g_lLcdCursorY = 30;
 long g_lLcdCursorX = 30;
 
+extern OsiSyncObj_t g_SpeakerSyncObj;
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -64,6 +66,7 @@ void clearScreen(){
 }
 
 int LcdPrintf(char *pcFormat, ...){
+    unsigned long key = osi_EnterCritical();
     int iRet = 0;
     char *pcBuff, *pcTemp;
     int iSize = 256;
@@ -90,5 +93,6 @@ int LcdPrintf(char *pcFormat, ...){
     }
     LCD_MESSAGE(pcBuff);
     free(pcBuff);
+    osi_ExitCritical(key);
     return iRet;
 }

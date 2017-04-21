@@ -67,6 +67,7 @@
 /* Demo app includes. */
 #include "i2s_if.h"
 #include "gpio_if.h"
+#include "osi.h"
 
 //*****************************************************************************
 //
@@ -148,9 +149,9 @@ long AudioSetupDMAMode(void (*pfnAppCbHndlr)(void),
         unsigned char RxTx)
 {
     MAP_I2SIntEnable(I2S_BASE,I2S_INT_XDATA);
-#ifdef USE_TIRTOS
+#if defined(USE_TIRTOS)
     long lRetVal = -1;
-    lRetVal = osi_InterruptRegister(INT_I2S, pfnAppCbHndlr, INT_PRIORITY_LVL_1);
+    lRetVal = osi_InterruptRegister(INT_I2S, pfnAppCbHndlr, INT_PRIORITY_LVL_6);
     ASSERT_ON_ERROR(lRetVal);
 
 

@@ -101,6 +101,8 @@ char g_cBsdBuf[BUF_SIZE];
 extern int wifiChanged;
 extern int wifiConnected;
 
+extern OsiSyncObj_t g_ControllerSyncObj;
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -513,6 +515,7 @@ long ConnectToNetwork()
 #endif
     }
 
+    osi_SyncObjSignal(&g_ControllerSyncObj);
     wifiConnected = 1;
     wifiChanged = 1;
     return SUCCESS;
@@ -932,7 +935,7 @@ int BsdTcpServer(unsigned short usPort)
 #endif
         APIparse(g_cBsdBuf);
 
-        osi_Sleep(50);
+        osi_Sleep(1000);
         if( iStatus <= 0 )
         {
           // error
@@ -969,7 +972,7 @@ int BsdTcpServer(unsigned short usPort)
 void HTTPServerTask( void *pvParameters )
 {
     long lRetVal = -1;
-
+    osi_Sleep(10000);
     //Initialize Global Variable
     InitializeAppVariables();
 

@@ -281,13 +281,14 @@ int main(){
         res = f_opendir(&dir,"/");
     }
 
+    //Test
     osi_SyncObjCreate(&g_SpeakerSyncObj);
     osi_SyncObjCreate(&g_ControllerSyncObj);
     osi_SyncObjCreate(&g_NetworkSyncObj);
 
     // Start the Controller Task
 #ifdef CONTROLLER
-    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 3, &g_ControllerTask );
+    lRetVal = osi_TaskCreate( Controller, (signed char*)"Controller",OSI_STACK_SIZE, NULL, 1, &g_ControllerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
