@@ -80,18 +80,14 @@ OsiMsgQ_t g_ControlMsgQueue;
 OsiSyncObj_t g_SpeakerSyncObj;
 OsiSyncObj_t g_ControllerSyncObj;
 OsiSyncObj_t g_NetworkSyncObj;
-
-FATFS fs;
-FRESULT res = FR_NOT_READY;
-DIR dir;
-
+OsiSyncObj_t g_FatFSSyncObj;
 
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
 #define SPI_IF_BIT_RATE         20000000
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
-#define PLAY_WATERMARK          30*1024
+#define PLAY_WATERMARK          50*1024
 
 typedef struct
 {
@@ -275,16 +271,11 @@ int main(){
 
     configureAudio();
 
-    while(res != FR_OK){
-        //LcdPrintf("Trying to open");
-        f_mount(&fs,"0",1);
-        res = f_opendir(&dir,"/");
-    }
-
     //Test
     osi_SyncObjCreate(&g_SpeakerSyncObj);
     osi_SyncObjCreate(&g_ControllerSyncObj);
     osi_SyncObjCreate(&g_NetworkSyncObj);
+    osi_SyncObjCreate(&g_FatFSSyncObj);
 
     // Start the Controller Task
 #ifdef CONTROLLER
@@ -319,7 +310,7 @@ int main(){
     ASSERT_ON_ERROR(lRetVal);
 
     // Create HTTP Server Task
-    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 4, &g_HTTPServerTask );
+    lRetVal = osi_TaskCreate(HTTPServerTask, (signed char*)"HTTPServerTask", 4096, NULL, 2, &g_HTTPServerTask );
     if(lRetVal < 0){
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();

@@ -75,12 +75,13 @@ int songCount = 0;
 unsigned char pBuffer[BUFFSIZE];
 unsigned char g_ucSpkrStartFlag;
 unsigned char songChanged = 0;
+unsigned int seekVal = 0;
 
-static FIL songfp;
-extern FATFS fs;
-extern FRESULT res;
-extern DIR dir;
-static UINT Size;
+FIL songfp;
+FATFS songfs;
+FRESULT songres;
+DIR songdir;
+UINT songSize;
 
 char songname[30] = "call.wav";
 const TCHAR* myWav = songname;
@@ -95,11 +96,32 @@ extern OsiSyncObj_t g_SpeakerSyncObj;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
+void openSongDir(){
+    songres = FR_NOT_READY;
+    while(songres != FR_OK){
+        //LcdPrintf("Trying to open");
+        f_mount(&songfs,"0",1);
+        songres = f_opendir(&songdir,"/");
+    }
+}
+
+void closeSongDir(){
+    songres = FR_NOT_READY;
+    while(songres != FR_OK){
+        //LcdPrintf("Trying to open");
+        f_closedir(&songdir);
+        songres = f_mount(&songfs,"0",1);
+    }
+}
 
 void openFile(){
+    if(songChanged){
+        seekVal = 0;
+        songChanged = 0;
+    }
     Message("\n\rReading user file...\n\r");
-    res = f_open(&songfp,myWav,FA_READ);
-    f_lseek(&songfp,44);
+    songres = f_open(&songfp,myWav,FA_READ);
+    f_lseek(&songfp,44 + seekVal);
 }
 
 void closeFile(){
@@ -107,21 +129,21 @@ void closeFile(){
 }
 
 void readFile(){
-    if(songChanged){
-        closeFile();
-        openFile();
-        songChanged = 0;
-    }
-    if(res == FR_OK)
+    openSongDir();
+    openFile();
+    if(songres == FR_OK)
     {
-        f_read(&songfp,pBuffer,BUFFSIZE,&Size);
-        Report("Read : %d Bytes\n\n\r",Size);
+        f_read(&songfp,pBuffer,BUFFSIZE,&songSize);
+        seekVal += songSize;
+        Report("Read : %d Bytes\n\n\r",songSize);
         Report("%s",pBuffer);
     }
     else
     {
-        Report("Failed to open %s\n\r",USERFILE1);
+        LcdPrintf("Failed to open %s\n\r",myWav);
     }
+    closeFile();
+    closeSongDir();
 }
 
 
@@ -150,13 +172,14 @@ void Speaker( void *pvParameters ){
             readFile();
             /* Wait to avoid buffer overflow as reading speed is faster than playback */
             while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){}
-            if( Size > 0){
-                iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, Size);
+            if( songSize > 0){
+                iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, songSize);
                 if(iRetVal < 0){
                     LcdPrintf("Unable to fill buffer");
                     LOOP_FOREVER();
                 }
             } else { // we reach at the of file
+                songChanged = 1;
                 //close file
                 closeFile();
                 // reopen the file

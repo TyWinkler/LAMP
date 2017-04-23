@@ -64,8 +64,8 @@ MEMORY
     //SRAM_DATA (RWX) : origin = 0x20013690, length = 0x1C970
 
     //HTTPServer
-    SRAM_CODE (RWX) : origin = 0x20004000, length = 0x16000
-    SRAM_DATA (RWX) : origin = 0x2001A000, length = 0x1C000
+    SRAM_CODE (RWX) : origin = 0x20004000, length = 0x17000
+    SRAM_DATA (RWX) : origin = 0x2001C000, length = 0x1D000
 
     //Test
     //SRAM_CODE (RWX) : origin = 0x20004000, length = 0x11000

@@ -105,7 +105,7 @@ void Controller( void *pvParameters ){
     timeHasChanged = 1;
     LCD();
 
-//#define RESETSPECIAL
+#define RESETSPECIAL
 #ifdef RESETSPECIAL
     apiEditTheme(0,0x000000,"NA",1);
     apiEditTheme(1,0x000000,"NA",2);
@@ -115,12 +115,9 @@ void Controller( void *pvParameters ){
 
     while(1){
 
-        osi_SyncObjWait(&g_ControllerSyncObj,60000);
-        key = osi_EnterCritical();
-        PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-        ts = localtime(&currentTime);
-        osi_ExitCritical(key);
-        key = osi_EnterCritical();
+        osi_SyncObjWait(&g_ControllerSyncObj,1000);
+        //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+        //ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(myTime, 80, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
@@ -147,7 +144,6 @@ void Controller( void *pvParameters ){
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }
-        osi_ExitCritical(key);
 #ifndef DEBUG
         LCD();
 #endif
@@ -240,11 +236,12 @@ void LCD(void){
 //
 //*****************************************************************************
 void LED(void){
-    static int prev_color = 0;
-    if(prev_color != myColor && specialColor == 0){
-        allColor(colorHex(myColor));
-        prev_color = myColor;
-    } else if(specialColor == 1){
+//    static int prev_color = 0;
+//    if(prev_color != myColor && specialColor == 0){
+//        allColor(colorHex(myColor));
+//        prev_color = myColor;
+//    } else
+    if(specialColor == 1){
         //Sunrise
         if(colorStage == 0){
             myColor = 0x02004f;
