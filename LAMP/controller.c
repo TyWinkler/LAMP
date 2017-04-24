@@ -28,7 +28,7 @@ extern unsigned char songChanged;
 extern alarm alarms[30];
 extern theme themes[30];
 //extern TCHAR* myWav;
-time_t currentTime;
+time_t currentTime = 0;
 struct tm* ts;
 char myTime[20];
 char prevTime[20];
@@ -86,10 +86,10 @@ int once = 0; // test
 
 void Controller( void *pvParameters ){
 
+    //time(&currentTime);
     PRCMRTCInUseSet();
-    time(&currentTime);
-    PRCMRTCSet(currentTime,0);
-    unsigned short throwaway;
+    unsigned short throwaway = 0;
+    PRCMRTCSet(currentTime,throwaway);
     //_tz.timezone = 0;
     //time_t* toss = 0;
    // int years = currentTime / 30758400;
@@ -99,6 +99,7 @@ void Controller( void *pvParameters ){
 //    getThemes();
 //    getAlarms();
     PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+    //currentTime = (time_t) RTCU32SecRegRead(void);
     ts = localtime(&currentTime);
     strftime(myTime, 80, "%b %d %I:%M %p", ts);
     timeHasChanged = 1;
@@ -115,8 +116,9 @@ void Controller( void *pvParameters ){
     while(1){
 
         osi_SyncObjWait(&g_ControllerSyncObj,1000);
-        //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-        //ts = localtime(&currentTime);
+        //currentTime = (time_t) RTCU32SecRegRead(void);
+        PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+        ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(myTime, 80, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
