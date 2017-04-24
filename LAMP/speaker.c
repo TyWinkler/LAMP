@@ -71,7 +71,7 @@ int songCount = 0;
 #define USERFILE1        "call.wav"
 #define USERFILE2        "stuck.wav"
 #define BUFFSIZE                1024*10
-#define PLAY_WATERMARK          50*1024
+#define PLAY_WATERMARK          60*1024
 unsigned char pBuffer[BUFFSIZE];
 unsigned char g_ucSpkrStartFlag;
 unsigned char songChanged = 0;
@@ -83,7 +83,7 @@ FRESULT songres;
 DIR songdir;
 UINT songSize;
 
-char songname[30] = "call.wav";
+char songname[30] = USERFILE2;
 const TCHAR* myWav = songname;
 
 extern unsigned long  g_ulStatus;
@@ -91,7 +91,7 @@ extern unsigned char g_uiPlayWaterMark;
 extern unsigned char g_loopback;
 //unsigned char speaker_data[16*1024];
 extern tCircularBuffer *pRxBuffer;
-
+extern OsiSyncObj_t g_ControllerSyncObj;
 extern OsiSyncObj_t g_SpeakerSyncObj;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -166,12 +166,14 @@ void Speaker( void *pvParameters ){
     g_ucSpkrStartFlag = 1;
     while(1){
         while(g_ucSpkrStartFlag){
-            osi_SyncObjWait(&g_SpeakerSyncObj,10);
+            osi_SyncObjWait(&g_SpeakerSyncObj,OSI_NO_WAIT);
             // Read from file and discard wav header
             //unsigned long key = osi_EnterCritical();
             readFile();
             /* Wait to avoid buffer overflow as reading speed is faster than playback */
-            while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){}
+            while((IsBufferSizeFilled(pRxBuffer,PLAY_WATERMARK) == TRUE)){
+                osi_SyncObjSignal(&g_ControllerSyncObj);
+            }
             if( songSize > 0){
                 iRetVal = FillBuffer(pRxBuffer,(unsigned char*)pBuffer, songSize);
                 if(iRetVal < 0){
@@ -186,8 +188,11 @@ void Speaker( void *pvParameters ){
                 openFile();
             }
             g_iReceiveCount++;
-            //osi_ExitCritical(key);
+            if(g_iReceiveCount > 6){
+                g_iReceiveCount = 0;
+                osi_SyncObjSignal(&g_ControllerSyncObj);
+            }
         }
-        osi_Sleep(10);
+        osi_SyncObjSignal(&g_ControllerSyncObj);
     }
 }
