@@ -38,7 +38,7 @@ alarm alarms[30];
 extern unsigned long myColor;
 extern unsigned char g_ucSpkrStartFlag;
 //extern const unsigned char* myWav;
-extern unsigned int baseTime;
+extern unsigned int currentTime;
 extern unsigned char songChanged;
 extern char songname[];
 extern unsigned int specialColor;
@@ -225,10 +225,10 @@ void apiPlayTheme(int themeId){
 
 //updates the time displayed on the device
 void apiUpdateTime(unsigned long time){
-    //unsigned long key = osi_EnterCritical();
-    baseTime = time;
+    unsigned long key = osi_EnterCritical();
+    currentTime = time;
     //PRCMRTCSet(currentTime,0);
-    //osi_ExitCritical(key);
+    osi_ExitCritical(key);
     osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 

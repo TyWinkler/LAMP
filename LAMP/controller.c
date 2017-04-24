@@ -59,7 +59,7 @@ extern OsiSyncObj_t g_SpeakerSyncObj;
 void TimerIntHandler(void){
     MAP_TimerIntClear(TIMERA2_BASE,TIMER_TIMA_TIMEOUT);
     // TO-DO
-    currentTime = baseTime + 1;
+    currentTime = currentTime + 1;
 }
 
 void playTheme(theme* playme){
@@ -96,6 +96,8 @@ int once = 0; // test
 void Controller( void *pvParameters ){
 
         MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+
+        MAP_TimerDisable(TIMERA2_BASE,TIMER_A);
         //
         // Register timer interrupt hander
         //
