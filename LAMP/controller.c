@@ -116,7 +116,7 @@ void Controller( void *pvParameters ){
 
         osi_SyncObjWait(&g_ControllerSyncObj,500);
         sr = osi_EnterCritical();
-        PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+        //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         osi_ExitCritical(sr);
         ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
