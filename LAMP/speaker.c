@@ -83,7 +83,7 @@ FRESULT songres;
 DIR songdir;
 UINT songSize;
 
-char songname[30] = "call.wav";
+char songname[30] = "stuck.wav";
 const TCHAR* myWav = songname;
 
 extern unsigned long  g_ulStatus;
@@ -163,8 +163,9 @@ void Speaker( void *pvParameters ){
     //res = f_opendir(&dir,"/");
     //open file
     openFile();
-    g_ucSpkrStartFlag = 1;
+    g_ucSpkrStartFlag = 0;
     while(1){
+        osi_SyncObjWait(&g_SpeakerSyncObj,10);
         while(g_ucSpkrStartFlag){
             osi_SyncObjWait(&g_SpeakerSyncObj,10);
             // Read from file and discard wav header
@@ -188,6 +189,6 @@ void Speaker( void *pvParameters ){
             g_iReceiveCount++;
             //osi_ExitCritical(key);
         }
-        osi_Sleep(10);
+        //FillZeroes(pRxBuffer, BUFFSIZE);
     }
 }

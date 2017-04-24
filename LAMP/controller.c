@@ -129,8 +129,8 @@ void Controller( void *pvParameters ){
     //int  = currentTime / 30758400;
     static int prev_min = 0;
     allColor(colorHex(LEDoff));
-//    getThemes();
-//    getAlarms();
+    getThemes();
+    getAlarms();
     //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
     //currentTime = (time_t) RTCU32SecRegRead(void);
     ts = localtime(&currentTime);
@@ -138,7 +138,7 @@ void Controller( void *pvParameters ){
     timeHasChanged = 1;
     LCD();
 
-#define RESETSPECIAL
+//#define RESETSPECIAL
 #ifdef RESETSPECIAL
     apiEditTheme(0,0x000000,"NA",1);
     apiEditTheme(1,0x000000,"NA",2);

@@ -18,6 +18,8 @@
 #include "hw_ints.h"
 #include "prcm.h"
 #include "LPD8806.h"
+#include "circ_buff.h"
+#define BUFFSIZE                1024*10
 
 //struct theme{
 //    unsigned long color;
@@ -43,6 +45,7 @@ extern unsigned char songChanged;
 extern char songname[];
 extern unsigned int specialColor;
 extern int colorStage;
+extern tCircularBuffer *pRxBuffer;
 
 FIL tafp;
 FATFS tafs;
@@ -51,6 +54,7 @@ DIR tadir;
 UINT taSize;
 
 extern OsiSyncObj_t g_ControllerSyncObj;
+extern OsiSyncObj_t g_SpeakerSyncObj;
 
 //Turns off speaker and lights
 void apiOff(){
@@ -58,12 +62,14 @@ void apiOff(){
     allColor(colorHex(myColor));
     g_ucSpkrStartFlag = 0;
     specialColor = 0;
+    FillZeroes(pRxBuffer, BUFFSIZE);
 }
 
 //immediately changes the color
 void apiSetColorIm(unsigned long color){
     //unsigned long key = osi_EnterCritical();
     myColor = color;
+    specialColor = 0;
     //osi_ExitCritical(key);
     allColor(colorHex(myColor));
 }
@@ -102,7 +108,7 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
         if(alarms[storageId].active == 0){
             alarms[storageId].active = 1;
         }
-        //storeAlarms();
+        storeAlarms();
     }
 }
 
@@ -150,7 +156,7 @@ void apiEditTheme(int themeId, long color, char* song, int special){
             themes[storageId].active = 1;
         }
         themes[storageId].special = special;
-        //storeThemes();
+        storeThemes();
     }
 }
 
@@ -166,7 +172,7 @@ void apiDeleteAlarm(int alarmId){
     }
     if(storageId != -1){
         alarms[storageId].active = 0;
-        //storeAlarms();
+        storeAlarms();
     }
 }
 
@@ -182,7 +188,7 @@ void apiDeleteTheme(int themeId){
     }
     if(storageId != -1){
         themes[storageId].active = 0;
-        //storeThemes();
+        storeThemes();
     }
 }
 
@@ -212,6 +218,7 @@ void apiPlayTheme(int themeId){
             songChanged = 1;
             if(strcmp(songname,"NA") == 0){
                 g_ucSpkrStartFlag = 0;
+                FillZeroes(pRxBuffer, BUFFSIZE);
             } else {
                 g_ucSpkrStartFlag = 1;
             }
@@ -220,6 +227,7 @@ void apiPlayTheme(int themeId){
         colorStage = 0;
     }
     //osi_ExitCritical(key);
+    osi_SyncObjSignal(&g_SpeakerSyncObj);
     osi_SyncObjSignal(&g_ControllerSyncObj);
 }
 
@@ -251,7 +259,9 @@ void closeTADir(){
 }
 
 void getAlarms(){
+    unsigned char temp = g_ucSpkrStartFlag;
     g_ucSpkrStartFlag = 0;
+    unsigned long key = osi_EnterCritical();
     openTADir();
     tares = f_open(&tafp,"alarms",FA_READ);
     if(tares == FR_OK) {
@@ -261,11 +271,16 @@ void getAlarms(){
         LcdPrintf("Failed to open themes");
     }
     closeTADir();
-    g_ucSpkrStartFlag = 1;
+    osi_ExitCritical(key);
+    if(temp){
+        g_ucSpkrStartFlag = 1;
+    }
 }
 
 void storeAlarms(){
+    unsigned char temp = g_ucSpkrStartFlag;
     g_ucSpkrStartFlag = 0;
+    unsigned long key = osi_EnterCritical();
     openTADir();
     tares = f_open(&tafp,"alarms",FA_CREATE_ALWAYS|FA_WRITE);
     if(tares == FR_OK) {
@@ -275,11 +290,16 @@ void storeAlarms(){
         LcdPrintf("Failed to create a new file");
     }
     closeTADir();
-    g_ucSpkrStartFlag = 1;
+    osi_ExitCritical(key);
+    if(temp){
+        g_ucSpkrStartFlag = 1;
+    }
 }
 
 void getThemes(){
+    unsigned char temp = g_ucSpkrStartFlag;
     g_ucSpkrStartFlag = 0;
+    unsigned long key = osi_EnterCritical();
     openTADir();
     tares = f_open(&tafp,"themes",FA_READ);
     if(tares == FR_OK) {
@@ -289,11 +309,16 @@ void getThemes(){
         LcdPrintf("Failed to open themes");
     }
     closeTADir();
-    g_ucSpkrStartFlag = 1;
+    osi_ExitCritical(key);
+    if(temp){
+        g_ucSpkrStartFlag = 1;
+    }
 }
 
 void storeThemes(){
+    unsigned char temp = g_ucSpkrStartFlag;
     g_ucSpkrStartFlag = 0;
+    unsigned long key = osi_EnterCritical();
     openTADir();
     tares = f_open(&tafp,"themes",FA_CREATE_ALWAYS|FA_WRITE);
     if(tares == FR_OK) {
@@ -303,5 +328,8 @@ void storeThemes(){
         LcdPrintf("Failed to create a new file");
     }
     closeTADir();
-    g_ucSpkrStartFlag = 1;
+    osi_ExitCritical(key);
+    if(temp){
+        g_ucSpkrStartFlag = 1;
+    }
 }
