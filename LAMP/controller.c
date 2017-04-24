@@ -85,9 +85,9 @@ void hasAlarmPlayed(void){
 int once = 0; // test
 
 void Controller( void *pvParameters ){
-    int sr;
+
     PRCMRTCInUseSet();
-    //time(&currentTime);
+    time(&currentTime);
     PRCMRTCSet(currentTime,0);
     unsigned short throwaway;
     //_tz.timezone = 0;
@@ -114,11 +114,9 @@ void Controller( void *pvParameters ){
 
     while(1){
 
-        osi_SyncObjWait(&g_ControllerSyncObj,500);
-        sr = osi_EnterCritical();
+        osi_SyncObjWait(&g_ControllerSyncObj,1000);
         //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-        osi_ExitCritical(sr);
-        ts = localtime(&currentTime);
+        //ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(myTime, 80, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
@@ -149,7 +147,8 @@ void Controller( void *pvParameters ){
         LCD();
 #endif
         LED();
-        osi_SyncObjSignal(&g_SpeakerSyncObj);
+        //osi_ExitCritical(key);
+        //osi_Sleep(100);
     }
 }
 
