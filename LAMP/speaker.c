@@ -140,7 +140,7 @@ void readFile(){
     }
     else
     {
-        LcdPrintf("Failed to open %s\n\r",myWav);
+        Report("Failed to open %s\n\r",myWav);
     }
     closeFile();
     closeSongDir();

@@ -15,7 +15,6 @@
 #include "grlib.h"
 #include "rom_map.h"
 #include "utils.h"
-#include "speaker.h"
 
 #define LEDoff 0x00000000
 //#define DEBUG2
@@ -226,6 +225,25 @@ void LCD(void){
 //            LEDWrite = 1;
 }
 
+long random_at_most(long max) {
+  unsigned long
+    // max <= RAND_MAX < ULONG_MAX, so this is okay.
+    num_bins = (unsigned long) max + 1,
+    num_rand = (unsigned long) RAND_MAX + 1,
+    bin_size = num_rand / num_bins,
+    defect   = num_rand % num_bins;
+
+  long x;
+  do {
+   x = rand();
+  }
+  // This is carefully written not to overflow
+  while (num_rand - defect <= (unsigned long)x);
+
+  // Truncated division is intentional
+  return (x/bin_size) + 1;
+}
+
 //*****************************************************************************
 //
 //! LED Routine
@@ -277,9 +295,87 @@ void LED(void){
 
     } else if(specialColor == 2){
         //Fire
-        allColor(colorHex(0xFF0000));
+        if(colorStage == 0){
+            myColor = 0xFF0000;
+            allColor(colorHex(myColor));
+            if(myColor == 0xFF0000){
+                colorStage++;
+            }
+        } else if(colorStage == 1){
+            myColor = mergeColors(myColor,0xE25822,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xE25822){
+                colorStage = random_at_most(3);
+            }
+        } else if(colorStage == 2){
+            myColor = mergeColors(myColor,0x6F1F00,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x6F1F00){
+                colorStage = random_at_most(3);
+            }
+        } else if(colorStage == 3){
+            myColor = mergeColors(myColor,0xBC3500,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xBC3500){
+                colorStage = random_at_most(3);
+            }
+        } else if(colorStage == 4){
+            myColor = mergeColors(myColor,0xFFB699,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xFFB699){
+                colorStage = random_at_most(3);
+            }
+        }
     } else if(specialColor == 3){
         //Rainbow
-        allColor(colorHex(0x00FF00));
+        if(colorStage == 0){
+            myColor = 0x9400D3;
+            allColor(colorHex(myColor));
+            if(myColor == 0x9400D3){
+                colorStage++;
+            }
+        } else if(colorStage == 1){
+            myColor = mergeColors(myColor,0x4B0082,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x4B0082){
+                colorStage++;
+            }
+        } else if(colorStage == 2){
+            myColor = mergeColors(myColor,0x0000FF,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x0000FF){
+                colorStage++;
+            }
+        } else if(colorStage == 3){
+            myColor = mergeColors(myColor,0x00FF00,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x00FF00){
+                colorStage++;
+            }
+        } else if(colorStage == 4){
+            myColor = mergeColors(myColor,0xFFFF00,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xFFFF00){
+                colorStage++;
+            }
+        } else if(colorStage == 5){
+            myColor = mergeColors(myColor,0xFF7F00,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xFF7F00){
+                colorStage++;
+            }
+        } else if(colorStage == 6){
+            myColor = mergeColors(myColor,0xFF0000,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0xFF0000){
+                colorStage++;
+            }
+        } else if(colorStage == 7){
+            myColor = mergeColors(myColor,0x9400D3,1);
+            allColor(colorHex(myColor));
+            if(myColor == 0x9400D3){
+                colorStage = 1;
+            }
+        }
     }
 }
