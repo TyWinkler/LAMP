@@ -114,7 +114,7 @@ void Controller( void *pvParameters ){
     strcpy(_tz.tzname,"CST");
     strcpy(_tz.dstname,"DST");
 
-    apiUpdateTime(3702061156);
+    apiUpdateTime(3702061156 - (3600*5));
 
     static int prev_min = 0;
     allColor(colorHex(LEDoff));

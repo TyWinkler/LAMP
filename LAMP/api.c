@@ -218,7 +218,7 @@ void apiPlayTheme(int themeId){
             songChanged = 1;
             if(strcmp(songname,"NA") == 0){
                 g_ucSpkrStartFlag = 0;
-                FillZeroes(pRxBuffer, BUFFSIZE);
+                //FillZeroes(pRxBuffer, BUFFSIZE);
             } else {
                 g_ucSpkrStartFlag = 1;
             }
@@ -268,7 +268,7 @@ void getAlarms(){
         f_read(&tafp,alarms,sizeof(struct alarm) * 30,&taSize);
         f_close(&tafp);
     } else {
-        LcdPrintf("Failed to open themes");
+        LcdPrintf("Failed to open alarms");
     }
     closeTADir();
     osi_ExitCritical(key);

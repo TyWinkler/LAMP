@@ -64,6 +64,7 @@
 #include "pcm_handler.h"
 
 #include "ff.h"
+#include "api.h"
 //Network
 
 
@@ -279,6 +280,14 @@ int main(){
     osi_SyncObjCreate(&g_ControllerSyncObj);
     osi_SyncObjCreate(&g_NetworkSyncObj);
     osi_SyncObjCreate(&g_FatFSSyncObj);
+
+//#define RESETSPECIAL
+#ifdef RESETSPECIAL
+    apiEditTheme(0,0x000000,"NA",1);
+    apiEditTheme(1,0x000000,"NA",2);
+    apiEditTheme(2,0x000000,"NA",3);
+
+#endif
 
     // Start the Controller Task
 #ifdef CONTROLLER
