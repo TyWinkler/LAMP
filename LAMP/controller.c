@@ -119,20 +119,16 @@ void Controller( void *pvParameters ){
         //
         MAP_TimerEnable(TIMERA2_BASE,TIMER_A);
 
-    //time(&currentTime);
-    //PRCMRTCInUseSet();
-    //unsigned short throwaway = 0;
-    //PRCMRTCSet(currentTime,throwaway);
-    //_tz.timezone = 0;
-    //time_t* toss = 0;
-   // int years = currentTime / 30758400;
-    //int  = currentTime / 30758400;
+    _tz.daylight = -1;
+    _tz.timezone = 21600;
+    strcpy(_tz.tzname,"CST");
+    strcpy(_tz.dstname,"DST");
+
     static int prev_min = 0;
     allColor(colorHex(LEDoff));
     getThemes();
     getAlarms();
-    //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
-    //currentTime = (time_t) RTCU32SecRegRead(void);
+
     ts = localtime(&currentTime);
     strftime(myTime, 80, "%b %d %I:%M %p", ts);
     timeHasChanged = 1;
