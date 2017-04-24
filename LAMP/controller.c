@@ -126,6 +126,9 @@ void Controller( void *pvParameters ){
     timeHasChanged = 1;
     LCD();
 
+    apiEditTheme(0,0x000000,"NA",1);
+    apiEditAlarm(1720, 0, 0, 0, 1);
+
 //#define RESETSPECIAL
 #ifdef RESETSPECIAL
     apiEditTheme(0,0x000000,"NA",1);
