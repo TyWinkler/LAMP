@@ -248,30 +248,30 @@ void clearStrip(){
 //! \return unsigned long color
 //
 //*****************************************************************************
-unsigned long mergeColors(unsigned long start, unsigned long end, int speed){
-    unsigned long startColor = start;
-    if(((end & 0xFF0000) - (startColor & 0xFF0000)) < speed){
+unsigned long mergeColors(long start, long end, int speed){
+    long startColor = start;
+    if((abs((long)((long)(end & 0xFF0000) - (long)(startColor & 0xFF0000))) <= speed * 0x010000)){
         startColor = (end & 0xFF0000) | (startColor & 0x00FFFF);
     }
-    if(((end & 0x00FF00) - (startColor & 0x00FF00)) < speed){
+    if(abs((long)((long)(end & 0x00FF00) - (long)(startColor & 0x00FF00))) <= speed * 0x0100){
         startColor = (end & 0x00FF00) | (startColor & 0xFF00FF);
     }
-    if(((end & 0x0000FF) - (startColor & 0x0000FF)) < speed){
+    if(abs((long)((long)(end & 0x0000FF) - (long)(startColor & 0x0000FF))) <= speed){
         startColor = (end & 0x0000FF) | (startColor & 0xFFFF00);
     }
-    if((start & 0xFF0000) > (end & 0xFF0000)){
+    if((startColor & 0xFF0000) > (end & 0xFF0000)){
         startColor -= 0x010000 * speed;
-    } else if((start & 0xFF0000) < (end & 0xFF0000)){
+    } else if((startColor & 0xFF0000) < (end & 0xFF0000)){
         startColor += 0x010000 * speed;
     }
-    if((start & 0x00FF00) > (end & 0x00FF00)){
+    if((startColor & 0x00FF00) > (end & 0x00FF00)){
         startColor -= 0x000100 * speed;
-    } else if((start & 0x00FF00) < (end & 0x00FF00)){
+    } else if((startColor & 0x00FF00) < (end & 0x00FF00)){
         startColor += 0x000100 * speed;
     }
-    if((start & 0x0000FF) > (end & 0x0000FF)){
+    if((startColor & 0x0000FF) > (end & 0x0000FF)){
         startColor -= 0x000001 * speed;
-    } else if((start & 0x0000FF) < (end & 0x0000FF)){
+    } else if((startColor & 0x0000FF) < (end & 0x0000FF)){
         startColor += 0x000001 * speed;
     }
     return startColor;
