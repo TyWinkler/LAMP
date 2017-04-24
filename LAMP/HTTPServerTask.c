@@ -737,8 +737,8 @@ int APIparse(char *commands){
 #ifdef DEBUG
             LcdPrintf(token);
 #endif
-                special= token[0] -0x30;
-                apiEditTheme(themeID, color, song, special);
+                special= token[0];
+                apiEditTheme(themeID, color, song, 0);
                 return 1;
             }
         }
