@@ -8,8 +8,9 @@
 #include "api.h"
 #include "hw_types.h"
 #include "hw_ints.h"
+#include "hw_memmap.h"
 #include "osi.h"
-#include "prcm.h"
+#include "timer.h"
 #include "LCD.h"
 #include "LPD8806.h"
 #include "grlib.h"
@@ -28,6 +29,7 @@ extern unsigned char songChanged;
 extern alarm alarms[30];
 extern theme themes[30];
 //extern TCHAR* myWav;
+time_t baseTime = 0;
 time_t currentTime = 0;
 struct tm* ts;
 char myTime[20];
@@ -52,6 +54,12 @@ extern OsiSyncObj_t g_SpeakerSyncObj;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
+
+void TimerIntHandler(void){
+    MAP_TimerIntClear(TIMERA2_BASE,TIMER_TIMA_TIMEOUT);
+    // TO-DO
+    currentTime = baseTime + 1;
+}
 
 void playTheme(theme* playme){
     //myWav = playme->song;
@@ -85,10 +93,30 @@ void hasAlarmPlayed(void){
 int once = 0; // test
 
 void Controller( void *pvParameters ){
+        //
+        // Register timer interrupt hander
+        //
+        MAP_TimerIntRegister(TIMERA2_BASE,TIMER_A,TimerIntHandler);
+        //
+        // Configure the timer
+        //
+        MAP_TimerConfigure(TIMERA2_BASE,TIMER_CFG_PERIODIC);
+        //
+        // Set the reload value
+        //
+        MAP_TimerLoadSet(TIMERA2_BASE,TIMER_A,80000000);
+        //
+        // Enable capture event interrupt
+        //
+        MAP_TimerIntEnable(TIMERA2_BASE,TIMER_TIMA_TIMEOUT);
+        //
+        // Enable Timer
+        //
+        MAP_TimerEnable(TIMERA2_BASE,TIMER_A);
 
     //time(&currentTime);
     //PRCMRTCInUseSet();
-    unsigned short throwaway = 0;
+    //unsigned short throwaway = 0;
     //PRCMRTCSet(currentTime,throwaway);
     //_tz.timezone = 0;
     //time_t* toss = 0;
@@ -98,7 +126,7 @@ void Controller( void *pvParameters ){
     allColor(colorHex(LEDoff));
 //    getThemes();
 //    getAlarms();
-    PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+    //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
     //currentTime = (time_t) RTCU32SecRegRead(void);
     ts = localtime(&currentTime);
     strftime(myTime, 80, "%b %d %I:%M %p", ts);
@@ -117,7 +145,7 @@ void Controller( void *pvParameters ){
 
         osi_SyncObjWait(&g_ControllerSyncObj,1000);
         //currentTime = (time_t) RTCU32SecRegRead(void);
-        PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
+        //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
             strftime(myTime, 80, "%b %d %I:%M %p", ts);
