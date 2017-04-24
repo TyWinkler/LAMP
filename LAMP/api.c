@@ -79,7 +79,7 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
-        if(alarms[i].alarmId == alarmId){
+        if(alarms[i].alarmId == alarmId && alarms[i].active){
             storageId = i;
             break;
         }

@@ -149,11 +149,11 @@ void Controller( void *pvParameters ){
             int i;
             for(i = 0; i < 30; i++){
                 if(alarms[i].active &&
+                   alarms[i].running == 1 &&
                    alarms[i].time/100 == ts->tm_hour &&
                    alarms[i].time%100 == ts->tm_min &&
-                   alarms[i].running == 1 &&
-                   !currentAlarmHasPlayed &&
-                   !snoozing)
+                   !currentAlarmHasPlayed)// &&
+                   //!snoozing)
                 {
                     currentAlarm = &alarms[i];
                     currentTheme = &themes[alarms[i].themeId];
@@ -161,10 +161,10 @@ void Controller( void *pvParameters ){
                     break;
                 }
             }
-            if(snoozing && snoozetime == ts->tm_min){
-                snoozing = 0;
-                apiPlayTheme(currentAlarm->themeId);
-            }
+//            if(snoozing && snoozetime == ts->tm_min){
+//                snoozing = 0;
+//                apiPlayTheme(currentAlarm->themeId);
+//            }
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }
