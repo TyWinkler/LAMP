@@ -85,12 +85,12 @@ void PinMuxConfig(void){
     MAP_PinConfigSet(PIN_58,PIN_STRENGTH_2MA|PIN_STRENGTH_4MA,PIN_TYPE_STD_PD);
 
     // Speakers
-    MAP_PinTypeI2C(PIN_03, PIN_MODE_5); // Configure PIN_03 for I2C0 I2C_S <----
+    MAP_PinTypeI2C(PIN_03, PIN_MODE_5); // Configure PIN_03 for I2C0 I2C_SCL
     MAP_PinTypeI2C(PIN_04, PIN_MODE_5); // Configure PIN_04 for I2C0 I2C_SDA
     MAP_PinTypeI2S(PIN_60, PIN_MODE_6); // Configure PIN_60 for McASP0 McASP0_McAXR1
     MAP_PinTypeI2S(PIN_45, PIN_MODE_6); // Configure PIN_45 for McASP0 McASP0_McAXR0
     MAP_PinTypeI2S(PIN_15, PIN_MODE_7); // Configure PIN_15 for McASP0 McASP0_McAFSX
-    MAP_PinTypeI2S(PIN_53, PIN_MODE_2); // Configure PIN_53 for McASP0 McASP0_McACLK <----
+    MAP_PinTypeI2S(PIN_53, PIN_MODE_2); // Configure PIN_53 for McASP0 McASP0_McACLK
 
     // SDCard Reader
     MAP_PinTypeSDHost(PIN_64, PIN_MODE_6); // Configure PIN_64 for SDHost0 SDCARD_DATA
