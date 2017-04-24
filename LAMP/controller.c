@@ -62,13 +62,6 @@ void TimerIntHandler(void){
     currentTime = currentTime + 1;
 }
 
-void playTheme(theme* playme){
-    //myWav = playme->song;
-    g_ucSpkrStartFlag = true;
-    songChanged = true;
-    myColor = playme->color;
-}
-
 void snooze(void){
     g_ucSpkrStartFlag = false;
     myColor = LEDoff;
@@ -77,10 +70,7 @@ void snooze(void){
 }
 
 void alarmOff(void){
-    g_ucSpkrStartFlag = false;
-    myColor = LEDoff;
     snoozing = 0;
-    currentAlarm->running = 0;
 }
 
 void hasAlarmPlayed(void){
@@ -124,6 +114,8 @@ void Controller( void *pvParameters ){
     strcpy(_tz.tzname,"CST");
     strcpy(_tz.dstname,"DST");
 
+    apiUpdateTime(3702061156);
+
     static int prev_min = 0;
     allColor(colorHex(LEDoff));
     getThemes();
@@ -156,20 +148,19 @@ void Controller( void *pvParameters ){
                 if(alarms[i].active &&
                    alarms[i].time/100 == ts->tm_hour &&
                    alarms[i].time%100 == ts->tm_min &&
-                   alarms[i].running == 0 &&
+                   alarms[i].running == 1 &&
                    !currentAlarmHasPlayed &&
                    !snoozing)
                 {
                     currentAlarm = &alarms[i];
                     currentTheme = &themes[alarms[i].themeId];
-                    playTheme(currentTheme);
-                    alarms[i].running = 1;
+                    apiPlayTheme(currentAlarm->themeId);
                     break;
                 }
             }
             if(snoozing && snoozetime == ts->tm_min){
                 snoozing = 0;
-                playTheme(currentTheme);
+                apiPlayTheme(currentAlarm->themeId);
             }
             hasAlarmPlayed();
             prev_min = ts->tm_min;
