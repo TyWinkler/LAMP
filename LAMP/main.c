@@ -269,8 +269,8 @@ int main(){
     SPIInit();
     LCDReset();
     displaymytext();
-    PRCMRTCInUseSet();
-    PRCMRTCSet(0,0);
+    //PRCMRTCInUseSet();
+    //PRCMRTCSet(0,0);
 
     configureAudio();
 
