@@ -87,9 +87,9 @@ int once = 0; // test
 void Controller( void *pvParameters ){
 
     //time(&currentTime);
-    PRCMRTCInUseSet();
+    //PRCMRTCInUseSet();
     unsigned short throwaway = 0;
-    PRCMRTCSet(currentTime,throwaway);
+    //PRCMRTCSet(currentTime,throwaway);
     //_tz.timezone = 0;
     //time_t* toss = 0;
    // int years = currentTime / 30758400;

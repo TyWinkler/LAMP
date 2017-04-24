@@ -48,6 +48,7 @@
 #include "utils.h"
 #include "spi.h"
 #include "LCD.h"
+#include "prcm.h"
 
 //Common interface includes
 #include "common.h"
@@ -268,6 +269,8 @@ int main(){
     SPIInit();
     LCDReset();
     displaymytext();
+    PRCMRTCInUseSet();
+    PRCMRTCSet(0,0);
 
     configureAudio();
 
