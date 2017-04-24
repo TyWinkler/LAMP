@@ -9,6 +9,7 @@
 #include "hw_types.h"
 #include "hw_ints.h"
 #include "hw_memmap.h"
+#include "prcm.h"
 #include "osi.h"
 #include "timer.h"
 #include "LCD.h"
@@ -93,6 +94,8 @@ void hasAlarmPlayed(void){
 int once = 0; // test
 
 void Controller( void *pvParameters ){
+
+        MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
         //
         // Register timer interrupt hander
         //
