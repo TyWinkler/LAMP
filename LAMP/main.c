@@ -257,6 +257,21 @@ void BoardInit(void){
     PRCMCC3200MCUInit();
 }
 
+int off_btn_flag = 0;
+void Off_btn_handler(void){
+    unsigned long ulStatus;
+    ulStatus = GPIOIntStatus(GPIOA2_BASE, true);
+    off_btn_flag = 1;
+    GPIOIntClear(GPIOA2_BASE, ulStatus);
+}
+
+void GPIO_init(void){
+    PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
+    PinTypeGPIO(PIN_08, PIN_MODE_0, false);
+    GPIODirModeSet(GPIOA2_BASE, 0x2, GPIO_DIR_MODE_IN);
+    GPIO_IF_ConfigureNIntEnable(GPIOA2_BASE, 0x2, GPIO_RISING_EDGE, Off_btn_handler);
+}
+
 //******************************************************************************
 //                            MAIN FUNCTION
 //******************************************************************************
@@ -270,9 +285,7 @@ int main(){
     SPIInit();
     LCDReset();
     displaymytext();
-    //PRCMRTCInUseSet();
-    //PRCMRTCSet(0,0);
-
+    GPIO_init();
     configureAudio();
 
     //Test

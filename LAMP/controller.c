@@ -48,6 +48,7 @@ extern const tDisplay g_ssalowCC3200_ili9341;
 extern tContext sContext;
 unsigned int specialColor = 0;
 unsigned long key;
+extern int off_btn_flag;
 
 extern OsiSyncObj_t g_ControllerSyncObj;
 extern OsiSyncObj_t g_SpeakerSyncObj;
@@ -171,6 +172,10 @@ void Controller( void *pvParameters ){
             }
             hasAlarmPlayed();
             prev_min = ts->tm_min;
+        }
+        if(off_btn_flag == 1){
+            off_btn_flag = 0;
+            apiOff();
         }
 #ifndef DEBUG
         LCD();
