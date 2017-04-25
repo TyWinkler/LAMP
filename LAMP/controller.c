@@ -117,7 +117,9 @@ void Controller( void *pvParameters ){
     apiUpdateTime(3702061156 - (3600*5));
 
     static int prev_min = 0;
+    unsigned long key = osi_EnterCritical();
     allColor(colorHex(LEDoff));
+    osi_ExitCritical(key);
     getThemes();
     getAlarms();
 
@@ -126,8 +128,8 @@ void Controller( void *pvParameters ){
     timeHasChanged = 1;
     LCD();
 
-    apiEditTheme(0,0x000000,"NA",1);
-    apiEditAlarm(1720, 0, 0, 0, 1);
+    //apiEditTheme(0,0x000000,"NA",1);
+    //apiEditAlarm(1720, 0, 0, 0, 1);
 
 //#define RESETSPECIAL
 #ifdef RESETSPECIAL
@@ -152,19 +154,21 @@ void Controller( void *pvParameters ){
                    alarms[i].running == 1 &&
                    alarms[i].time/100 == ts->tm_hour &&
                    alarms[i].time%100 == ts->tm_min &&
-                   !currentAlarmHasPlayed)// &&
-                   //!snoozing)
+                   !currentAlarmHasPlayed &&
+                   !snoozing)
                 {
                     currentAlarm = &alarms[i];
                     currentTheme = &themes[alarms[i].themeId];
+                    apiOff();
                     apiPlayTheme(currentAlarm->themeId);
                     break;
                 }
             }
-//            if(snoozing && snoozetime == ts->tm_min){
-//                snoozing = 0;
-//                apiPlayTheme(currentAlarm->themeId);
-//            }
+            if(snoozing && snoozetime == ts->tm_min){
+                snoozing = 0;
+                apiOff();
+                apiPlayTheme(currentAlarm->themeId);
+            }
             hasAlarmPlayed();
             prev_min = ts->tm_min;
         }

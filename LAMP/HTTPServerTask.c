@@ -597,6 +597,7 @@ int APIparse(char *commands){
             LcdPrintf(token);
 #endif
             if(strncmp(token, "NA",2) != 0){
+
                 time=strtol(token, NULL, 10);
             }
 
@@ -640,7 +641,7 @@ int APIparse(char *commands){
 #ifdef DEBUG
                 LcdPrintf(token);
 #endif
-                    alarmID = token[0];
+                alarmID = strtol(token, NULL, 10);
                     //token should just contain the one char
             }
 
@@ -655,7 +656,7 @@ int APIparse(char *commands){
                 LcdPrintf(token);
 #endif
                 if(strncmp(token, "NA",2) != 0){
-                    running= token[0];
+                    running = strtol(token, NULL, 10);
                     //token should just contain the one char
                 }
             }
@@ -790,11 +791,14 @@ int APIparse(char *commands){
         token=strtok(NULL, "=");
         unsigned long time;
         if(strcmp(token, "time")==0){
-            token=strtok(NULL, "");
-            //LcdPrintf("%d",token);
-            time = strtol(token, NULL, 10);
-            //LcdPrintf("%d",time);
-            //apiUpdateTime(time);
+            token=strtok(NULL, ".");
+            //g_lLcdCursorY = 150;
+            //LcdPrintf(token);
+            char ptr[11];
+            strncpy(ptr,token,10);
+            //LcdPrintf(ptr);
+            time = atol(ptr);
+            apiUpdateTime(time - (3600*5));
             return 1;
         }
     }

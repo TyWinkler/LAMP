@@ -86,7 +86,7 @@ OsiSyncObj_t g_FatFSSyncObj;
 
 #define OSI_STACK_SIZE          1024
 #define SAMPLERATE              44100
-#define SPI_IF_BIT_RATE         20000000
+#define SPI_IF_BIT_RATE         10000000
 #define TIMER_FREQ              80000000
 #define PLAY_BUFFER_SIZE        70*1024
 #define PLAY_WATERMARK          50*1024

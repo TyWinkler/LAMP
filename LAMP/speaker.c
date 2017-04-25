@@ -118,6 +118,7 @@ void openFile(){
     if(songChanged){
         seekVal = 0;
         songChanged = 0;
+        FillZeroes(pRxBuffer, BUFFSIZE);
     }
     Message("\n\rReading user file...\n\r");
     songres = f_open(&songfp,myWav,FA_READ);
@@ -165,9 +166,9 @@ void Speaker( void *pvParameters ){
     openFile();
     g_ucSpkrStartFlag = 0;
     while(1){
-        osi_SyncObjWait(&g_SpeakerSyncObj,10);
+        osi_SyncObjWait(&g_SpeakerSyncObj,20);
         while(g_ucSpkrStartFlag){
-            osi_SyncObjWait(&g_SpeakerSyncObj,10);
+            osi_SyncObjWait(&g_SpeakerSyncObj,20);
             // Read from file and discard wav header
             //unsigned long key = osi_EnterCritical();
             readFile();

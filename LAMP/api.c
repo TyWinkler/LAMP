@@ -79,7 +79,7 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
     int i;
     int storageId = -1;
     for(i = 0; i < 30; i++){
-        if(alarms[i].alarmId == alarmId && alarms[i].active){
+        if(alarms[i].alarmId == alarmId){
             storageId = i;
             break;
         }
@@ -108,6 +108,8 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
         if(alarms[storageId].active == 0){
             alarms[storageId].active = 1;
         }
+        //g_lLcdCursorY = 150;
+        //LcdPrintf("%d.%d.%d.%d",time,themeId,alarmId,running);
         storeAlarms();
     }
 }
@@ -306,7 +308,7 @@ void getThemes(){
         f_read(&tafp,themes,sizeof(struct theme) * 30,&taSize);
         f_close(&tafp);
     } else {
-        LcdPrintf("Failed to open themes");
+        //LcdPrintf("Failed to open themes");
     }
     closeTADir();
     osi_ExitCritical(key);
@@ -325,7 +327,7 @@ void storeThemes(){
         f_write(&tafp,themes,sizeof(struct theme) * 30,&taSize);
         f_close(&tafp);
     } else {
-        LcdPrintf("Failed to create a new file");
+        //LcdPrintf("Failed to create a new file");
     }
     closeTADir();
     osi_ExitCritical(key);

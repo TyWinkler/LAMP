@@ -40,11 +40,12 @@
 
 #include "gpio.h"
 
+#include "osi.h"
+
 
 // Global Variables
 #define SPI_IF_BIT_RATE  5000
-#define NUMLEDS 6
-
+#define NUMLEDS 18
 unsigned long pixels[NUMLEDS];
 unsigned long myColor = 0x000000;
 unsigned long LEDWrite = 0;
@@ -92,6 +93,7 @@ void LPD8806Init(){
 //
 //*****************************************************************************
 void reset(){
+    unsigned long key = osi_EnterCritical();
     unsigned int i;
     unsigned long ulDummy;
 
@@ -105,6 +107,7 @@ void reset(){
     }
 
     MAP_SPICSDisable(GSPI_BASE);
+    osi_ExitCritical(key);
 }
 
 //*****************************************************************************
@@ -121,7 +124,7 @@ void reset(){
 void display(){
     unsigned int i;
     unsigned long ulDummy;
-
+    unsigned long key = osi_EnterCritical();
     GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_0,1);  // pin 50 GPIO_PIN_0
 
     // Enable SPI Transfer
@@ -143,6 +146,7 @@ void display(){
     reset();
 
     GPIOPinWrite(GPIOA0_BASE,GPIO_PIN_0,0);
+    osi_ExitCritical(key);
 }
 
 //*****************************************************************************
@@ -161,9 +165,12 @@ void display(){
 //*****************************************************************************
 unsigned long color(unsigned char r, unsigned char g, unsigned char b){
     unsigned long c;
-    c = 0x808080 | (((unsigned long)g / 2) << 16)
+//    c = 0x808080 | (((unsigned long)g / 2) << 16)
+//                 | (((unsigned long)r / 2) << 8)
+//                 | ((unsigned long)b / 2);
+    c = 0x808080 | ((unsigned long)g / 2)
                  | (((unsigned long)r / 2) << 8)
-                 | ((unsigned long)b / 2);
+                 | (((unsigned long)b / 2) << 16);
     return c;
 }
 
@@ -186,9 +193,12 @@ unsigned long colorHex(unsigned long hex){
     g = (hex >> 8) & 0xFF;
     r = (hex >> 16) & 0xFF;
     b = (hex) & 0xFF;
-    c = 0x808080 | (((unsigned long)g / 2) << 16)
+//    c = 0x808080 | (((unsigned long)g / 2) << 16)
+//                 | (((unsigned long)r / 2) << 8)
+//                 | ((unsigned long)b / 2);
+    c = 0x808080 | ((unsigned long)g / 2)
                  | (((unsigned long)r / 2) << 8)
-                 | ((unsigned long)b / 2);
+                 | (((unsigned long)b / 2) << 16);
     return c;
 }
 
@@ -219,11 +229,13 @@ void setPixel(unsigned int p, unsigned long color){
 //
 //*****************************************************************************
 void allColor(unsigned long color){
+    unsigned long key = osi_EnterCritical();
     int i;
     for(i = 0; i < NUMLEDS; i++){
         setPixel(i,color);
     }
     display();
+    osi_ExitCritical(key);
 }
 
 //*****************************************************************************
