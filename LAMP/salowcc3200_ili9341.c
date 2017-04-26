@@ -467,7 +467,7 @@ salowCC3200_ili9341InitScreen(void)
       WriteData(0x86);  //--
 
       WriteCommand(ILI9341_MADCTL);    // Memory Access Control
-      WriteData(0x48);
+      WriteData(0x88);
 
       WriteCommand(ILI9341_PIXFMT);
       WriteData(0x55);
