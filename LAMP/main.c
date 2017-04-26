@@ -208,7 +208,7 @@ void configureAudio(){
     // Configure Audio Codec
     AudioCodecReset(AUDIO_CODEC_TI_3254, NULL);
     AudioCodecConfig(AUDIO_CODEC_TI_3254, AUDIO_CODEC_16_BIT, SAMPLERATE, AUDIO_CODEC_STEREO, AUDIO_CODEC_SPEAKER_ALL, AUDIO_CODEC_MIC_NONE);
-    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 60);
+    AudioCodecSpeakerVolCtrl(AUDIO_CODEC_TI_3254, AUDIO_CODEC_SPEAKER_ALL, 40);
 
     // Initialize the Audio(I2S) Module
     AudioInit();

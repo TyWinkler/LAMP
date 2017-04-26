@@ -597,8 +597,7 @@ int APIparse(char *commands){
             LcdPrintf(token);
 #endif
             if(strncmp(token, "NA",2) != 0){
-
-                time=strtol(token, NULL, 10);
+                time=atol(token);
             }
 
             //parse theme_id
@@ -612,7 +611,7 @@ int APIparse(char *commands){
                 LcdPrintf(token);
 #endif
                 if(strncmp(token, "NA",2)!=0){
-                    themeID = -1;
+                    themeID =atol(token);
                     //token should just contain the one char if not NA
                 }
             }

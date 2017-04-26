@@ -19,7 +19,7 @@
 #include "prcm.h"
 #include "LPD8806.h"
 #include "circ_buff.h"
-#define BUFFSIZE                1024*10
+#define BUFFSIZE                1024
 
 //struct theme{
 //    unsigned long color;
@@ -62,7 +62,9 @@ void apiOff(){
     allColor(colorHex(myColor));
     g_ucSpkrStartFlag = 0;
     specialColor = 0;
-    FillZeroes(pRxBuffer, BUFFSIZE);
+//    int temp = GetBufferSize(pRxBuffer);
+//    UpdateReadPtr(pRxBuffer, temp);
+    //FillZeroes(pRxBuffer, BUFFSIZE*50);
 }
 
 //immediately changes the color
@@ -108,7 +110,7 @@ void apiEditAlarm(int time, int themeId, int dow, int alarmId, int running){
         if(alarms[storageId].active == 0){
             alarms[storageId].active = 1;
         }
-        //g_lLcdCursorY = 150;
+        g_lLcdCursorY = 150;
         //LcdPrintf("%d.%d.%d.%d",time,themeId,alarmId,running);
         storeAlarms();
     }

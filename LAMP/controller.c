@@ -125,7 +125,7 @@ void Controller( void *pvParameters ){
     getAlarms();
 
     ts = localtime(&currentTime);
-    strftime(myTime, 80, "%b %d %I:%M %p", ts);
+    strftime(myTime, 20, "%b %d %I:%M %p", ts);
     timeHasChanged = 1;
     LCD();
 
@@ -147,7 +147,7 @@ void Controller( void *pvParameters ){
         //PRCMRTCGet((unsigned long*)&currentTime, &throwaway);
         ts = localtime(&currentTime);
         if(prev_min != ts->tm_min){
-            strftime(myTime, 80, "%b %d %I:%M %p", ts);
+            strftime(myTime, 20, "%b %d %I:%M %p", ts);
             timeHasChanged = 1;
             int i;
             for(i = 0; i < 30; i++){
@@ -175,6 +175,7 @@ void Controller( void *pvParameters ){
         }
         if(off_btn_flag == 1){
             off_btn_flag = 0;
+
             apiOff();
         }
 #ifndef DEBUG
